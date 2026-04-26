@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class ForkliftMapper {
 
     private final TaskMapper taskMapper;
+    private final LocationMapper locationMapper;
 
     public ForkliftResponse toResponse(Forklift entity) {
         if (entity == null) return null;
@@ -19,7 +20,8 @@ public class ForkliftMapper {
                 entity.getWeightCapacity(),
                 entity.getTasks().stream()
                         .map(taskMapper::toResponse)
-                        .toList()
+                        .toList(),
+                locationMapper.toResponse(entity.getCurrentLocation())
         );
     }
 

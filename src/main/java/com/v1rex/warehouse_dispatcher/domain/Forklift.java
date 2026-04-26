@@ -28,4 +28,10 @@ public class Forklift {
                 cascade = CascadeType.ALL,
                 fetch = FetchType.EAGER)
     private List<Task> tasks = new ArrayList<>();
+
+
+    @ManyToOne
+    @JoinColumn(name = "current_location_id")
+    private Location currentLocation;
+
 }

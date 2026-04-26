@@ -1,6 +1,6 @@
 package com.v1rex.warehouse_dispatcher.dto;
 
-import io.smallrye.common.constraint.NotNull;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
 
 
