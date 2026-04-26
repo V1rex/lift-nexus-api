@@ -1,6 +1,7 @@
 package com.v1rex.warehouse_dispatcher.web;
 
 
+import com.v1rex.warehouse_dispatcher.dto.ForkliftLocationUpdateRequest;
 import com.v1rex.warehouse_dispatcher.dto.ForkliftRequest;
 import com.v1rex.warehouse_dispatcher.dto.ForkliftResponse;
 import com.v1rex.warehouse_dispatcher.service.ForkliftService;
@@ -39,6 +40,20 @@ public class ForkliftController {
 
         return ResponseEntity.created(location).body(savedForklift);
     }
+
+    @PutMapping("/{id}/location")
+    public ResponseEntity<ForkliftResponse> updateForkliftLocation(
+            @PathVariable Long id,
+            @Valid @RequestBody ForkliftLocationUpdateRequest updateRequest
+            ){
+
+        ForkliftResponse updatedForklift = forkliftService.updateForkliftLocation(id,
+                updateRequest.locationId());
+
+        return ResponseEntity.ok(updatedForklift);
+
+    }
+
 
     @GetMapping
     public ResponseEntity<Page<ForkliftResponse>> findAllForklifts(

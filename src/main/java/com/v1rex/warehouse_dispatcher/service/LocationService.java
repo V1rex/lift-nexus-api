@@ -40,13 +40,13 @@ public class LocationService {
     }
 
 
-    public Location findEntityById(Long id) {
+    protected Location findEntityById(Long id) {
         return locationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location  with "
                 + id + " not found."));
     }
 
-    public Page<Location> findAllEntities(Pageable pageable){
+    protected Page<Location> findAllEntities(Pageable pageable){
         return locationRepository.findAll(pageable);
     }
 

@@ -2,6 +2,7 @@ package com.v1rex.warehouse_dispatcher.service;
 
 
 import com.v1rex.warehouse_dispatcher.domain.Forklift;
+import com.v1rex.warehouse_dispatcher.domain.Location;
 import com.v1rex.warehouse_dispatcher.dto.ForkliftRequest;
 import com.v1rex.warehouse_dispatcher.dto.ForkliftResponse;
 import com.v1rex.warehouse_dispatcher.exceptions.ResourceNotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ForkliftService {
     private final ForkliftRepository forkliftRepository;
     private final ForkliftMapper forkliftMapper;
+    private final LocationService locationService;
 
     @Transactional
     public ForkliftResponse createForklift(ForkliftRequest request){
@@ -35,7 +37,7 @@ public class ForkliftService {
         return forkliftMapper.toResponse(findEntityById(id));
     }
 
-     @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public Page<ForkliftResponse> findAll(Pageable pageable) {
          return findAllEntities(pageable).map(forkliftMapper::toResponse);
      }
@@ -46,6 +48,18 @@ public class ForkliftService {
                                                             Pageable pageable
      ){
          return findEntitiesWithCapacityGreaterThan(weightCapacity, pageable).map(forkliftMapper::toResponse);
+     }
+
+     @Transactional
+     public ForkliftResponse updateForkliftLocation(Long forkLiftId, Long locationId){
+        Forklift forklift = findEntityById(forkLiftId);
+        Location newLocation = locationService.findEntityById(locationId);
+
+        forklift.setCurrentLocation(newLocation);
+
+        Forklift updatedForklift = forkliftRepository.save(forklift);
+
+        return forkliftMapper.toResponse(updatedForklift);
      }
 
      public Forklift findEntityById(Long id) {
