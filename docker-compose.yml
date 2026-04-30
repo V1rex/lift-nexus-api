@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres:16
+    container_name: warehouse-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: warehouse_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
