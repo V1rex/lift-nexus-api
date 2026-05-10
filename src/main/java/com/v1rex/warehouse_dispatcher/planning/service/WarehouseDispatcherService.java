@@ -10,12 +10,15 @@ import com.v1rex.warehouse_dispatcher.forklift.repository.ForkliftRepository;
 import com.v1rex.warehouse_dispatcher.location.repository.LocationRepository;
 import com.v1rex.warehouse_dispatcher.task.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class WarehouseDispatcherService {
     private final LocationRepository locationRepository;
@@ -25,14 +28,17 @@ public class WarehouseDispatcherService {
     private final SolverManager<WarehouseSchedule> solverManager;
 
     private WarehouseSchedule bestSolution;
+    private static final Long SINGLETON_JOB_ID = 1L;
 
     public WarehouseSchedule buildCurrentState() {
-        // 1. Fetch data from the database
+        log.info("Building current warehouse state for optimization...");
         List<Location> locations = locationRepository.findAll();
         List<Forklift> forklifts = forkliftRepository.findAll();
         List<Task> tasks = taskRepository.findAll();
 
-        // 2. Assemble the "Whiteboard" (The Planning Solution)
+        log.debug("Found {} locations, {} forklifts, and {} tasks in DB.",
+                  locations.size(), forklifts.size(), tasks.size());
+
         WarehouseSchedule schedule = new WarehouseSchedule();
         schedule.setLocations(locations);
         schedule.setForklifts(forklifts);
@@ -43,13 +49,25 @@ public class WarehouseDispatcherService {
     }
 
     public void startSolving() {
-        WarehouseSchedule problem = buildCurrentState();
-        // Update the bestSolution as the solver finds better ones
-        // Explicitly define the ID and the lambda
-        Long problemId = 1L;
-        solverManager.solveAndListen(problemId,
-                problem,
-                this::saveSolution);
+        MDC.put("jobId", SINGLETON_JOB_ID.toString());
+        log.info("Attempting to start solver...");
+        try {
+                WarehouseSchedule problem = buildCurrentState();
+                // 2. Start Solving
+                solverManager.solveAndListen(
+                    SINGLETON_JOB_ID,
+                    problem,
+                    this::saveSolution
+                );
+
+                log.info("Solver successfully started in background thread.");
+
+        } catch (Exception e) {
+            log.error("Critical failure while starting the solver: ", e);
+        } finally {
+            // Clear MDC so other logs don't get 'polluted' with this JobId
+            MDC.remove("jobId");
+        }
     }
 
     public WarehouseSchedule getSolution() {
@@ -58,13 +76,32 @@ public class WarehouseDispatcherService {
 
     @Transactional
     public void saveSolution(WarehouseSchedule solution) {
-        for (Forklift forklift : solution.getForklifts()) {
-            for (Task task : forklift.getTasks()) {
-                // MANUALLY sync the relationship before saving
-                task.setForklift(forklift);
-                taskRepository.save(task);
+
+        MDC.put("jobId", SINGLETON_JOB_ID.toString());
+
+        log.info("New best solution found! Score: {}", solution.getScore());
+
+
+        if (solution.getScore().isFeasible()) {
+            log.info("Solution is feasible. Updating task assignments in database.");
+            try {
+                for (Forklift forklift : solution.getForklifts()) {
+                    for (Task task : forklift.getTasks()) {
+                        task.setForklift(forklift);
+                        taskRepository.save(task);
+                    }
+                    forkliftRepository.save(forklift);
+                }
+                log.debug("Database sync complete for all forklifts and tasks.");
+            } catch (Exception e) {
+                log.error("Failed to persist solution to database: ", e);
             }
-            forkliftRepository.save(forklift);
+        } else {
+            log.warn("Latest solution is infeasible (Score: {}). Skipping DB save.",
+                    solution.getScore());
         }
+
+        this.bestSolution = solution;
+        MDC.remove("jobId");
     }
 }
