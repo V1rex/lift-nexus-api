@@ -12,12 +12,14 @@ import com.v1rex.warehouse_dispatcher.task.repository.TaskRepository;
 import com.v1rex.warehouse_dispatcher.task.dto.TaskResponse;
 import com.v1rex.warehouse_dispatcher.task.domain.Task;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
@@ -27,6 +29,9 @@ public class TaskService {
 
     @Transactional
     public TaskResponse createTask(TaskRequest request){
+        log.info("Creating task with pickLocationId: {} and deliveryLocationId: {}",
+                request.pickLocationId(), request.deliveryLocationId());
+
         Location pickLocation = locationService.findEntityById(request.pickLocationId());
         Location deliveryLocation = locationService.findEntityById(request.deliveryLocationId());
 
@@ -40,18 +45,29 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(task);
 
+        log.info("Successfully created Task with Id: {}, pickLocationId: {} and deliveryLocationId: {}",
+        savedTask.getId(), savedTask.getPickLocation().getId(), savedTask.getDeliveryLocation().getId());
+
         return taskMapper.toResponse(savedTask);
     }
 
     @Transactional
     public TaskResponse updateTask(Long id, TaskStatusUpdateRequest newStatusRequest){
+        log.info("Updating task with id: {} to new status: {}", id, newStatusRequest.status());
+
         Task task = findEntityById(id);
 
         TaskStatus currentStatus = task.getStatus();
         TaskStatus newStatus = newStatusRequest.status();
-        checkStatusBeforeUpdate(currentStatus, newStatus );
+        checkStatusBeforeUpdate(id, currentStatus, newStatus );
         // update the status of the task
         task.setStatus(newStatus);
+
+
+        log.info("Successfully updated Task {}: {} -> {}",
+                        task.getId(),
+                        currentStatus,
+                        newStatus);
 
         return taskMapper.toResponse(task);
     }
@@ -73,21 +89,26 @@ public class TaskService {
 
      public Task findEntityById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() ->new ResourceNotFoundException("Task with " + id + " not found.") );
+                .orElseThrow(() ->{
+                    log.warn("Task with id: {} not found.", id);
+                    return new ResourceNotFoundException("Task with " + id + " not found.");} );
     }
 
-     private void checkStatusBeforeUpdate(TaskStatus currentStatus, TaskStatus newStatus){
+     private void checkStatusBeforeUpdate(Long id, TaskStatus currentStatus, TaskStatus newStatus){
                 if (currentStatus == TaskStatus.COMPLETED) {
+                    log.error("Cannot update Task with id: {} because it is already completed.", id);
                     throw new IllegalStateException("Cannot update a" +
                             " task that is already completed.");
                     }
 
                 if (currentStatus == TaskStatus.IN_PROGRESS && newStatus == TaskStatus.OPEN) {
+                    log.error("Cannot update Task with id: {} from in progress to open.", id);
                     throw new IllegalStateException("Cannot un-assign a " +
                             "task that is already in progress.");
                 }
 
                 if (currentStatus == TaskStatus.ASSIGNED && newStatus == TaskStatus.OPEN) {
+                    log.error("Cannot update Task with id: {} from assigned to open.", id);
                     throw new IllegalStateException("Cannot un-assign a " +
                             "task that is already assigned.");
                 }

@@ -7,12 +7,14 @@ import com.v1rex.warehouse_dispatcher.common.exception.ResourceNotFoundException
 import com.v1rex.warehouse_dispatcher.location.mapper.LocationMapper;
 import com.v1rex.warehouse_dispatcher.location.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class LocationService {
 
@@ -22,11 +24,19 @@ public class LocationService {
 
     @Transactional
     public LocationResponse createLocation(LocationRequest request){
+        log.info("Creating location with latitude: {} and longitude: {}", request.latitude(), request.longitude());
         Location location = locationMapper.toEntity(request);
 
-        Location savedForklift = locationRepository.save(location);
+        Location savedLocation = locationRepository.save(location);
 
-        return locationMapper.toResponse(savedForklift);
+
+        log.info("Successfully creation location with Id: {} latitude: {} and longitude: {}",
+                savedLocation.getId(),
+                savedLocation.getLatitude(),
+                savedLocation.getLongitude());
+
+
+        return locationMapper.toResponse(savedLocation);
     }
 
     @Transactional(readOnly=true )
@@ -42,8 +52,10 @@ public class LocationService {
 
     public Location findEntityById(Long id) {
         return locationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Location  with "
-                + id + " not found."));
+                .orElseThrow(() ->{
+                    log.warn("Location with id: {} not found.", id);
+                    return new ResourceNotFoundException("Location  with "
+                            + id + " not found.");});
     }
 
     public Page<Location> findAllEntities(Pageable pageable){

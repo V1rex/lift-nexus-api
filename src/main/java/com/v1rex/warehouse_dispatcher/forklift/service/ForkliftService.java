@@ -10,6 +10,7 @@ import com.v1rex.warehouse_dispatcher.location.service.LocationService;
 import com.v1rex.warehouse_dispatcher.forklift.mapper.ForkliftMapper;
 import com.v1rex.warehouse_dispatcher.forklift.repository.ForkliftRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ForkliftService {
     private final ForkliftRepository forkliftRepository;
@@ -26,10 +28,12 @@ public class ForkliftService {
 
     @Transactional
     public ForkliftResponse createForklift(ForkliftRequest request){
+        log.info("Creating a Forklift: {}", request);
         Forklift forklift = forkliftMapper.toEntity(request);
 
         Forklift savedForklift = forkliftRepository.save(forklift);
 
+        log.info("Successfully created Forklift with Id: {}", savedForklift.getId());
         return forkliftMapper.toResponse(savedForklift);
     }
 
@@ -53,6 +57,7 @@ public class ForkliftService {
 
      @Transactional
      public ForkliftResponse updateForkliftLocation(Long forkLiftId, Long locationId){
+        log.info("Moving Forklift ID {} to Location ID {}", forkLiftId, locationId);
         Forklift forklift = findEntityById(forkLiftId);
         Location newLocation = locationService.findEntityById(locationId);
 
@@ -60,12 +65,17 @@ public class ForkliftService {
 
         Forklift updatedForklift = forkliftRepository.save(forklift);
 
+        log.debug("Update successful for Forklift ID {}", forkLiftId);
         return forkliftMapper.toResponse(updatedForklift);
      }
 
      public Forklift findEntityById(Long id) {
         return forkliftRepository.findById(id)
-                .orElseThrow(() ->new ResourceNotFoundException("Forklift with " + id + " not found.") );
+                .orElseThrow(() ->{
+
+                    log.warn("Lookup failed: Forklift ID {} not found", id);
+                    return new ResourceNotFoundException("Forklift with " + id + " not found.");
+                } );
     }
 
      public Page<Forklift> findAllEntities(Pageable pageable){
