@@ -30,13 +30,13 @@ public class WarehouseDispatcherService {
         // 1. Fetch data from the database
         List<Location> locations = locationRepository.findAll();
         List<Forklift> forklifts = forkliftRepository.findAll();
-        List<Task> unassignedTasks = taskRepository.findByForkliftIsNull();
+        List<Task> tasks = taskRepository.findAll();
 
         // 2. Assemble the "Whiteboard" (The Planning Solution)
         WarehouseSchedule schedule = new WarehouseSchedule();
         schedule.setLocations(locations);
         schedule.setForklifts(forklifts);
-        schedule.setTaskPool(unassignedTasks);
+        schedule.setTaskPool(tasks);
 
         // 3. Return the fully loaded state ready for optimization
         return schedule;
