@@ -23,4 +23,13 @@ jobs:
           cache: 'maven'
 
       - name: Execute Test Suite with Maven
-        run: mvn clean test
+        run: mvn clean package
+
+      - name: Upload Production Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: warehouse-dispatcher-build-assets
+          path: |
+            target/*.jar
+            target/openapi.json
+          retention-days: 7
