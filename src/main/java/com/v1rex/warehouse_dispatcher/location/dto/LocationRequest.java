@@ -1,6 +1,6 @@
 package com.v1rex.warehouse_dispatcher.location.dto;
 
-import io.smallrye.common.constraint.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public record LocationRequest(
     @NotNull Float latitude,
