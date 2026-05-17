@@ -1,7 +1,7 @@
 CREATE TABLE location (
     id BIGSERIAL PRIMARY KEY,
-    latitude FLOAT,
-    longitude FLOAT
+    latitude FLOAT NOT NULL ,
+    longitude FLOAT NOT NULL
 );
 
 

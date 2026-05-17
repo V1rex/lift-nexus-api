@@ -1,9 +1,6 @@
 package com.v1rex.warehouse_dispatcher.location.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -18,8 +15,10 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Float latitude;
 
+    @Column(nullable = false)
     private Float longitude;
 
     public double distanceTo(Location other) {
