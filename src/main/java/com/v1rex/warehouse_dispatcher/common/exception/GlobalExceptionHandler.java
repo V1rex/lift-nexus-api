@@ -2,6 +2,7 @@ package com.v1rex.warehouse_dispatcher.common.exception;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,26 @@ public class GlobalExceptionHandler {
 
         return createErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, request);
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiError> handleConstraintViolationException(
+        ConstraintViolationException ex,
+        HttpServletRequest request) {
+
+    log.warn("Validation failed at {} : {}", request.getRequestURI(), ex.getMessage());
+
+
+    String detailMessage = ex.getConstraintViolations().stream()
+            .map(violation -> violation.getMessage())
+            .findFirst()
+            .orElse("Invalid request parameter.");
+
+    return createErrorResponse(
+            detailMessage,
+            HttpStatus.BAD_REQUEST,
+            request
+    );
+}
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneralException(

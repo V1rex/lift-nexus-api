@@ -26,6 +26,27 @@ import java.net.URI;
 public class ForkliftController {
     private final ForkliftService forkliftService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ForkliftResponse> getForkliftById(@PathVariable Long id) {
+        return ResponseEntity.ok(forkliftService.findById(id));
+    }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<ForkliftResponse>> findWithCapacity(
+            @RequestParam @Min(1) Integer minCapacity,
+            @PageableDefault(size = 10, sort = "weightCapacity") Pageable pageable
+    ) {
+        return ResponseEntity.ok(forkliftService.findWithCapacityGreaterThan(minCapacity, pageable));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ForkliftResponse>> findAllForklifts(
+          @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(forkliftService.findAll(pageable));
+    }
+
     @PostMapping
     public ResponseEntity<ForkliftResponse> createForklift(
             @RequestBody @Valid ForkliftRequest request
@@ -53,29 +74,6 @@ public class ForkliftController {
         return ResponseEntity.ok(updatedForklift);
 
     }
-
-
-    @GetMapping
-    public ResponseEntity<Page<ForkliftResponse>> findAllForklifts(
-          @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(forkliftService.findAll(pageable));
-    }
-
-
-    @GetMapping("/search")
-    public ResponseEntity<Page<ForkliftResponse>> findWithCapacity(
-            @RequestParam @Min(1) Integer minCapacity,
-            @PageableDefault(size = 10, sort = "weightCapacity") Pageable pageable
-    ) {
-        return ResponseEntity.ok(forkliftService.findWithCapacityGreaterThan(minCapacity, pageable));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ForkliftResponse> getForkliftById(@PathVariable Long id) {
-        return ResponseEntity.ok(forkliftService.findById(id));
-    }
-
 
 
 }
