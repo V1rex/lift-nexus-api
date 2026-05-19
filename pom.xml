@@ -187,9 +187,6 @@
                             <excludes>
                                 <exclude>**/config/**</exclude>
                                 <exclude>**/common/exception/**</exclude>
-                                <exclude>**/*DTO*</exclude>
-                                <exclude>**/*Entity*</exclude>
-                                <exclude>**/*Mapper*</exclude>
                             </excludes>
                         </configuration>
                     </execution>

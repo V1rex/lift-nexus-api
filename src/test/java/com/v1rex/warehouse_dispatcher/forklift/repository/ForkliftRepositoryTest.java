@@ -1,6 +1,7 @@
 package com.v1rex.warehouse_dispatcher.forklift.repository;
 
 import com.v1rex.warehouse_dispatcher.forklift.domain.Forklift;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class ForkliftRepositoryTest {
                     .build();
 
             assertThatThrownBy(() -> forkliftRepository.saveAndFlush(invalidForklift))
-                    .isInstanceOf(Exception.class);
+                    .isInstanceOf(ConstraintViolationException.class);
         }
 
         @Test
@@ -48,7 +49,7 @@ public class ForkliftRepositoryTest {
                     .build();
 
             assertThatThrownBy(() -> forkliftRepository.saveAndFlush(invalidForklift))
-                    .isInstanceOf(Exception.class);
+                    .isInstanceOf(ConstraintViolationException.class);
         }
 
         @Test
@@ -59,7 +60,7 @@ public class ForkliftRepositoryTest {
                     .build();
 
             assertThatThrownBy(() -> forkliftRepository.saveAndFlush(invalidForklift))
-                    .isInstanceOf(Exception.class);
+                    .isInstanceOf(ConstraintViolationException.class);
         }
     }
 
