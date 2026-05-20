@@ -18,6 +18,9 @@ public class TaskMapper {
     public Task toEntity(TaskRequest request){
         if (request == null) return null;
         return Task.builder()
+                // we note that extracting the pickLocation and deliveryLocation
+                // can be taken care of by the LocationService
+                // and will be only injected later to seperate the concerns
                 .weight(request.weight())
                 .status(request.status() != null ?
                         request.status() :
