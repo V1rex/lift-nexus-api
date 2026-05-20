@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>com.v1rex</groupId>
-    <artifactId>Warehouse_Dispatcher</artifactId>
+    <artifactId>lift-nexus-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Warehouse Dispatcher</name>
-    <description>Warehouse Dispatcher</description>
+    <name>LiftNexus API</name>
+    <description>High-performance asynchronous optimization and dispatching engine for intralogistics assets using Timefold and Spring Boot.</description>
     <url/>
     <licenses>
         <license/>
