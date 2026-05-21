@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DispatcherController {
 
-    private final WarehouseDispatcherService dispatcherService;
+  private final WarehouseDispatcherService dispatcherService;
 
-    @PostMapping("/solve")
-    public String solve() {
-        dispatcherService.startSolving();
-        return "Solver started in the background. Optimization is running.";
-    }
+  @PostMapping("/solve")
+  public String solve() {
+    dispatcherService.startSolving();
+    return "Solver started in the background. Optimization is running.";
+  }
 
-    @GetMapping("/solution")
-    public WarehouseSchedule getSolution() {
-        return dispatcherService.buildCurrentState();
-    }
+  @GetMapping("/solution")
+  public WarehouseSchedule getSolution() {
+    return dispatcherService.buildCurrentState();
+  }
 }

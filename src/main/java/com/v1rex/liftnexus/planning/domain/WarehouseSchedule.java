@@ -9,24 +9,23 @@ import ai.timefold.solver.core.api.score.HardSoftScore;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.location.domain.Location;
 import com.v1rex.liftnexus.task.domain.Task;
+import java.util.List;
 import lombok.*;
 
-import java.util.List;
-
 @PlanningSolution
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class WarehouseSchedule {
 
-    @ProblemFactCollectionProperty
-    private List<Location> locations;
+  @ProblemFactCollectionProperty private List<Location> locations;
 
-    @ValueRangeProvider(id = "taskPoolRange")
-    @PlanningEntityCollectionProperty
-    private List<Task> taskPool;
+  @ValueRangeProvider(id = "taskPoolRange")
+  @PlanningEntityCollectionProperty
+  private List<Task> taskPool;
 
-    @PlanningEntityCollectionProperty
-    private List<Forklift> forklifts;
+  @PlanningEntityCollectionProperty private List<Forklift> forklifts;
 
-    @PlanningScore
-    private HardSoftScore score;
+  @PlanningScore private HardSoftScore score;
 }

@@ -11,19 +11,19 @@ import lombok.*;
 @AllArgsConstructor
 public class Location {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private Float latitude;
+  @Column(nullable = false)
+  private Float latitude;
 
-    @Column(nullable = false)
-    private Float longitude;
+  @Column(nullable = false)
+  private Float longitude;
 
-    public double distanceTo(Location other) {
-        double dx = this.latitude - other.latitude;
-        double dy = this.longitude - other.longitude;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
+  public double distanceTo(Location other) {
+    double dx = this.latitude - other.latitude;
+    double dy = this.longitude - other.longitude;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 }

@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ForkliftRepository extends JpaRepository<Forklift, Long> {
 
-    Page<Forklift> findByWeightCapacityGreaterThan(Integer weight, Pageable pageable);
+  Page<Forklift> findByWeightCapacityGreaterThan(Integer weight, Pageable pageable);
 }
