@@ -25,6 +25,72 @@ jobs:
       - name: Execute Test Suite with Maven
         run: mvn clean package
 
+      - name: Evaluate Code Style Compliance
+        id: spotless-status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "style_status=passing" >> $GITHUB_OUTPUT
+            echo "style_color=brightgreen" >> $GITHUB_OUTPUT
+          else
+            echo "style_status=failing" >> $GITHUB_OUTPUT
+            echo "style_color=red" >> $GITHUB_OUTPUT
+          fi
+
+
+      - name: Calculate Service Doc Coverage Percentage
+        id: calc-doc-coverage
+        if: always()
+        run: |
+          # 1. Count the public metrics inside your Service layers explicitly
+          TOTAL_ELEMENTS=$(find src/main/java -path "**/service/**/*.java" -o -name "*Service.java" | xargs grep -E -c "public (class|interface|void|[A-Z][a-zA-Z0-9_<>]*)") || echo "0"
+          echo "Total Service Elements: $TOTAL_ELEMENTS"
+          
+          # 2. Parse Checkstyle XML file for missing documentation warnings
+          if [ -f target/checkstyle-result.xml ]; then
+            MISSING_DOCS=$(grep -c "com.puppycrawl.tools.checkstyle.checks.javadoc" target/checkstyle-result.xml || echo 0)
+          else
+            MISSING_DOCS=0
+          fi
+          echo "Missing Service Javadocs: $MISSING_DOCS"
+          
+          # 3. Calculate Math Score
+          if [ "$TOTAL_ELEMENTS" -gt 0 ]; then
+            if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then MISSING_DOCS=$TOTAL_ELEMENTS; fi
+            COVERAGE=$(( (TOTAL_ELEMENTS - MISSING_DOCS) * 100 / TOTAL_ELEMENTS ))
+          else
+            COVERAGE=100
+          fi
+          
+          echo "doc_percentage=$COVERAGE" >> $GITHUB_OUTPUT
+          
+          # 4. Color Code assigning rules based on threshold
+          if [ "$COVERAGE" -ge 80 ]; then echo "doc_color=brightgreen" >> $GITHUB_OUTPUT;
+          elif [ "$COVERAGE" -ge 50 ]; then echo "doc_color=yellow" >> $GITHUB_OUTPUT;
+          else echo "doc_color=red" >> $GITHUB_OUTPUT; fi
+
+      - name: Generate Dynamic Style Badges
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 27dc15f2c2aeef4b021fdff63d7ba722
+          filename: lift-nexus-metrics.json
+          label: code style
+          message: ${{ steps.spotless-status.outputs.style_status }}
+          color: ${{ steps.spotless-status.outputs.style_color }}
+
+      - name: Generate Dynamic Doc Badges
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 27dc15f2c2aeef4b021fdff63d7ba722
+          filename: lift-nexus-docs.json
+          label: service coverage
+          message: ${{ steps.calc-doc-coverage.outputs.doc_percentage }}%
+          color: ${{ steps.calc-doc-coverage.outputs.doc_color }}
+
       - name: Upload Production Build Artifacts
         uses: actions/upload-artifact@v4
         with:
