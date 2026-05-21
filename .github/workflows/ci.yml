@@ -22,7 +22,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # ⚡ Bulletproof Cache Layer: Forces GitHub to stop re-downloading dependencies every time
       - name: Cache Maven Dependencies
         uses: actions/cache@v4
         with:
@@ -32,7 +31,6 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Execute Test Suite with Maven
-        # 🎯 Allow pipeline to continue so badges update even if code style has violations
         run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
 
       - name: Evaluate Code Style Compliance
@@ -51,7 +49,6 @@ jobs:
         id: calc-doc-coverage
         if: always()
         run: |
-          # 1. Loop through service files cleanly to aggregate element counts
           TOTAL_ELEMENTS=0
           while read -r file; do
             if [ -f "$file" ]; then
@@ -62,7 +59,6 @@ jobs:
           
           echo "Total Service Elements: $TOTAL_ELEMENTS"
           
-          # 2. Parse Checkstyle XML specifically looking for method and field documentation rules
           MISSING_DOCS=0
           if [ -f target/checkstyle-result.xml ]; then
             MISSING_METHODS=$(grep -c "MissingJavadocMethod" target/checkstyle-result.xml || echo 0)
@@ -71,7 +67,6 @@ jobs:
           fi
           echo "Missing Service Javadocs: $MISSING_DOCS"
           
-          # 3. Prevent negative math strings and compute safe coverage percentage 🎯
           if [ "$TOTAL_ELEMENTS" -gt 0 ]; then
             if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then
               COVERAGE=0
@@ -85,10 +80,40 @@ jobs:
           echo "doc_percentage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Final Computed Coverage: ${COVERAGE}%"
           
-          # 4. Pick matching dynamic colors
           if [ "$COVERAGE" -ge 80 ]; then echo "doc_color=brightgreen" >> $GITHUB_OUTPUT;
           elif [ "$COVERAGE" -ge 50 ]; then echo "doc_color=yellow" >> $GITHUB_OUTPUT;
           else echo "doc_color=red" >> $GITHUB_OUTPUT; fi
+
+      - name: Parse JaCoCo Test Coverage
+        id: jacoco-coverage
+        if: always()
+        run: |
+          JACOCO_XML="target/site/jacoco/jacoco.xml"
+          if [ -f "$JACOCO_XML" ]; then
+            # Extract total line execution counts from the global counter footer tag
+            LINE_INFO=$(tail -n 15 "$JACOCO_XML" | grep 'type="LINE"' || true)
+            MISSED=$(echo "$LINE_INFO" | sed -n 's/.*missed="\([0-9]*\)".*/\1/p' || echo 0)
+            COVERED=$(echo "$LINE_INFO" | sed -n 's/.*covered="\([0-9]*\)".*/\1/p' || echo 0)
+            
+            TOTAL=$((MISSED + COVERED))
+            if [ "$TOTAL" -gt 0 ]; then
+              PERCENT=$((COVERED * 100 / TOTAL))
+            else
+              PERCENT=0
+            fi
+          else
+            echo "JaCoCo report missing, fallback to 0%"
+            PERCENT=0
+          fi
+          
+          echo "test_percentage=$PERCENT" >> $GITHUB_OUTPUT
+          echo "Total Verified Test Coverage: ${PERCENT}%"
+          
+          # Match industry standard code coverage color steps
+          if [ "$PERCENT" -ge 85 ]; then echo "test_color=brightgreen" >> $GITHUB_OUTPUT;
+          elif [ "$PERCENT" -ge 70 ]; then echo "test_color=green" >> $GITHUB_OUTPUT;
+          elif [ "$PERCENT" -ge 50 ]; then echo "test_color=yellow" >> $GITHUB_OUTPUT;
+          else echo "test_color=red" >> $GITHUB_OUTPUT; fi
 
       - name: Generate Dynamic Style Badges
         uses: schneegans/dynamic-badges-action@v1.7.0
@@ -108,9 +133,20 @@ jobs:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 27dc15f2c2aeef4b021fdff63d7ba722
           filename: lift-nexus-docs.json
-          label: service coverage
+          label: doc coverage
           message: "${{ steps.calc-doc-coverage.outputs.doc_percentage || '0' }}%"
           color: ${{ steps.calc-doc-coverage.outputs.doc_color || 'red' }}
+
+      - name: Generate Dynamic Test Coverage Badges
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        if: always()
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 27dc15f2c2aeef4b021fdff63d7ba722
+          filename: lift-nexus-coverage.json
+          label: test coverage
+          message: "${{ steps.jacoco-coverage.outputs.test_percentage || '0' }}%"
+          color: ${{ steps.jacoco-coverage.outputs.test_color || 'red' }}
 
       - name: Upload Production Build Artifacts
         uses: actions/upload-artifact@v4
