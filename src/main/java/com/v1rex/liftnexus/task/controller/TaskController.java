@@ -26,10 +26,28 @@ import java.net.URI;
 public class TaskController {
     private final TaskService taskService;
 
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
+        return ResponseEntity.ok(taskService.findById(id));
+    }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<TaskResponse>> searchTasks(
+        @RequestParam(required = false) TaskStatus status,
+        @RequestParam(required = false) @Min(1) Integer minWeight,
+        @PageableDefault(size = 10, sort = "weight") Pageable pageable
+    ) {
+       return ResponseEntity.ok(taskService.searchTasks(status,
+               minWeight,
+               pageable));
+    }
+
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(
             @RequestBody @Valid TaskRequest taskRequest
-            ){
+    ){
         TaskResponse savedPickTask =
                 taskService.createTask(taskRequest);
 
@@ -47,7 +65,7 @@ public class TaskController {
     public ResponseEntity<TaskResponse> updateTaskStatus(
             @PathVariable Long id,
             @RequestBody TaskStatusUpdateRequest newStatusRequest
-            ){
+    ){
         TaskResponse updatedTask =
                 taskService.updateTask(id, newStatusRequest);
 
@@ -56,21 +74,6 @@ public class TaskController {
     }
 
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<TaskResponse>> searchTasks(
-        @RequestParam(required = false) TaskStatus status,
-        @RequestParam(required = false) @Min(1) Integer minWeight,
-        @PageableDefault(size = 10, sort = "weight") Pageable pageable
-    ) {
-       return ResponseEntity.ok(taskService.searchTasks(status,
-               minWeight,
-               pageable));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.findById(id));
-    }
 
 
 
