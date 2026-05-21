@@ -22,6 +22,15 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      # ⚡ Bulletproof Cache Layer: Forces GitHub to stop re-downloading dependencies every time
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Execute Test Suite with Maven
         # 🎯 Allow pipeline to continue so badges update even if code style has violations
         run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
@@ -62,10 +71,13 @@ jobs:
           fi
           echo "Missing Service Javadocs: $MISSING_DOCS"
           
-          # 3. Prevent dividing by zero and compute coverage percentage
+          # 3. Prevent negative math strings and compute safe coverage percentage 🎯
           if [ "$TOTAL_ELEMENTS" -gt 0 ]; then
-            if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then MISSING_DOCS=$TOTAL_ELEMENTS; fi
-            COVERAGE=$(( (TOTAL_ELEMENTS - MISSING_DOCS) * 100 / TOTAL_ELEMENTS ))
+            if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then
+              COVERAGE=0
+            else
+              COVERAGE=$(( (TOTAL_ELEMENTS - MISSING_DOCS) * 100 / TOTAL_ELEMENTS ))
+            fi
           else
             COVERAGE=100
           fi
