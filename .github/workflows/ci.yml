@@ -71,7 +71,6 @@ jobs:
 
       - name: Generate Dynamic Style Badges
         uses: schneegans/dynamic-badges-action@v1.7.0
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 27dc15f2c2aeef4b021fdff63d7ba722
@@ -82,7 +81,6 @@ jobs:
 
       - name: Generate Dynamic Doc Badges
         uses: schneegans/dynamic-badges-action@v1.7.0
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 27dc15f2c2aeef4b021fdff63d7ba722
