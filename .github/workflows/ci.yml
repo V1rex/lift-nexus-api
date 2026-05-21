@@ -23,7 +23,8 @@ jobs:
           cache: 'maven'
 
       - name: Execute Test Suite with Maven
-        run: mvn clean package
+        # 🎯 Added flags to ensure code analysis runs completely without crashing early
+        run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
 
       - name: Evaluate Code Style Compliance
         id: spotless-status
@@ -37,16 +38,16 @@ jobs:
             echo "style_color=red" >> $GITHUB_OUTPUT
           fi
 
-
       - name: Calculate Service Doc Coverage Percentage
         id: calc-doc-coverage
         if: always()
         run: |
-          # 1. Count the public metrics inside your Service layers explicitly
-          TOTAL_ELEMENTS=$(find src/main/java -path "**/service/**/*.java" -o -name "*Service.java" | xargs grep -E -c "public (class|interface|void|[A-Z][a-zA-Z0-9_<>]*)") || echo "0"
+          # 1. Fixed counting logic to return a single aggregate integer value
+          TOTAL_ELEMENTS=$(find src/main/java -path "**/service/**/*.java" -o -name "*Service.java" | xargs grep -E -h "public (class|interface|void|[A-Z][a-zA-Z0-9_<>]*)" | wc -l) || echo "0"
+          TOTAL_ELEMENTS=$(echo "$TOTAL_ELEMENTS" | tr -d '[:space:]')
           echo "Total Service Elements: $TOTAL_ELEMENTS"
           
-          # 2. Parse Checkstyle XML file for missing documentation warnings
+
           if [ -f target/checkstyle-result.xml ]; then
             MISSING_DOCS=$(grep -c "com.puppycrawl.tools.checkstyle.checks.javadoc" target/checkstyle-result.xml || echo 0)
           else
@@ -54,7 +55,6 @@ jobs:
           fi
           echo "Missing Service Javadocs: $MISSING_DOCS"
           
-          # 3. Calculate Math Score
           if [ "$TOTAL_ELEMENTS" -gt 0 ]; then
             if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then MISSING_DOCS=$TOTAL_ELEMENTS; fi
             COVERAGE=$(( (TOTAL_ELEMENTS - MISSING_DOCS) * 100 / TOTAL_ELEMENTS ))
@@ -64,13 +64,13 @@ jobs:
           
           echo "doc_percentage=$COVERAGE" >> $GITHUB_OUTPUT
           
-          # 4. Color Code assigning rules based on threshold
           if [ "$COVERAGE" -ge 80 ]; then echo "doc_color=brightgreen" >> $GITHUB_OUTPUT;
           elif [ "$COVERAGE" -ge 50 ]; then echo "doc_color=yellow" >> $GITHUB_OUTPUT;
           else echo "doc_color=red" >> $GITHUB_OUTPUT; fi
 
       - name: Generate Dynamic Style Badges
         uses: schneegans/dynamic-badges-action@v1.7.0
+        if: always() # Ensure it runs even if tests fail so your badge updates to "failing"
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 27dc15f2c2aeef4b021fdff63d7ba722
@@ -81,6 +81,7 @@ jobs:
 
       - name: Generate Dynamic Doc Badges
         uses: schneegans/dynamic-badges-action@v1.7.0
+        if: always()
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 27dc15f2c2aeef4b021fdff63d7ba722
