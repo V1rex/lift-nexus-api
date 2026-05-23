@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoadUnitRepository extends JpaRepository<LoadUnit, Long> {
 
-    boolean existsByTrackingCode(String trackingCode);
+  boolean existsByTrackingCode(String trackingCode);
 
-    Optional<LoadUnit> findByTrackingCode(String trackingCode);
+  Optional<LoadUnit> findByTrackingCode(String trackingCode);
 
-    Page<LoadUnit> findByStatus(LoadUnitStatus status, Pageable pageable);
+  Page<LoadUnit> findByStatus(LoadUnitStatus status, Pageable pageable);
 }

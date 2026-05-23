@@ -16,28 +16,26 @@ import lombok.*;
 @Builder
 public class LoadUnit {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotBlank(message = "Tracking code must be provided")
-    @Column(nullable = false, updatable = false, unique = true)
-    private String trackingCode;
+  @NotBlank(message = "Tracking code must be provided")
+  @Column(nullable = false, updatable = false, unique = true)
+  private String trackingCode;
 
-    @Min(value = 0, message = "Weight cannot be negative")
-    @Column(nullable = false, updatable = false)
-    private int weightKg;
+  @Min(value = 0, message = "Weight cannot be negative")
+  @Column(nullable = false, updatable = false)
+  private int weightKg;
 
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private LoadUnitStatus status;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private LoadUnitStatus status;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "current_storage_bin_id")
+  private StorageBin currentBin;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_storage_bin_id")
-    private StorageBin currentBin;
-
-    @Version
-    private Long version;
+  @Version private Long version;
 }

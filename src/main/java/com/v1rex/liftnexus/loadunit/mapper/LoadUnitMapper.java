@@ -9,31 +9,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoadUnitMapper {
 
-    public LoadUnit toEntity(LoadUnitRequest request, StorageBin currentBin) {
-        if (request == null) {
-            return null;
-        }
-        return LoadUnit.builder()
-                .trackingCode(request.trackingCode())
-                .weightKg(request.weightKg())
-                .status(request.status())
-                .currentBin(currentBin)
-                .build();
+  public LoadUnit toEntity(LoadUnitRequest request, StorageBin currentBin) {
+    if (request == null) {
+      return null;
     }
+    return LoadUnit.builder()
+        .trackingCode(request.trackingCode())
+        .weightKg(request.weightKg())
+        .status(request.status())
+        .currentBin(currentBin)
+        .build();
+  }
 
-    public LoadUnitResponse toResponse(LoadUnit entity) {
-        if (entity == null) {
-            return null;
-        }
-        Long binId = entity.getCurrentBin() != null ? entity.getCurrentBin().getId() : null;
-
-        return new LoadUnitResponse(
-                entity.getId(),
-                entity.getTrackingCode(),
-                entity.getWeightKg(),
-                entity.getStatus(),
-                binId,
-                entity.getVersion()
-        );
+  public LoadUnitResponse toResponse(LoadUnit entity) {
+    if (entity == null) {
+      return null;
     }
+    Long binId = entity.getCurrentBin() != null ? entity.getCurrentBin().getId() : null;
+
+    return new LoadUnitResponse(
+        entity.getId(),
+        entity.getTrackingCode(),
+        entity.getWeightKg(),
+        entity.getStatus(),
+        binId,
+        entity.getVersion());
+  }
 }
