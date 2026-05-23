@@ -6,7 +6,7 @@ import ai.timefold.solver.core.api.score.stream.Constraint;
 import ai.timefold.solver.core.api.score.stream.ConstraintFactory;
 import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
-import com.v1rex.liftnexus.task.domain.Task;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
 import java.util.List;
 
 public class WarehouseConstraintProvider implements ConstraintProvider {
@@ -20,56 +20,56 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
     };
   }
 
-  // Hard constraint: check if all the assigned tasks to a Forklift does
+  // Hard constraint: check if all the assigned transportOrders to a Forklift does
   // not exceed the capacity of the forklift
   private Constraint forkliftCapacity(ConstraintFactory factory) {
     return factory
-        .forEach(Task.class) // Start with the Task
-        .filter(task -> task.getForklift() != null)
-        .filter(task -> task.getWeight() > task.getForklift().getWeightCapacity())
+        .forEach(TransportOrder.class) // Start with the TransportOrder
+        .filter(transportorder -> transportorder.getForklift() != null)
+        .filter(transportorder -> transportorder.getWeight() > transportorder.getForklift().getWeightCapacity())
         .penalize(HardSoftScore.ONE_HARD)
         .asConstraint("Forklift capacity limit");
   }
 
-  // Hard constraint: check if the assigned tasks to a Forklift is
-  // compatible with the requirement equipment type of the task
+  // Hard constraint: check if the assigned transportOrders to a Forklift is
+  // compatible with the requirement equipment type of the transportorder
   private Constraint taskEquipmentRequirement(ConstraintFactory factory) {
     return factory
-        .forEach(Task.class)
-        .filter(task -> task.getForklift() != null)
-        .filter(task -> task.getRequiredEquipment() != task.getForklift().getEquipmentType())
+        .forEach(TransportOrder.class)
+        .filter(transportorder -> transportorder.getForklift() != null)
+        .filter(transportorder -> transportorder.getRequiredEquipment() != transportorder.getForklift().getEquipmentType())
         .penalize(HardSoftScore.ONE_HARD)
-        .asConstraint("Task equipment type requirement");
+        .asConstraint("TransportOrder equipment type requirement");
   }
 
   // Soft constraint: sum complete travel distance of the forklift
   private Constraint minimizeTravelDistance(ConstraintFactory factory) {
     return factory
         .forEach(Forklift.class)
-        .filter(forklift -> !forklift.getTasks().isEmpty())
+        .filter(forklift -> !forklift.getTransportOrders().isEmpty())
         .penalize(
             HardSoftScore.ONE_SOFT,
             forklift -> {
               int totalTraveledDistance = 0;
 
-              List<Task> tasks = forklift.getTasks();
-              // initial drive to the first task
+              List<TransportOrder> transportOrders = forklift.getTransportOrders();
+              // initial drive to the first transportorder
               totalTraveledDistance +=
-                  (int) forklift.getCurrentStorageBin().distanceTo(tasks.get(0).getPickStorageBin());
+                  (int) forklift.getCurrentStorageBin().distanceTo(transportOrders.get(0).getPickStorageBin());
 
-              for (int i = 0; i < tasks.size(); i++) {
-                Task current = tasks.get(i);
+              for (int i = 0; i < transportOrders.size(); i++) {
+                TransportOrder current = transportOrders.get(i);
 
                 // We calculate the travel distance from currentTask
                 // to the Delivery StorageBin
                 totalTraveledDistance +=
                     (int) current.getPickStorageBin().distanceTo(current.getDeliveryStorageBin());
 
-                // if there is a next task, we calculate the travel distance
+                // if there is a next transportorder, we calculate the travel distance
                 // from the delivery storagebin to the pick storagebin
-                // of the next task
-                if (i < tasks.size() - 1) {
-                  Task next = tasks.get(i + 1);
+                // of the next transportorder
+                if (i < transportOrders.size() - 1) {
+                  TransportOrder next = transportOrders.get(i + 1);
                   totalTraveledDistance +=
                       (int) current.getDeliveryStorageBin().distanceTo(next.getPickStorageBin());
                 }

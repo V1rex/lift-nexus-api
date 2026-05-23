@@ -1,5 +1,5 @@
 /*
-package com.v1rex.liftnexus.task.mapper;
+package com.v1rex.liftnexus.transportorder.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -9,10 +9,10 @@ import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
 import com.v1rex.liftnexus.storagebin.mapper.StorageBinMapper;
-import com.v1rex.liftnexus.task.domain.Task;
-import com.v1rex.liftnexus.task.dto.TaskRequest;
-import com.v1rex.liftnexus.task.dto.TaskResponse;
-import com.v1rex.liftnexus.task.enums.TaskStatus;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
+import com.v1rex.liftnexus.transportorder.dto.TransportOrderRequest;
+import com.v1rex.liftnexus.transportorder.dto.TransportOrderResponse;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,18 +26,18 @@ public class TaskMapperTest {
 
   @Mock private StorageBinMapper storageBinMapper;
 
-  @InjectMocks private TaskMapper mapper;
+  @InjectMocks private TransportOrderMapper mapper;
 
   @Nested
   @DisplayName("Tests for toEntity mapping")
   class ToEntityTests {
 
     @Test
-    @DisplayName("Should correctly map TaskRequest to Task Entity")
+    @DisplayName("Should correctly map TransportOrderRequest to TransportOrder Entity")
     void shouldMapRequestToEntity() {
-      TaskRequest request = new TaskRequest(1L, 2L, TaskStatus.OPEN, EquipmentType.STANDARD, 100);
+      TransportOrderRequest request = new TransportOrderRequest(1L, 2L, TransportOrderStatus.OPEN, EquipmentType.STANDARD, 100);
 
-      Task entity = mapper.toEntity(request);
+      TransportOrder entity = mapper.toEntity(request);
 
       assertNotNull(entity);
 
@@ -61,9 +61,9 @@ public class TaskMapperTest {
     }
 
     @Test
-    @DisplayName("Should return null when TaskRequest is null")
+    @DisplayName("Should return null when TransportOrderRequest is null")
     void shouldReturnNull_WhenRequestIsNull() {
-      Task entity = mapper.toEntity(null);
+      TransportOrder entity = mapper.toEntity(null);
 
       assertNull(entity);
     }
@@ -74,7 +74,7 @@ public class TaskMapperTest {
   class ToResponseTests {
 
     @Test
-    @DisplayName("Should correctly map Task Entity to TaskResponse DTO")
+    @DisplayName("Should correctly map TransportOrder Entity to TransportOrderResponse DTO")
     void shouldMapEntityToResponse() {
       // Arranging
       StorageBin mockPickStorageBin =
@@ -85,14 +85,14 @@ public class TaskMapperTest {
 
       Forklift mockForlift = Forklift.builder().id(5L).weightCapacity(100).build();
 
-      Task mockTask =
-          Task.builder()
+      TransportOrder mockTask =
+          TransportOrder.builder()
               .id(15L)
               .pickStorageBin(mockPickStorageBin)
               .deliveryStorageBin(mockDeliveryStorageBin)
               .weight(10)
               .requiredEquipment(EquipmentType.STANDARD)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .forklift(mockForlift)
               .build();
 
@@ -119,9 +119,9 @@ public class TaskMapperTest {
     }
 
     @Test
-    @DisplayName("Should return null when Task Entity is null")
+    @DisplayName("Should return null when TransportOrder Entity is null")
     void shouldReturnNull_WhenEntityIsNull() {
-      TaskResponse response = mapper.toResponse(null);
+      TransportOrderResponse response = mapper.toResponse(null);
       assertNull(response);
     }
   }

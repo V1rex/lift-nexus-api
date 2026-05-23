@@ -6,9 +6,10 @@ import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.repository.StorageBinRepository;
-import com.v1rex.liftnexus.task.domain.Task;
-import com.v1rex.liftnexus.task.repository.TaskRepository;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
+import com.v1rex.liftnexus.transportorder.repository.TransportOrderRepository;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WarehouseDispatcherService {
   private final StorageBinRepository storageBinRepository;
   private final ForkliftRepository forkliftRepository;
-  private final TaskRepository taskRepository;
+  private final TransportOrderRepository transportOrderRepository;
 
   private final SolverManager<WarehouseSchedule> solverManager;
 
@@ -32,18 +33,18 @@ public class WarehouseDispatcherService {
     log.info("Building current warehouse state for optimization...");
     List<StorageBin> storageBins = storageBinRepository.findAll();
     List<Forklift> forklifts = forkliftRepository.findAll();
-    List<Task> tasks = taskRepository.findAll();
+    List<TransportOrder> transportOrders = transportOrderRepository.findAll();
 
     log.debug(
-        "Found {} storageBins, {} forklifts, and {} tasks in DB.",
+        "Found {} storageBins, {} forklifts, and {} transportOrders in DB.",
         storageBins.size(),
         forklifts.size(),
-        tasks.size());
+        transportOrders.size());
 
     WarehouseSchedule schedule = new WarehouseSchedule();
     schedule.setStorageBins(storageBins);
     schedule.setForklifts(forklifts);
-    schedule.setTaskPool(tasks);
+    schedule.setTransportOrderPool(transportOrders);
 
     // 3. Return the fully loaded state ready for optimization
     return schedule;
@@ -79,16 +80,16 @@ public class WarehouseDispatcherService {
     log.info("New best solution found! Score: {}", solution.getScore());
 
     if (solution.getScore().isFeasible()) {
-      log.info("Solution is feasible. Updating task assignments in database.");
+      log.info("Solution is feasible. Updating transportorder assignments in database.");
       try {
         for (Forklift forklift : solution.getForklifts()) {
-          for (Task task : forklift.getTasks()) {
-            task.setForklift(forklift);
-            taskRepository.save(task);
+          for (TransportOrder transportOrder : forklift.getTransportOrders()) {
+            transportOrder.setForklift(forklift);
+            transportOrderRepository.save(transportOrder);
           }
           forkliftRepository.save(forklift);
         }
-        log.debug("Database sync complete for all forklifts and tasks.");
+        log.debug("Database sync complete for all forklifts and transportOrders.");
       } catch (Exception e) {
         log.error("Failed to persist solution to database: ", e);
       }

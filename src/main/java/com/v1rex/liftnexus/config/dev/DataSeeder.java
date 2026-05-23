@@ -6,9 +6,9 @@ import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.repository.StorageBinRepository;
-import com.v1rex.liftnexus.task.domain.Task;
-import com.v1rex.liftnexus.task.enums.TaskStatus;
-import com.v1rex.liftnexus.task.repository.TaskRepository;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
+import com.v1rex.liftnexus.transportorder.repository.TransportOrderRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class DataSeeder
         implements CommandLineRunner {
   private final StorageBinRepository storageBinRepository;
   private final ForkliftRepository forkliftRepository;
-  private final TaskRepository taskRepository;
+  private final TransportOrderRepository taskRepository;
 
   @Override
   @Transactional
@@ -59,33 +59,33 @@ public class DataSeeder
 
     forkliftRepository.saveAll(List.of(heavyTruck, reachTruck));
 
-    Task activeTask =
-        Task.builder()
+    TransportOrder activeTask =
+        TransportOrder.builder()
             .pickStorageBin(zoneB)
             .deliveryStorageBin(shipping)
             .weight(500)
-            .status(TaskStatus.IN_PROGRESS)
+            .status(TransportOrderStatus.IN_PROGRESS)
             .requiredEquipment(EquipmentType.REACH_TRUCK)
             .forklift(reachTruck) // Assigning it manually because it's IN_PROGRESS
             .build();
 
-    reachTruck.getTasks().add(activeTask);
+    reachTruck.getTransportOrders().add(activeTask);
 
-    Task heavyTask =
-        Task.builder()
+    TransportOrder heavyTask =
+        TransportOrder.builder()
             .pickStorageBin(zoneA)
             .deliveryStorageBin(shipping)
             .weight(4000)
-            .status(TaskStatus.OPEN)
+            .status(TransportOrderStatus.OPEN)
             .requiredEquipment(EquipmentType.SIDE_LOADER)
             .build();
 
-    Task openTask =
-        Task.builder()
+    TransportOrder openTask =
+        TransportOrder.builder()
             .pickStorageBin(dock)
             .deliveryStorageBin(zoneB)
             .weight(100)
-            .status(TaskStatus.OPEN)
+            .status(TransportOrderStatus.OPEN)
             .requiredEquipment(EquipmentType.STANDARD)
             .build();
 

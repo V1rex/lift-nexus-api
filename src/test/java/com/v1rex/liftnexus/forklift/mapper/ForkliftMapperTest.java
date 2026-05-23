@@ -13,10 +13,10 @@ import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
 import com.v1rex.liftnexus.storagebin.mapper.StorageBinMapper;
-import com.v1rex.liftnexus.task.domain.Task;
-import com.v1rex.liftnexus.task.dto.TaskResponse;
-import com.v1rex.liftnexus.task.enums.TaskStatus;
-import com.v1rex.liftnexus.task.mapper.TaskMapper;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
+import com.v1rex.liftnexus.transportorder.dto.TransportOrderResponse;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
+import com.v1rex.liftnexus.transportorder.mapper.TransportOrderMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class ForkliftMapperTest {
 
-  @Mock private TaskMapper taskMapper;
+  @Mock private TransportOrderMapper taskMapper;
 
   @Mock private StorageBinMapper storageBinMapper;
 
@@ -69,24 +69,24 @@ public class ForkliftMapperTest {
     @DisplayName("Should correctly map " + "Forklift Entity to ForkliftResponse DTO")
     void shouldMapEntityToResponse() {
       // Arranging
-      Task mockTask1 = Task.builder().id(1L).weight(10).build();
+      TransportOrder mockTask1 = TransportOrder.builder().id(1L).weight(10).build();
 
       when(taskMapper.toResponse(mockTask1))
           .thenReturn(
-              new TaskResponse(1L, null, null, 10, EquipmentType.STANDARD, TaskStatus.OPEN, null));
+              new TransportOrderResponse(1L, null, null, 10, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null));
 
-      Task mockTask2 = Task.builder().id(2L).weight(5).build();
+      TransportOrder mockTask2 = TransportOrder.builder().id(2L).weight(5).build();
 
       when(taskMapper.toResponse(mockTask2))
           .thenReturn(
-              new TaskResponse(2L, null, null, 5, EquipmentType.STANDARD, TaskStatus.OPEN, null));
+              new TransportOrderResponse(2L, null, null, 5, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null));
 
       StorageBin mockStorageBin =
           StorageBin.builder().id(99L).latitude(51.5136F).longitude(7.4653F).build();
       when(storageBinMapper.toResponse(mockStorageBin))
           .thenReturn(new StorageBinResponse(99L, 51.5136F, 7.4653F));
 
-      List<Task> mockTasks = new ArrayList<>();
+      List<TransportOrder> mockTasks = new ArrayList<>();
       mockTasks.add(mockTask1);
       mockTasks.add(mockTask2);
 
@@ -95,7 +95,7 @@ public class ForkliftMapperTest {
               .id(42L)
               .weightCapacity(1)
               .equipmentType(EquipmentType.STANDARD)
-              .tasks(mockTasks)
+              .transportOrders(mockTasks)
               .currentStorageBin(mockStorageBin)
               .build();
 
@@ -110,12 +110,12 @@ public class ForkliftMapperTest {
       assertEquals(1, response.weightCapacity());
       assertEquals(EquipmentType.STANDARD, response.equipmentType());
 
-      // we take a look at the mocked tasks
-      assertEquals(2, response.tasks().size());
-      assertEquals(1L, response.tasks().get(0).id());
-      assertEquals(10, response.tasks().get(0).weight());
-      assertEquals(2L, response.tasks().get(1).id());
-      assertEquals(5, response.tasks().get(1).weight());
+      // we take a look at the mocked transportOrders
+      assertEquals(2, response.transportOrders().size());
+      assertEquals(1L, response.transportOrders().get(0).id());
+      assertEquals(10, response.transportOrders().get(0).weight());
+      assertEquals(2L, response.transportOrders().get(1).id());
+      assertEquals(5, response.transportOrders().get(1).weight());
 
       // we take a look at the mocked storagebin
       assertEquals(99L, response.currentLocation().id());

@@ -3,7 +3,7 @@ package com.v1rex.liftnexus.forklift.domain;
 import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
 import ai.timefold.solver.core.api.domain.variable.PlanningListVariable;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.task.domain.Task;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -33,7 +33,7 @@ public class Forklift {
 
   @PlanningListVariable(valueRangeProviderRefs = "taskPoolRange")
   @OneToMany(mappedBy = "forklift", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  private List<Task> tasks = new ArrayList<>();
+  private List<TransportOrder> transportOrders = new ArrayList<>();
 
   @Builder.Default
   @Enumerated(EnumType.STRING)

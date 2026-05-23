@@ -1,5 +1,5 @@
 /*
-package com.v1rex.liftnexus.task.repository;
+package com.v1rex.liftnexus.transportorder.repository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -7,8 +7,8 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.task.domain.Task;
-import com.v1rex.liftnexus.task.enums.TaskStatus;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
+import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class TaskRepositoryTest {
 
-  @Autowired private TaskRepository taskRepository;
+  @Autowired private TransportOrderRepository taskRepository;
 
   @Autowired private EntityManager entityManager;
   private StorageBin defaultPickStorageBin;
@@ -56,8 +56,8 @@ public class TaskRepositoryTest {
     @Test
     @DisplayName("Should throw database exception when weight capacity is zero")
     void shouldThrowException_WhenWeightCapacityIsZero() {
-      Task invalidTask =
-          Task.builder()
+      TransportOrder invalidTask =
+          TransportOrder.builder()
               .weight(0)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
@@ -70,8 +70,8 @@ public class TaskRepositoryTest {
     @Test
     @DisplayName("Should throw database exception when weight capacity is negative")
     void shouldThrowException_WhenWeightCapacityIsNegative() {
-      Task invalidTask =
-          Task.builder()
+      TransportOrder invalidTask =
+          TransportOrder.builder()
               .weight(-1)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
@@ -84,8 +84,8 @@ public class TaskRepositoryTest {
     @Test
     @DisplayName("Should throw database exception when weight capacity is null")
     void shouldThrowException_WhenWeightCapacityIsNull() {
-      Task invalidTask =
-          Task.builder()
+      TransportOrder invalidTask =
+          TransportOrder.builder()
               .weight(null)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
@@ -101,20 +101,20 @@ public class TaskRepositoryTest {
   class QueryTests {
 
     @Test
-    @DisplayName("Should find tasks that do not have an assigned forklift")
+    @DisplayName("Should find transportOrders that do not have an assigned forklift")
     void shouldFindTasksByForkliftIsNull() {
-      Task unassignedTask1 =
-          Task.builder()
+      TransportOrder unassignedTask1 =
+          TransportOrder.builder()
               .weight(500)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .forklift(null)
               .build();
-      Task unassignedTask2 =
-          Task.builder()
+      TransportOrder unassignedTask2 =
+          TransportOrder.builder()
               .weight(800)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .forklift(null)
@@ -124,10 +124,10 @@ public class TaskRepositoryTest {
           Forklift.builder().weightCapacity(2000).equipmentType(EquipmentType.STANDARD).build();
       entityManager.persist(mockForklift);
 
-      Task assignedTask =
-          Task.builder()
+      TransportOrder assignedTask =
+          TransportOrder.builder()
               .weight(1200)
-              .status(TaskStatus.ASSIGNED)
+              .status(TransportOrderStatus.ASSIGNED)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .forklift(mockForklift)
@@ -138,33 +138,33 @@ public class TaskRepositoryTest {
       taskRepository.save(assignedTask);
       taskRepository.flush();
 
-      java.util.List<Task> results = taskRepository.findByForkliftIsNull();
+      java.util.List<TransportOrder> results = taskRepository.findByForkliftIsNull();
 
       assertThat(results).hasSize(2);
-      assertThat(results).extracting(Task::getWeight).containsExactlyInAnyOrder(500, 800);
+      assertThat(results).extracting(TransportOrder::getWeight).containsExactlyInAnyOrder(500, 800);
     }
 
     @Test
-    @DisplayName("Should find paged tasks matching a specific status")
+    @DisplayName("Should find paged transportOrders matching a specific status")
     void shouldFindTasksByStatusWithPagination() {
       taskRepository.save(
-          Task.builder()
+          TransportOrder.builder()
               .weight(100)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
-          Task.builder()
+          TransportOrder.builder()
               .weight(200)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
-          Task.builder()
+          TransportOrder.builder()
               .weight(300)
-              .status(TaskStatus.COMPLETED)
+              .status(TransportOrderStatus.COMPLETED)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
@@ -172,33 +172,33 @@ public class TaskRepositoryTest {
 
       Pageable pageable = PageRequest.of(0, 10);
 
-      Page<Task> pendingPage = taskRepository.findByStatus(TaskStatus.OPEN, pageable);
+      Page<TransportOrder> pendingPage = taskRepository.findByStatus(TransportOrderStatus.OPEN, pageable);
 
       assertThat(pendingPage.getTotalElements()).isEqualTo(2);
-      assertThat(pendingPage.getContent()).allMatch(task -> task.getStatus() == TaskStatus.OPEN);
+      assertThat(pendingPage.getContent()).allMatch(transportorder -> transportorder.getStatus() == TransportOrderStatus.OPEN);
     }
 
     @Test
-    @DisplayName("Should find paged tasks with a weight strictly greater than the threshold")
+    @DisplayName("Should find paged transportOrders with a weight strictly greater than the threshold")
     void shouldFindTasksWithWeightGreaterThanThreshold() {
       taskRepository.save(
-          Task.builder()
+          TransportOrder.builder()
               .weight(500)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
-          Task.builder()
+          TransportOrder.builder()
               .weight(1000)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
-          Task.builder()
+          TransportOrder.builder()
               .weight(1500)
-              .status(TaskStatus.OPEN)
+              .status(TransportOrderStatus.OPEN)
               .pickStorageBin(defaultPickStorageBin)
               .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
@@ -206,10 +206,10 @@ public class TaskRepositoryTest {
 
       Pageable pageable = PageRequest.of(0, 10);
 
-      Page<Task> results = taskRepository.findByWeightGreaterThan(999, pageable);
+      Page<TransportOrder> results = taskRepository.findByWeightGreaterThan(999, pageable);
 
       assertThat(results.getTotalElements()).isEqualTo(2);
-      var weights = results.getContent().stream().map(Task::getWeight).toList();
+      var weights = results.getContent().stream().map(TransportOrder::getWeight).toList();
       assertThat(weights).containsExactlyInAnyOrder(1000, 1500);
     }
 
@@ -222,23 +222,23 @@ public class TaskRepositoryTest {
           "Should filter by both status and minimum weight when both parameters are provided")
       void shouldSearchByStatusAndMinWeight() {
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(500)
-                .status(TaskStatus.OPEN)
+                .status(TransportOrderStatus.OPEN)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(1500)
-                .status(TaskStatus.OPEN)
+                .status(TransportOrderStatus.OPEN)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(2000)
-                .status(TaskStatus.COMPLETED)
+                .status(TransportOrderStatus.COMPLETED)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
@@ -246,7 +246,7 @@ public class TaskRepositoryTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Task> result = taskRepository.searchTasks(TaskStatus.OPEN, 1000, pageable);
+        Page<TransportOrder> result = taskRepository.searchTasks(TransportOrderStatus.OPEN, 1000, pageable);
 
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().get(0).getWeight()).isEqualTo(1500);
@@ -257,23 +257,23 @@ public class TaskRepositoryTest {
           "Should ignore status filter and only filter by minimum weight when status is null")
       void shouldSearchByMinWeightOnly_WhenStatusIsNull() {
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(500)
-                .status(TaskStatus.OPEN)
+                .status(TransportOrderStatus.OPEN)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(1200)
-                .status(TaskStatus.OPEN)
+                .status(TransportOrderStatus.OPEN)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(1800)
-                .status(TaskStatus.COMPLETED)
+                .status(TransportOrderStatus.COMPLETED)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
@@ -281,26 +281,26 @@ public class TaskRepositoryTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Task> result = taskRepository.searchTasks(null, 1000, pageable);
+        Page<TransportOrder> result = taskRepository.searchTasks(null, 1000, pageable);
 
         assertThat(result.getTotalElements()).isEqualTo(2);
       }
 
       @Test
       @DisplayName(
-          "Should return all tasks within page limits when all query criteria parameters are null")
+          "Should return all transportOrders within page limits when all query criteria parameters are null")
       void shouldReturnAllTasks_WhenAllParametersAreNull() {
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(500)
-                .status(TaskStatus.OPEN)
+                .status(TransportOrderStatus.OPEN)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
-            Task.builder()
+            TransportOrder.builder()
                 .weight(1500)
-                .status(TaskStatus.COMPLETED)
+                .status(TransportOrderStatus.COMPLETED)
                 .pickStorageBin(defaultPickStorageBin)
                 .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
@@ -308,7 +308,7 @@ public class TaskRepositoryTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Task> result = taskRepository.searchTasks(null, null, pageable);
+        Page<TransportOrder> result = taskRepository.searchTasks(null, null, pageable);
 
         assertThat(result.getTotalElements()).isEqualTo(2);
       }

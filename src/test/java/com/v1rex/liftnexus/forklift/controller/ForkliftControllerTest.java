@@ -13,7 +13,7 @@ import com.v1rex.liftnexus.forklift.dto.ForkliftLocationUpdateRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.forklift.service.ForkliftService;
-import com.v1rex.liftnexus.task.dto.TaskResponse;
+import com.v1rex.liftnexus.transportorder.dto.TransportOrderResponse;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +48,7 @@ public class ForkliftControllerTest {
     @DisplayName("Should return a Forklift when GET request is made to /api/v1/forklifts/{id}")
     void shouldReturnForklift_WhenGetRequestIsMadeToFindById() throws Exception {
       ForkliftResponse mockDto =
-          new ForkliftResponse(1L, 40, EquipmentType.STANDARD, new ArrayList<TaskResponse>(), null);
+          new ForkliftResponse(1L, 40, EquipmentType.STANDARD, new ArrayList<TransportOrderResponse>(), null);
 
       when(forkliftService.findById(1L)).thenReturn(mockDto);
 

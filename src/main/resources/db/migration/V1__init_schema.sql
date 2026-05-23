@@ -14,7 +14,7 @@ CREATE TABLE forklift (
 );
 
 
-CREATE TABLE task (
+CREATE TABLE transportOrder (
     id BIGSERIAL PRIMARY KEY,
     pick_location_id BIGINT NOT NULL,
     delivery_location_id BIGINT NOT NULL,
@@ -28,5 +28,5 @@ CREATE TABLE task (
 );
 
 
-CREATE INDEX idx_task_forklift ON task(forklift_id);
+CREATE INDEX idx_task_forklift ON transportOrder(forklift_id);
 CREATE INDEX idx_forklift_location ON forklift(current_location_id);
