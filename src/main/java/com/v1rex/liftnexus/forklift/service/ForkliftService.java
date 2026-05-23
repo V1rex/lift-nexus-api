@@ -7,7 +7,7 @@ import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.service.LocationService;
+import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ForkliftService {
   private final ForkliftRepository forkliftRepository;
   private final ForkliftMapper forkliftMapper;
-  private final LocationService locationService;
+  private final StorageBinService storageBinService;
 
   @Transactional
   public ForkliftResponse createForklift(ForkliftRequest request) {
@@ -55,7 +55,7 @@ public class ForkliftService {
   public ForkliftResponse updateForkliftLocation(Long forkLiftId, Long locationId) {
     log.info("Moving Forklift ID {} to StorageBin ID {}", forkLiftId, locationId);
     Forklift forklift = findEntityById(forkLiftId);
-    StorageBin newStorageBin = locationService.findEntityById(locationId);
+    StorageBin newStorageBin = storageBinService.findEntityById(locationId);
 
     forklift.setCurrentStorageBin(newStorageBin);
 

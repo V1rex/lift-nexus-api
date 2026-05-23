@@ -8,16 +8,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
-import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
-import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
-import com.v1rex.liftnexus.storagebin.service.LocationService;
+import com.v1rex.liftnexus.storagebin.domain.ZoneType;
+import com.v1rex.liftnexus.storagebin.dto.CoordinateDto;
+import com.v1rex.liftnexus.storagebin.dto.StorageBinRequest;
+import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
+import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -25,100 +27,117 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = LocationController.class)
+@WebMvcTest(controllers = StorageBinController.class)
 @ActiveProfiles("test")
+@DisplayName("StorageBin REST API Gateway Endpoints Tests")
 public class StorageBinControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-  @MockitoBean private LocationService locationService;
+    @MockitoBean
+    private StorageBinService storageBinService;
 
-  @Test
-  @DisplayName("Should return a list of locations when GET request is made to /api/v1/locations")
-  void shouldReturnLocations_WhenGetRequestIsMade() throws Exception {
-    LocationResponse mockDto = new LocationResponse(1L, 51.5136F, 7.4653F);
+    @Nested
+    @DisplayName("Query Endpoints (GET Operations)")
+    class ReadOperations{
+        @Test
+        @DisplayName("GET /api/v1/storage-bins should return nested structural arrays")
+        void shouldReturnStorageBinsPaginated() throws Exception {
+            CoordinateDto coordinate = new CoordinateDto(4, 12, 2);
+            StorageBinResponse response = new StorageBinResponse(1L, "A-04-B-12-T-02", coordinate, ZoneType.STORAGE, 1000);
 
-    Page<LocationResponse> mockPage = new PageImpl<>(List.of(mockDto));
-    Mockito.when(locationService.findAll(any(Pageable.class))).thenReturn(mockPage);
+            Mockito.when(storageBinService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(response)));
 
-    mockMvc
-        .perform(get("/api/v1/locations").accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content[0].id").value(1))
-        .andExpect(jsonPath("$.content[0].latitude").value(51.5136))
-        .andExpect(jsonPath("$.content[0].longitude").value(7.4653));
-  }
+            mockMvc.perform(get("/api/v1/storage-bins").accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[0].binCode").value("A-04-B-12-T-02"))
+                    .andExpect(jsonPath("$.content[0].coordinate.x").value(4))
+                    .andExpect(jsonPath("$.content[0].coordinate.z").value(2));
+        }
 
-  @Test
-  @DisplayName("Should return a storagebin when GET request is made to /api/v1/locations/{id}")
-  void shouldReturnLocation_WhenGetRequestIsMadeToFindById() throws Exception {
-    LocationResponse mockDto = new LocationResponse(1L, 51.5136F, 7.4653F);
+        @Test
+        @DisplayName("GET /api/v1/storage-bins/{id} should return 200 OK and the requested bin")
+        void shouldReturnStorageBin_WhenIdExists() throws Exception {
+            // Arrange
+            CoordinateDto coordinate = new CoordinateDto(2, 5, 1);
+            StorageBinResponse response = new StorageBinResponse(99L, "B-02-B-05-T-01", coordinate, ZoneType.STORAGE, 1500);
 
-    Mockito.when(locationService.findById(1L)).thenReturn(mockDto);
+            Mockito.when(storageBinService.findById(99L)).thenReturn(response);
 
-    mockMvc
-        .perform(get("/api/v1/locations/1").accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.latitude").value(51.5136))
-        .andExpect(jsonPath("$.longitude").value(7.4653));
-  }
+            // Act & Assert
+            mockMvc.perform(get("/api/v1/storage-bins/{id}", 99L)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(99))
+                    .andExpect(jsonPath("$.binCode").value("B-02-B-05-T-01"))
+                    .andExpect(jsonPath("$.coordinate.x").value(2))
+                    .andExpect(jsonPath("$.coordinate.y").value(5))
+                    .andExpect(jsonPath("$.coordinate.z").value(1))
+                    .andExpect(jsonPath("$.zoneType").value("STORAGE"));
+        }
 
-  @Test
-  @DisplayName(
-      "Should return 404 Not Found when GET request is made to /api/v1/locations/{id} with non-existing id")
-  void shouldReturnNotFound_WhenGetRequestIsMadeToFindByIdWithNonExistingId() throws Exception {
-    Long nonExistingId = 1L;
+        @Test
+        @DisplayName("GET /api/v1/storage-bins/{id} should return 404 Not Found if missing")
+        void shouldReturn404_WhenStorageBinDoesNotExist() throws Exception {
+            // Arrange
+            Long missingId = 999L;
+            Mockito.when(storageBinService.findById(missingId))
+                    .thenThrow(new ResourceNotFoundException("Storage bin with " + missingId + " not found."));
 
-    Mockito.when(locationService.findById(nonExistingId))
-        .thenThrow(new ResourceNotFoundException("StorageBin with " + nonExistingId + " not found."));
+            // Act & Assert
+            mockMvc.perform(get("/api/v1/storage-bins/{id}", missingId)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
+        }
+    }
 
-    mockMvc
-        .perform(get("/api/v1/locations/{id}", nonExistingId).accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isNotFound());
-  }
+    @Nested
+    @DisplayName("Query Endpoints (POST Operations)")
+    class WriteOperations{
 
-  @Test
-  @DisplayName("Should return 201 Created and the storagebin URI when valid data is posted")
-  void shouldCreateLocation_WhenDataIsValid() throws Exception {
-    LocationRequest requestDto = new LocationRequest(51.5136F, 7.4653F);
-    LocationResponse responseDto = new LocationResponse(42L, 51.5136F, 7.4653F);
+        @Test
+        @DisplayName("POST /api/v1/storage-bins should process complex inputs and output 201 HTTP headers")
+        void shouldCreateStorageBin_WhenPayloadIsValid() throws Exception {
+            CoordinateDto coordinate = new CoordinateDto(1, 1, 0);
+            StorageBinRequest request = new StorageBinRequest("CHARGER-1", coordinate, ZoneType.CHARGING_STATION, 0);
+            StorageBinResponse response = new StorageBinResponse(77L, "CHARGER-1", coordinate, ZoneType.CHARGING_STATION, 0);
 
-    Mockito.when(locationService.createLocation(any(LocationRequest.class)))
-        .thenReturn(responseDto);
+            Mockito.when(storageBinService.createStorageBin(any(StorageBinRequest.class))).thenReturn(response);
 
-    mockMvc
-        .perform(
-            post("/api/v1/locations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto))
-                .accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isCreated())
-        .andExpect(
-            header()
-                .string("StorageBin", org.hamcrest.Matchers.containsString("/api/v1/locations/42")))
-        .andExpect(jsonPath("$.id").value(42))
-        .andExpect(jsonPath("$.latitude").value(51.5136))
-        .andExpect(jsonPath("$.longitude").value(7.4653));
-  }
+            mockMvc.perform(post("/api/v1/storage-bins")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request))
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isCreated())
+                    .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/api/v1/storage-bins/77")))
+                    .andExpect(jsonPath("$.id").value(77))
+                    .andExpect(jsonPath("$.maxWeightCapacityKg").value(0));
+        }
 
-  @Test
-  @DisplayName("Should return 400 Bad Request when validation fails on create")
-  void shouldReturnBadRequest_WhenPostRequestContainsInvalidData() throws Exception {
-    String invalidJson = "{\"latitude\": 51.5136, \"longitude\": null}";
+        @Test
+        @DisplayName("POST /api/v1/storage-bins should return 400 Bad Request if coordinates are malformed")
+        void shouldRejectCreation_WhenPayloadIsMissingCoordinates() throws Exception {
+            // Missing the nested CoordinateDto entirely
+            String invalidJson = "{\"binCode\":\"ERROR\",\"zoneType\":\"STORAGE\",\"maxWeightCapacityKg\":500}";
 
-    mockMvc
-        .perform(
-            post("/api/v1/locations").contentType(MediaType.APPLICATION_JSON).content(invalidJson))
-        .andDo(print())
-        .andExpect(status().isBadRequest());
+            mockMvc.perform(post("/api/v1/storage-bins")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(invalidJson))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest());
 
-    Mockito.verifyNoInteractions(locationService);
-  }
+            Mockito.verifyNoInteractions(storageBinService);
+        }
+
+    }
+
+
+
 }

@@ -1,7 +1,7 @@
 package com.v1rex.liftnexus.task.mapper;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
-import com.v1rex.liftnexus.storagebin.mapper.LocationMapper;
+import com.v1rex.liftnexus.storagebin.mapper.StorageBinMapper;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.dto.TaskRequest;
 import com.v1rex.liftnexus.task.dto.TaskResponse;
@@ -10,16 +10,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor // Automatically injects the LocationMapper
+@RequiredArgsConstructor // Automatically injects the StorageBinMapper
 public class TaskMapper {
 
-  private final LocationMapper locationMapper;
+  private final StorageBinMapper storageBinMapper;
 
   public Task toEntity(TaskRequest request) {
     if (request == null) return null;
     return Task.builder()
         // we note that extracting the pickStorageBin and deliveryStorageBin
-        // can be taken care of by the LocationService
+        // can be taken care of by the StorageBinService
         // and will be only injected later to seperate the concerns
         .weight(request.weight())
         .status(request.status() != null ? request.status() : TaskStatus.OPEN)
@@ -34,8 +34,8 @@ public class TaskMapper {
     if (entity == null) return null;
     return new TaskResponse(
         entity.getId(),
-        locationMapper.toResponse(entity.getPickStorageBin()),
-        locationMapper.toResponse(entity.getDeliveryStorageBin()),
+        storageBinMapper.toResponse(entity.getPickStorageBin()),
+        storageBinMapper.toResponse(entity.getDeliveryStorageBin()),
         entity.getWeight(),
         entity.getRequiredEquipment(),
         entity.getStatus(),

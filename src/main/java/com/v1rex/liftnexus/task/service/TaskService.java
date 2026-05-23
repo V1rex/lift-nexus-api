@@ -2,7 +2,7 @@ package com.v1rex.liftnexus.task.service;
 
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.service.LocationService;
+import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.dto.TaskRequest;
 import com.v1rex.liftnexus.task.dto.TaskResponse;
@@ -24,7 +24,7 @@ public class TaskService {
   private final TaskRepository taskRepository;
   private final TaskMapper taskMapper;
 
-  private final LocationService locationService;
+  private final StorageBinService storageBinService;
 
   @Transactional
   public TaskResponse createTask(TaskRequest request) {
@@ -33,8 +33,8 @@ public class TaskService {
         request.pickLocationId(),
         request.deliveryLocationId());
 
-    StorageBin pickStorageBin = locationService.findEntityById(request.pickLocationId());
-    StorageBin deliveryStorageBin = locationService.findEntityById(request.deliveryLocationId());
+    StorageBin pickStorageBin = storageBinService.findEntityById(request.pickLocationId());
+    StorageBin deliveryStorageBin = storageBinService.findEntityById(request.deliveryLocationId());
 
     Task task = taskMapper.toEntity(request);
 

@@ -1,68 +1,84 @@
 package com.v1rex.liftnexus.storagebin.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.v1rex.liftnexus.storagebin.domain.Coordinate3D;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
-import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.domain.ZoneType;
+import com.v1rex.liftnexus.storagebin.dto.CoordinateDto;
+import com.v1rex.liftnexus.storagebin.dto.StorageBinRequest;
+import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("StorageBinMapper Unit Tests")
 class StorageBinMapperTest {
 
-  private final LocationMapper mapper = new LocationMapper();
+    private final StorageBinMapper mapper = new StorageBinMapper();
 
-  @Nested
-  @DisplayName("Tests for toEntity mapping")
-  class ToEntityTests {
+    @Nested
+    @DisplayName("Mapping Request to Entity")
+    class ToEntityTests {
 
-    @Test
-    @DisplayName("Should correctly map LocationRequest to StorageBin Entity")
-    void shouldMapRequestToEntity() {
+        @Test
+        @DisplayName("Should map valid StorageBinRequest to a complete Entity")
+        void shouldMapRequestToEntity() {
+            CoordinateDto coordDto = new CoordinateDto(4, 12, 3);
+            StorageBinRequest request = new
+                    StorageBinRequest("A-04-B-12-T-03",
+                                                                        coordDto,
+                                                                        ZoneType.STORAGE,
+                                1500);
 
-      LocationRequest request = new LocationRequest(51.5136F, 7.4653F);
+            StorageBin entity = mapper.toEntity(request);
 
-      StorageBin entity = mapper.toEntity(request);
+            assertThat(entity).isNotNull();
+            assertThat(entity.getId()).isNull();
+            assertThat(entity.getBinCode()).isEqualTo("A-04-B-12-T-03");
+            assertThat(entity.getCoordinate().getX()).isEqualTo(4);
+            assertThat(entity.getCoordinate().getY()).isEqualTo(12);
+            assertThat(entity.getCoordinate().getZ()).isEqualTo(3);
+            assertThat(entity.getZoneType()).isEqualTo(ZoneType.STORAGE);
+            assertThat(entity.getMaxWeightCapacityKg()).isEqualTo(1500);
+        }
 
-      assertNotNull(entity);
-      assertNull(entity.getId(), "New entities mapped from a request should not have an ID yet");
-      assertEquals(51.5136F, entity.getLatitude());
-      assertEquals(7.4653F, entity.getLongitude());
+        @Test
+        void shouldReturnNull_WhenRequestIsNull() {
+            assertThat(mapper.toEntity(null)).isNull();
+        }
     }
 
-    @Test
-    @DisplayName("Should return null when LocationRequest is null")
-    void shouldReturnNull_WhenRequestIsNull() {
-      StorageBin entity = mapper.toEntity(null);
+    @Nested
+    @DisplayName("Mapping Entity to Response")
+    class ToResponseTests {
 
-      assertNull(entity);
+        @Test
+        @DisplayName("Should map complete StorageBin entity to nested Response DTO")
+        void shouldMapEntityToResponse() {
+            StorageBin entity = StorageBin.builder()
+                    .id(42L)
+                    .binCode("C-01-B-02-T-00")
+                    .coordinate(new Coordinate3D(1, 2, 0))
+                    .zoneType(ZoneType.CHARGING_STATION)
+                    .maxWeightCapacityKg(0)
+                    .build();
+
+            StorageBinResponse response = mapper.toResponse(entity);
+
+            assertThat(response).isNotNull();
+            assertThat(response.id()).isEqualTo(42L);
+            assertThat(response.binCode()).isEqualTo("C-01-B-02-T-00");
+            assertThat(response.coordinate().x()).isEqualTo(1);
+            assertThat(response.coordinate().y()).isEqualTo(2);
+            assertThat(response.coordinate().z()).isEqualTo(0);
+            assertThat(response.zoneType()).isEqualTo(ZoneType.CHARGING_STATION);
+            assertThat(response.maxWeightCapacityKg()).isZero();
+        }
+
+        @Test
+        void shouldReturnNull_WhenEntityIsNull() {
+            assertThat(mapper.toResponse(null)).isNull();
+        }
     }
-  }
-
-  @Nested
-  @DisplayName("Tests for toResponse mapping")
-  class ToResponseTests {
-
-    @Test
-    @DisplayName("Should correctly map StorageBin Entity to LocationResponse DTO")
-    void shouldMapEntityToResponse() {
-      StorageBin entity = StorageBin.builder().id(42L).latitude(51.5136F).longitude(7.4653F).build();
-
-      LocationResponse response = mapper.toResponse(entity);
-
-      assertNotNull(response);
-      assertEquals(42L, response.id());
-      assertEquals(51.5136F, response.latitude());
-      assertEquals(7.4653F, response.longitude());
-    }
-
-    @Test
-    @DisplayName("Should return null when StorageBin Entity is null")
-    void shouldReturnNull_WhenEntityIsNull() {
-      LocationResponse response = mapper.toResponse(null);
-
-      assertNull(response);
-    }
-  }
 }

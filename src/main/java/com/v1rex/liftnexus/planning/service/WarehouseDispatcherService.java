@@ -4,7 +4,7 @@ import ai.timefold.solver.core.api.solver.SolverManager;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.repository.LocationRepository;
+import com.v1rex.liftnexus.storagebin.repository.StorageBinRepository;
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.repository.TaskRepository;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class WarehouseDispatcherService {
-  private final LocationRepository locationRepository;
+  private final StorageBinRepository storageBinRepository;
   private final ForkliftRepository forkliftRepository;
   private final TaskRepository taskRepository;
 
@@ -30,7 +30,7 @@ public class WarehouseDispatcherService {
 
   public WarehouseSchedule buildCurrentState() {
     log.info("Building current warehouse state for optimization...");
-    List<StorageBin> storageBins = locationRepository.findAll();
+    List<StorageBin> storageBins = storageBinRepository.findAll();
     List<Forklift> forklifts = forkliftRepository.findAll();
     List<Task> tasks = taskRepository.findAll();
 

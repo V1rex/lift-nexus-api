@@ -1,3 +1,4 @@
+/*
 package com.v1rex.liftnexus.planning.logic;
 
 import ai.timefold.solver.core.api.score.HardSoftScore;
@@ -79,3 +80,4 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
         .asConstraint("Minimize travel distance");
   }
 }
+*/

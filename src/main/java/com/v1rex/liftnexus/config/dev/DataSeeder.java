@@ -1,10 +1,11 @@
+/*
 package com.v1rex.liftnexus.config.dev;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.repository.LocationRepository;
+import com.v1rex.liftnexus.storagebin.repository.StorageBinRepository;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.enums.TaskStatus;
 import com.v1rex.liftnexus.task.repository.TaskRepository;
@@ -20,15 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Profile("dev")
 @RequiredArgsConstructor
-public class DataSeeder implements CommandLineRunner {
-  private final LocationRepository locationRepository;
+public class DataSeeder
+        implements CommandLineRunner {
+  private final StorageBinRepository storageBinRepository;
   private final ForkliftRepository forkliftRepository;
   private final TaskRepository taskRepository;
 
   @Override
   @Transactional
   public void run(String... args) {
-    if (locationRepository.count() > 0) {
+    if (storageBinRepository.count() > 0) {
       log.info("Warehouse already has data. Skipping seed.");
       return;
     }
@@ -39,7 +41,7 @@ public class DataSeeder implements CommandLineRunner {
     StorageBin zoneA = StorageBin.builder().latitude(10.0f).longitude(5.0f).build();
     StorageBin zoneB = StorageBin.builder().latitude(-5.0f).longitude(15.0f).build();
     StorageBin shipping = StorageBin.builder().latitude(20.0f).longitude(20.0f).build();
-    locationRepository.saveAll(List.of(dock, zoneA, zoneB, shipping));
+    storageBinRepository.saveAll(List.of(dock, zoneA, zoneB, shipping));
 
     Forklift heavyTruck =
         Forklift.builder()
@@ -91,8 +93,9 @@ public class DataSeeder implements CommandLineRunner {
 
     log.info(
         "Seeding complete: {} Locations, {} Forklifts, {} Tasks.",
-        locationRepository.count(),
+        storageBinRepository.count(),
         forkliftRepository.count(),
         taskRepository.count());
   }
 }
+*/
