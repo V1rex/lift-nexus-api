@@ -1,11 +1,11 @@
-package com.v1rex.liftnexus.location.service;
+package com.v1rex.liftnexus.storagebin.service;
 
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationRequest;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.mapper.LocationMapper;
-import com.v1rex.liftnexus.location.repository.LocationRepository;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.mapper.LocationMapper;
+import com.v1rex.liftnexus.storagebin.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,20 +25,20 @@ public class LocationService {
   @Transactional
   public LocationResponse createLocation(LocationRequest request) {
     log.info(
-        "Creating location with latitude: {} and longitude: {}",
+        "Creating storagebin with latitude: {} and longitude: {}",
         request.latitude(),
         request.longitude());
-    Location location = locationMapper.toEntity(request);
+    StorageBin storageBin = locationMapper.toEntity(request);
 
-    Location savedLocation = locationRepository.save(location);
+    StorageBin savedStorageBin = locationRepository.save(storageBin);
 
     log.info(
-        "Successfully creation location with Id: {} latitude: {} and longitude: {}",
-        savedLocation.getId(),
-        savedLocation.getLatitude(),
-        savedLocation.getLongitude());
+        "Successfully creation storagebin with Id: {} latitude: {} and longitude: {}",
+        savedStorageBin.getId(),
+        savedStorageBin.getLatitude(),
+        savedStorageBin.getLongitude());
 
-    return locationMapper.toResponse(savedLocation);
+    return locationMapper.toResponse(savedStorageBin);
   }
 
   @Transactional(readOnly = true)
@@ -51,17 +51,17 @@ public class LocationService {
     return findAllEntities(pageable).map(locationMapper::toResponse);
   }
 
-  public Location findEntityById(Long id) {
+  public StorageBin findEntityById(Long id) {
     return locationRepository
         .findById(id)
         .orElseThrow(
             () -> {
-              log.warn("Location with id: {} not found.", id);
-              return new ResourceNotFoundException("Location  with " + id + " not found.");
+              log.warn("StorageBin with id: {} not found.", id);
+              return new ResourceNotFoundException("StorageBin  with " + id + " not found.");
             });
   }
 
-  public Page<Location> findAllEntities(Pageable pageable) {
+  public Page<StorageBin> findAllEntities(Pageable pageable) {
     return locationRepository.findAll(pageable);
   }
 }

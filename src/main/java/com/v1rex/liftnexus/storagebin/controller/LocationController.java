@@ -1,8 +1,8 @@
-package com.v1rex.liftnexus.location.controller;
+package com.v1rex.liftnexus.storagebin.controller;
 
-import com.v1rex.liftnexus.location.dto.LocationRequest;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.service.LocationService;
+import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.service.LocationService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;

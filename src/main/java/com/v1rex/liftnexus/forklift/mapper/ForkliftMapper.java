@@ -3,7 +3,7 @@ package com.v1rex.liftnexus.forklift.mapper;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
-import com.v1rex.liftnexus.location.mapper.LocationMapper;
+import com.v1rex.liftnexus.storagebin.mapper.LocationMapper;
 import com.v1rex.liftnexus.task.mapper.TaskMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class ForkliftMapper {
         entity.getWeightCapacity(),
         entity.getEquipmentType(),
         entity.getTasks().stream().map(taskMapper::toResponse).toList(),
-        locationMapper.toResponse(entity.getCurrentLocation()));
+        locationMapper.toResponse(entity.getCurrentStorageBin()));
   }
 
   public Forklift toEntity(ForkliftRequest request) {

@@ -3,8 +3,8 @@ package com.v1rex.liftnexus.config.dev;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.repository.LocationRepository;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.repository.LocationRepository;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.enums.TaskStatus;
 import com.v1rex.liftnexus.task.repository.TaskRepository;
@@ -35,32 +35,32 @@ public class DataSeeder implements CommandLineRunner {
 
     log.info("-------- Seeding Warehouse Dispatcher data ---------- ");
 
-    Location dock = Location.builder().latitude(0.0f).longitude(0.0f).build();
-    Location zoneA = Location.builder().latitude(10.0f).longitude(5.0f).build();
-    Location zoneB = Location.builder().latitude(-5.0f).longitude(15.0f).build();
-    Location shipping = Location.builder().latitude(20.0f).longitude(20.0f).build();
+    StorageBin dock = StorageBin.builder().latitude(0.0f).longitude(0.0f).build();
+    StorageBin zoneA = StorageBin.builder().latitude(10.0f).longitude(5.0f).build();
+    StorageBin zoneB = StorageBin.builder().latitude(-5.0f).longitude(15.0f).build();
+    StorageBin shipping = StorageBin.builder().latitude(20.0f).longitude(20.0f).build();
     locationRepository.saveAll(List.of(dock, zoneA, zoneB, shipping));
 
     Forklift heavyTruck =
         Forklift.builder()
             .weightCapacity(5000)
             .equipmentType(EquipmentType.SIDE_LOADER)
-            .currentLocation(dock)
+            .currentStorageBin(dock)
             .build();
 
     Forklift reachTruck =
         Forklift.builder()
             .weightCapacity(2000)
             .equipmentType(EquipmentType.REACH_TRUCK)
-            .currentLocation(zoneA)
+            .currentStorageBin(zoneA)
             .build();
 
     forkliftRepository.saveAll(List.of(heavyTruck, reachTruck));
 
     Task activeTask =
         Task.builder()
-            .pickLocation(zoneB)
-            .deliveryLocation(shipping)
+            .pickStorageBin(zoneB)
+            .deliveryStorageBin(shipping)
             .weight(500)
             .status(TaskStatus.IN_PROGRESS)
             .requiredEquipment(EquipmentType.REACH_TRUCK)
@@ -71,8 +71,8 @@ public class DataSeeder implements CommandLineRunner {
 
     Task heavyTask =
         Task.builder()
-            .pickLocation(zoneA)
-            .deliveryLocation(shipping)
+            .pickStorageBin(zoneA)
+            .deliveryStorageBin(shipping)
             .weight(4000)
             .status(TaskStatus.OPEN)
             .requiredEquipment(EquipmentType.SIDE_LOADER)
@@ -80,8 +80,8 @@ public class DataSeeder implements CommandLineRunner {
 
     Task openTask =
         Task.builder()
-            .pickLocation(dock)
-            .deliveryLocation(zoneB)
+            .pickStorageBin(dock)
+            .deliveryStorageBin(zoneB)
             .weight(100)
             .status(TaskStatus.OPEN)
             .requiredEquipment(EquipmentType.STANDARD)

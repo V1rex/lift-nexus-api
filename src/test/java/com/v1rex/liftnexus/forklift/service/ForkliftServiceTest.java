@@ -12,9 +12,9 @@ import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.service.LocationService;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.service.LocationService;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -193,33 +193,33 @@ public class ForkliftServiceTest {
   }
 
   @Nested
-  @DisplayName("Update Forklift Location Feature")
-  class UpdateForkliftLocation {
+  @DisplayName("Update Forklift StorageBin Feature")
+  class UpdateForkliftStorageBin {
     private final Long forkliftId = 1L;
     private final Long locationId = 10L;
 
     @Test
     @DisplayName(
-        "Should successfully update forklift location when both forklift and location exist")
+        "Should successfully update forklift storagebin when both forklift and storagebin exist")
     void updateForkliftLocation_ShouldReturnResponse_WhenBothExist() {
       Forklift existingForklift = new Forklift();
       existingForklift.setId(forkliftId);
       existingForklift.setWeightCapacity(1000);
       existingForklift.setEquipmentType(EquipmentType.STANDARD);
 
-      Location newLocation = new Location();
-      newLocation.setId(locationId);
-      newLocation.setLatitude(40.71F);
-      newLocation.setLongitude(-74.07F);
+      StorageBin newStorageBin = new StorageBin();
+      newStorageBin.setId(locationId);
+      newStorageBin.setLatitude(40.71F);
+      newStorageBin.setLongitude(-74.07F);
 
       when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.of(existingForklift));
-      when(locationService.findEntityById(locationId)).thenReturn(newLocation);
+      when(locationService.findEntityById(locationId)).thenReturn(newStorageBin);
 
       Forklift updatedForklift = new Forklift();
       updatedForklift.setId(forkliftId);
       updatedForklift.setWeightCapacity(1000);
       updatedForklift.setEquipmentType(EquipmentType.STANDARD);
-      updatedForklift.setCurrentLocation(newLocation);
+      updatedForklift.setCurrentStorageBin(newStorageBin);
 
       when(forkliftRepository.save(any(Forklift.class))).thenReturn(updatedForklift);
 
@@ -251,18 +251,18 @@ public class ForkliftServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when location does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when storagebin does not exist")
     void updateForkliftLocation_ShouldThrowException_WhenLocationDoesNotExist() {
       Forklift existingForklift = new Forklift();
       existingForklift.setId(forkliftId);
 
       when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.of(existingForklift));
       when(locationService.findEntityById(locationId))
-          .thenThrow(new ResourceNotFoundException("Location with " + locationId + " not found."));
+          .thenThrow(new ResourceNotFoundException("StorageBin with " + locationId + " not found."));
 
       assertThatThrownBy(() -> forkliftService.updateForkliftLocation(forkliftId, locationId))
           .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("Location with " + locationId + " not found.");
+          .hasMessageContaining("StorageBin with " + locationId + " not found.");
 
       verify(forkliftRepository, never()).save(any());
     }

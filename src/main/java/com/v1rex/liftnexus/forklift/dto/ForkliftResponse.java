@@ -1,7 +1,7 @@
 package com.v1rex.liftnexus.forklift.dto;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
 import com.v1rex.liftnexus.task.dto.TaskResponse;
 import java.util.List;
 

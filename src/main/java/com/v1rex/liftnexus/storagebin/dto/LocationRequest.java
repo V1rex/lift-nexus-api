@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.location.dto;
+package com.v1rex.liftnexus.storagebin.dto;
 
 import jakarta.validation.constraints.NotNull;
 

@@ -54,23 +54,23 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
               List<Task> tasks = forklift.getTasks();
               // initial drive to the first task
               totalTraveledDistance +=
-                  (int) forklift.getCurrentLocation().distanceTo(tasks.get(0).getPickLocation());
+                  (int) forklift.getCurrentStorageBin().distanceTo(tasks.get(0).getPickStorageBin());
 
               for (int i = 0; i < tasks.size(); i++) {
                 Task current = tasks.get(i);
 
                 // We calculate the travel distance from currentTask
-                // to the Delivery Location
+                // to the Delivery StorageBin
                 totalTraveledDistance +=
-                    (int) current.getPickLocation().distanceTo(current.getDeliveryLocation());
+                    (int) current.getPickStorageBin().distanceTo(current.getDeliveryStorageBin());
 
                 // if there is a next task, we calculate the travel distance
-                // from the delivery location to the pick location
+                // from the delivery storagebin to the pick storagebin
                 // of the next task
                 if (i < tasks.size() - 1) {
                   Task next = tasks.get(i + 1);
                   totalTraveledDistance +=
-                      (int) current.getDeliveryLocation().distanceTo(next.getPickLocation());
+                      (int) current.getDeliveryStorageBin().distanceTo(next.getPickStorageBin());
                 }
               }
               // todo: think about the metrics!!

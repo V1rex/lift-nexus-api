@@ -147,7 +147,7 @@ public class ForkliftControllerTest {
   class CreateForkliftTest {
 
     @Test
-    @DisplayName("Should return 201 Created along with matching location headers")
+    @DisplayName("Should return 201 Created along with matching storagebin headers")
     void shouldCreateForkliftAndReturnCreated() throws Exception {
       ForkliftRequest requestPayload = new ForkliftRequest(1500, EquipmentType.STANDARD);
       ForkliftResponse generatedResponse =
@@ -163,18 +163,18 @@ public class ForkliftControllerTest {
                   .content(objectMapper.writeValueAsString(requestPayload)))
           .andDo(print())
           .andExpect(status().isCreated())
-          .andExpect(header().string("Location", "http://localhost/api/v1/forklifts/99"))
+          .andExpect(header().string("StorageBin", "http://localhost/api/v1/forklifts/99"))
           .andExpect(jsonPath("$.id").value(99))
           .andExpect(jsonPath("$.weightCapacity").value(1500));
     }
   }
 
   @Nested
-  @DisplayName("Tests - PUT /api/v1/forklifts/{id}/location")
-  class UpdateLocationTest {
+  @DisplayName("Tests - PUT /api/v1/forklifts/{id}/storagebin")
+  class UpdateStorageBinTest {
 
     @Test
-    @DisplayName("Should update forklift coordinates location and return 200 OK")
+    @DisplayName("Should update forklift coordinates storagebin and return 200 OK")
     void shouldUpdateForkliftLocationAndReturnOk() throws Exception {
       ForkliftLocationUpdateRequest updateRequest = new ForkliftLocationUpdateRequest(5L);
       ForkliftResponse updatedResponse =

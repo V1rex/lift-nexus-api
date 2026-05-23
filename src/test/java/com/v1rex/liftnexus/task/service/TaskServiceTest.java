@@ -7,9 +7,9 @@ import static org.mockito.Mockito.*;
 
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.service.LocationService;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.service.LocationService;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.dto.TaskRequest;
 import com.v1rex.liftnexus.task.dto.TaskResponse;
@@ -44,26 +44,26 @@ public class TaskServiceTest {
     private final Long pickLocationId = 10L;
     private final Long deliveryLocationId = 20L;
     private TaskRequest validRequest;
-    private Location pickLocation;
-    private Location deliveryLocation;
+    private StorageBin pickStorageBin;
+    private StorageBin deliveryStorageBin;
 
     @BeforeEach
     void setUp() {
       validRequest =
           new TaskRequest(pickLocationId, deliveryLocationId, null, EquipmentType.STANDARD, 750);
 
-      pickLocation = new Location();
-      pickLocation.setId(pickLocationId);
+      pickStorageBin = new StorageBin();
+      pickStorageBin.setId(pickLocationId);
 
-      deliveryLocation = new Location();
-      deliveryLocation.setId(deliveryLocationId);
+      deliveryStorageBin = new StorageBin();
+      deliveryStorageBin.setId(deliveryLocationId);
     }
 
     @Test
     @DisplayName("Should successfully create an OPEN task when locations are valid")
     void createTask_ShouldReturnResponse_WhenRequestIsValid() {
-      when(locationService.findEntityById(pickLocationId)).thenReturn(pickLocation);
-      when(locationService.findEntityById(deliveryLocationId)).thenReturn(deliveryLocation);
+      when(locationService.findEntityById(pickLocationId)).thenReturn(pickStorageBin);
+      when(locationService.findEntityById(deliveryLocationId)).thenReturn(deliveryStorageBin);
 
       Task transientTask = new Task();
       transientTask.setWeight(750);
@@ -73,8 +73,8 @@ public class TaskServiceTest {
       savedTask.setId(100L);
       savedTask.setStatus(TaskStatus.OPEN);
       savedTask.setWeight(750);
-      savedTask.setPickLocation(pickLocation);
-      savedTask.setDeliveryLocation(deliveryLocation);
+      savedTask.setPickStorageBin(pickStorageBin);
+      savedTask.setDeliveryStorageBin(deliveryStorageBin);
       savedTask.setRequiredEquipment(EquipmentType.STANDARD);
 
       when(taskRepository.save(any(Task.class))).thenReturn(savedTask);

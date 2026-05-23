@@ -5,7 +5,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
-import com.v1rex.liftnexus.location.domain.Location;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.enums.TaskStatus;
 import jakarta.persistence.EntityManager;
@@ -30,21 +30,21 @@ public class TaskRepositoryTest {
   @Autowired private TaskRepository taskRepository;
 
   @Autowired private EntityManager entityManager;
-  private Location defaultPickLocation;
-  private Location defaultDeliveryLocation;
+  private StorageBin defaultPickStorageBin;
+  private StorageBin defaultDeliveryStorageBin;
 
   @BeforeEach
   void setUp() {
-    defaultPickLocation = new Location();
-    defaultPickLocation.setLatitude(51.5142f);
-    defaultPickLocation.setLongitude(7.4653f);
+    defaultPickStorageBin = new StorageBin();
+    defaultPickStorageBin.setLatitude(51.5142f);
+    defaultPickStorageBin.setLongitude(7.4653f);
 
-    defaultDeliveryLocation = new Location();
-    defaultDeliveryLocation.setLatitude(51.5155f);
-    defaultDeliveryLocation.setLongitude(7.4668f);
+    defaultDeliveryStorageBin = new StorageBin();
+    defaultDeliveryStorageBin.setLatitude(51.5155f);
+    defaultDeliveryStorageBin.setLongitude(7.4668f);
 
-    entityManager.persist(defaultPickLocation);
-    entityManager.persist(defaultDeliveryLocation);
+    entityManager.persist(defaultPickStorageBin);
+    entityManager.persist(defaultDeliveryStorageBin);
     entityManager.flush();
   }
 
@@ -58,8 +58,8 @@ public class TaskRepositoryTest {
       Task invalidTask =
           Task.builder()
               .weight(0)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build();
 
       assertThatThrownBy(() -> taskRepository.saveAndFlush(invalidTask))
@@ -72,8 +72,8 @@ public class TaskRepositoryTest {
       Task invalidTask =
           Task.builder()
               .weight(-1)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build();
 
       assertThatThrownBy(() -> taskRepository.saveAndFlush(invalidTask))
@@ -86,8 +86,8 @@ public class TaskRepositoryTest {
       Task invalidTask =
           Task.builder()
               .weight(null)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build();
 
       assertThatThrownBy(() -> taskRepository.saveAndFlush(invalidTask))
@@ -106,16 +106,16 @@ public class TaskRepositoryTest {
           Task.builder()
               .weight(500)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .forklift(null)
               .build();
       Task unassignedTask2 =
           Task.builder()
               .weight(800)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .forklift(null)
               .build();
 
@@ -127,8 +127,8 @@ public class TaskRepositoryTest {
           Task.builder()
               .weight(1200)
               .status(TaskStatus.ASSIGNED)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .forklift(mockForklift)
               .build();
 
@@ -150,22 +150,22 @@ public class TaskRepositoryTest {
           Task.builder()
               .weight(100)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
           Task.builder()
               .weight(200)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
           Task.builder()
               .weight(300)
               .status(TaskStatus.COMPLETED)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.flush();
 
@@ -184,22 +184,22 @@ public class TaskRepositoryTest {
           Task.builder()
               .weight(500)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
           Task.builder()
               .weight(1000)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.save(
           Task.builder()
               .weight(1500)
               .status(TaskStatus.OPEN)
-              .pickLocation(defaultPickLocation)
-              .deliveryLocation(defaultDeliveryLocation)
+              .pickStorageBin(defaultPickStorageBin)
+              .deliveryStorageBin(defaultDeliveryStorageBin)
               .build());
       taskRepository.flush();
 
@@ -224,22 +224,22 @@ public class TaskRepositoryTest {
             Task.builder()
                 .weight(500)
                 .status(TaskStatus.OPEN)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
             Task.builder()
                 .weight(1500)
                 .status(TaskStatus.OPEN)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
             Task.builder()
                 .weight(2000)
                 .status(TaskStatus.COMPLETED)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.flush();
 
@@ -259,22 +259,22 @@ public class TaskRepositoryTest {
             Task.builder()
                 .weight(500)
                 .status(TaskStatus.OPEN)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
             Task.builder()
                 .weight(1200)
                 .status(TaskStatus.OPEN)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
             Task.builder()
                 .weight(1800)
                 .status(TaskStatus.COMPLETED)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.flush();
 
@@ -293,15 +293,15 @@ public class TaskRepositoryTest {
             Task.builder()
                 .weight(500)
                 .status(TaskStatus.OPEN)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.save(
             Task.builder()
                 .weight(1500)
                 .status(TaskStatus.COMPLETED)
-                .pickLocation(defaultPickLocation)
-                .deliveryLocation(defaultDeliveryLocation)
+                .pickStorageBin(defaultPickStorageBin)
+                .deliveryStorageBin(defaultDeliveryStorageBin)
                 .build());
         taskRepository.flush();
 

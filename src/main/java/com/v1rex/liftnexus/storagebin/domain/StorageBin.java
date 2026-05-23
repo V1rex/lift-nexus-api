@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.location.domain;
+package com.v1rex.liftnexus.storagebin.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class StorageBin {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class Location {
   @Column(nullable = false)
   private Float longitude;
 
-  public double distanceTo(Location other) {
+  public double distanceTo(StorageBin other) {
     double dx = this.latitude - other.latitude;
     double dy = this.longitude - other.longitude;
     return Math.sqrt(dx * dx + dy * dy);

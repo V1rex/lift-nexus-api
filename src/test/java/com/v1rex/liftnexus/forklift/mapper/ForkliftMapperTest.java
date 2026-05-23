@@ -9,9 +9,9 @@ import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.mapper.LocationMapper;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.mapper.LocationMapper;
 import com.v1rex.liftnexus.task.domain.Task;
 import com.v1rex.liftnexus.task.dto.TaskResponse;
 import com.v1rex.liftnexus.task.enums.TaskStatus;
@@ -40,7 +40,7 @@ public class ForkliftMapperTest {
   class ToEntityTests {
 
     @Test
-    @DisplayName("Should correctly map LocationRequest to Location Entity")
+    @DisplayName("Should correctly map LocationRequest to StorageBin Entity")
     void shouldMapRequestToEntity() {
       ForkliftRequest request = new ForkliftRequest(1, EquipmentType.STANDARD);
 
@@ -80,9 +80,9 @@ public class ForkliftMapperTest {
           .thenReturn(
               new TaskResponse(2L, null, null, 5, EquipmentType.STANDARD, TaskStatus.OPEN, null));
 
-      Location mockLocation =
-          Location.builder().id(99L).latitude(51.5136F).longitude(7.4653F).build();
-      when(locationMapper.toResponse(mockLocation))
+      StorageBin mockStorageBin =
+          StorageBin.builder().id(99L).latitude(51.5136F).longitude(7.4653F).build();
+      when(locationMapper.toResponse(mockStorageBin))
           .thenReturn(new LocationResponse(99L, 51.5136F, 7.4653F));
 
       List<Task> mockTasks = new ArrayList<>();
@@ -95,7 +95,7 @@ public class ForkliftMapperTest {
               .weightCapacity(1)
               .equipmentType(EquipmentType.STANDARD)
               .tasks(mockTasks)
-              .currentLocation(mockLocation)
+              .currentStorageBin(mockStorageBin)
               .build();
 
       // Acting
@@ -116,7 +116,7 @@ public class ForkliftMapperTest {
       assertEquals(2L, response.tasks().get(1).id());
       assertEquals(5, response.tasks().get(1).weight());
 
-      // we take a look at the mocked location
+      // we take a look at the mocked storagebin
       assertEquals(99L, response.currentLocation().id());
       assertEquals(51.5136F, response.currentLocation().latitude());
       assertEquals(7.4653F, response.currentLocation().longitude());

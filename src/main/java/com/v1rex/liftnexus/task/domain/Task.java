@@ -6,7 +6,7 @@ import ai.timefold.solver.core.api.domain.variable.InverseRelationShadowVariable
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
-import com.v1rex.liftnexus.location.domain.Location;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.task.enums.TaskStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -27,11 +27,11 @@ public class Task {
 
   @ManyToOne
   @JoinColumn(name = "pick_location_id", nullable = false)
-  private Location pickLocation;
+  private StorageBin pickStorageBin;
 
   @ManyToOne
   @JoinColumn(name = "delivery_location_id", nullable = false)
-  private Location deliveryLocation;
+  private StorageBin deliveryStorageBin;
 
   @NotNull
   @Min(value = 1, message = "Weight must be greater than 0")

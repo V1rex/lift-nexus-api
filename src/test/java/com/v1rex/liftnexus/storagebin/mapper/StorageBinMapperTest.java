@@ -1,15 +1,15 @@
-package com.v1rex.liftnexus.location.mapper;
+package com.v1rex.liftnexus.storagebin.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationRequest;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class LocationMapperTest {
+class StorageBinMapperTest {
 
   private final LocationMapper mapper = new LocationMapper();
 
@@ -18,12 +18,12 @@ class LocationMapperTest {
   class ToEntityTests {
 
     @Test
-    @DisplayName("Should correctly map LocationRequest to Location Entity")
+    @DisplayName("Should correctly map LocationRequest to StorageBin Entity")
     void shouldMapRequestToEntity() {
 
       LocationRequest request = new LocationRequest(51.5136F, 7.4653F);
 
-      Location entity = mapper.toEntity(request);
+      StorageBin entity = mapper.toEntity(request);
 
       assertNotNull(entity);
       assertNull(entity.getId(), "New entities mapped from a request should not have an ID yet");
@@ -34,7 +34,7 @@ class LocationMapperTest {
     @Test
     @DisplayName("Should return null when LocationRequest is null")
     void shouldReturnNull_WhenRequestIsNull() {
-      Location entity = mapper.toEntity(null);
+      StorageBin entity = mapper.toEntity(null);
 
       assertNull(entity);
     }
@@ -45,9 +45,9 @@ class LocationMapperTest {
   class ToResponseTests {
 
     @Test
-    @DisplayName("Should correctly map Location Entity to LocationResponse DTO")
+    @DisplayName("Should correctly map StorageBin Entity to LocationResponse DTO")
     void shouldMapEntityToResponse() {
-      Location entity = Location.builder().id(42L).latitude(51.5136F).longitude(7.4653F).build();
+      StorageBin entity = StorageBin.builder().id(42L).latitude(51.5136F).longitude(7.4653F).build();
 
       LocationResponse response = mapper.toResponse(entity);
 
@@ -58,7 +58,7 @@ class LocationMapperTest {
     }
 
     @Test
-    @DisplayName("Should return null when Location Entity is null")
+    @DisplayName("Should return null when StorageBin Entity is null")
     void shouldReturnNull_WhenEntityIsNull() {
       LocationResponse response = mapper.toResponse(null);
 

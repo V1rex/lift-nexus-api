@@ -1,10 +1,11 @@
-package com.v1rex.liftnexus.location.repository;
+package com.v1rex.liftnexus.storagebin.repository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import com.v1rex.liftnexus.location.domain.Location;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +17,29 @@ import org.springframework.test.context.ActiveProfiles;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @ActiveProfiles("test")
-public class LocationRepositoryTest {
+public class StorageBinRepositoryTest {
 
   @Autowired private LocationRepository locationRepository;
 
   @Test
-  @DisplayName("Should save and find a Location by ID")
+  @DisplayName("Should save and find a StorageBin by ID")
   void shouldSaveAndFindLocation() {
-    Location location = Location.builder().latitude(51.5136F).longitude(7.4653F).build();
+    StorageBin storageBin = StorageBin.builder().latitude(51.5136F).longitude(7.4653F).build();
 
-    Location saved = locationRepository.save(location);
+    StorageBin saved = locationRepository.save(storageBin);
 
-    Optional<Location> found = locationRepository.findById(saved.getId());
+    Optional<StorageBin> found = locationRepository.findById(saved.getId());
     assertThat(found).isPresent();
-    assertThat(found.get().getLatitude()).isEqualTo(location.getLatitude());
-    assertThat(found.get().getLongitude()).isEqualTo(location.getLongitude());
+    assertThat(found.get().getLatitude()).isEqualTo(storageBin.getLatitude());
+    assertThat(found.get().getLongitude()).isEqualTo(storageBin.getLongitude());
   }
 
   @Test
-  @DisplayName("Should return empty Optional when Location does not exist")
+  @DisplayName("Should return empty Optional when StorageBin does not exist")
   void shouldReturnEmptyOptional_WhenLocationDoesNotExist() {
     Long nonExistingId = 99999L;
 
-    Optional<Location> found = locationRepository.findById(nonExistingId);
+    Optional<StorageBin> found = locationRepository.findById(nonExistingId);
 
     assertThat(found).isEmpty();
   }
@@ -46,11 +47,11 @@ public class LocationRepositoryTest {
   @Test
   @DisplayName("Should throw exception when required fields are missing")
   void shouldThrowException_WhenRequiredFieldsAreMissing() {
-    Location invalidLocation = Location.builder().latitude(51.5136f).longitude(null).build();
+    StorageBin invalidStorageBin = StorageBin.builder().latitude(51.5136f).longitude(null).build();
 
     assertThatThrownBy(
             () -> {
-              locationRepository.saveAndFlush(invalidLocation);
+              locationRepository.saveAndFlush(invalidStorageBin);
             })
         .isInstanceOf(DataIntegrityViolationException.class);
   }

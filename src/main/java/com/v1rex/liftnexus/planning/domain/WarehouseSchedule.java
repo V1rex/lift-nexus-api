@@ -7,7 +7,7 @@ import ai.timefold.solver.core.api.domain.solution.ProblemFactCollectionProperty
 import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
 import ai.timefold.solver.core.api.score.HardSoftScore;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
-import com.v1rex.liftnexus.location.domain.Location;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.task.domain.Task;
 import java.util.List;
 import lombok.*;
@@ -19,7 +19,7 @@ import lombok.*;
 @AllArgsConstructor
 public class WarehouseSchedule {
 
-  @ProblemFactCollectionProperty private List<Location> locations;
+  @ProblemFactCollectionProperty private List<StorageBin> storageBins;
 
   @ValueRangeProvider(id = "taskPoolRange")
   @PlanningEntityCollectionProperty

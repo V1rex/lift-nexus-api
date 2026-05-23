@@ -2,7 +2,7 @@ package com.v1rex.liftnexus.forklift.domain;
 
 import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
 import ai.timefold.solver.core.api.domain.variable.PlanningListVariable;
-import com.v1rex.liftnexus.location.domain.Location;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.task.domain.Task;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -42,5 +42,5 @@ public class Forklift {
 
   @ManyToOne
   @JoinColumn(name = "current_location_id")
-  private Location currentLocation;
+  private StorageBin currentStorageBin;
 }

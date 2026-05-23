@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.location;
+package com.v1rex.liftnexus.storagebin;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -6,9 +6,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationRequest;
-import com.v1rex.liftnexus.location.repository.LocationRepository;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
+import com.v1rex.liftnexus.storagebin.repository.LocationRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class LocationIntegrationTest {
+class StorageBinIntegrationTest {
 
   @Autowired private MockMvc mockMvc;
 
@@ -37,7 +37,7 @@ class LocationIntegrationTest {
   }
 
   @Test
-  @DisplayName("E2E: Should save location in database and return 201 when a valid POST is made")
+  @DisplayName("E2E: Should save storagebin in database and return 201 when a valid POST is made")
   void shouldRegisterLocationInDatabase_WhenValidPostRequestIsMade() throws Exception {
     LocationRequest request = new LocationRequest(51.5136F, 7.4653F);
 
@@ -49,10 +49,10 @@ class LocationIntegrationTest {
         .andDo(print())
         .andExpect(status().isCreated());
 
-    List<Location> savedLocations = locationRepository.findAll();
+    List<StorageBin> savedStorageBins = locationRepository.findAll();
 
-    assertEquals(1, savedLocations.size(), "Database should have exactly one location");
-    assertEquals(51.5136F, savedLocations.get(0).getLatitude());
-    assertEquals(7.4653F, savedLocations.get(0).getLongitude());
+    assertEquals(1, savedStorageBins.size(), "Database should have exactly one storagebin");
+    assertEquals(51.5136F, savedStorageBins.get(0).getLatitude());
+    assertEquals(7.4653F, savedStorageBins.get(0).getLongitude());
   }
 }

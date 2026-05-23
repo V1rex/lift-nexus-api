@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.location.controller;
+package com.v1rex.liftnexus.storagebin.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,9 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
-import com.v1rex.liftnexus.location.dto.LocationRequest;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.service.LocationService;
+import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.service.LocationService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = LocationController.class)
 @ActiveProfiles("test")
-public class LocationControllerTest {
+public class StorageBinControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
@@ -53,7 +53,7 @@ public class LocationControllerTest {
   }
 
   @Test
-  @DisplayName("Should return a location when GET request is made to /api/v1/locations/{id}")
+  @DisplayName("Should return a storagebin when GET request is made to /api/v1/locations/{id}")
   void shouldReturnLocation_WhenGetRequestIsMadeToFindById() throws Exception {
     LocationResponse mockDto = new LocationResponse(1L, 51.5136F, 7.4653F);
 
@@ -75,7 +75,7 @@ public class LocationControllerTest {
     Long nonExistingId = 1L;
 
     Mockito.when(locationService.findById(nonExistingId))
-        .thenThrow(new ResourceNotFoundException("Location with " + nonExistingId + " not found."));
+        .thenThrow(new ResourceNotFoundException("StorageBin with " + nonExistingId + " not found."));
 
     mockMvc
         .perform(get("/api/v1/locations/{id}", nonExistingId).accept(MediaType.APPLICATION_JSON))
@@ -84,7 +84,7 @@ public class LocationControllerTest {
   }
 
   @Test
-  @DisplayName("Should return 201 Created and the location URI when valid data is posted")
+  @DisplayName("Should return 201 Created and the storagebin URI when valid data is posted")
   void shouldCreateLocation_WhenDataIsValid() throws Exception {
     LocationRequest requestDto = new LocationRequest(51.5136F, 7.4653F);
     LocationResponse responseDto = new LocationResponse(42L, 51.5136F, 7.4653F);
@@ -102,7 +102,7 @@ public class LocationControllerTest {
         .andExpect(status().isCreated())
         .andExpect(
             header()
-                .string("Location", org.hamcrest.Matchers.containsString("/api/v1/locations/42")))
+                .string("StorageBin", org.hamcrest.Matchers.containsString("/api/v1/locations/42")))
         .andExpect(jsonPath("$.id").value(42))
         .andExpect(jsonPath("$.latitude").value(51.5136))
         .andExpect(jsonPath("$.longitude").value(7.4653));

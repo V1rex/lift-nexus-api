@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.location.service;
+package com.v1rex.liftnexus.storagebin.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -6,11 +6,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
-import com.v1rex.liftnexus.location.domain.Location;
-import com.v1rex.liftnexus.location.dto.LocationRequest;
-import com.v1rex.liftnexus.location.dto.LocationResponse;
-import com.v1rex.liftnexus.location.mapper.LocationMapper;
-import com.v1rex.liftnexus.location.repository.LocationRepository;
+import com.v1rex.liftnexus.storagebin.domain.StorageBin;
+import com.v1rex.liftnexus.storagebin.dto.LocationRequest;
+import com.v1rex.liftnexus.storagebin.dto.LocationResponse;
+import com.v1rex.liftnexus.storagebin.mapper.LocationMapper;
+import com.v1rex.liftnexus.storagebin.repository.LocationRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,8 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Location Service Unit Tests")
-public class LocationServiceTest {
+@DisplayName("StorageBin Service Unit Tests")
+public class StorageBinServiceTest {
 
   @Mock private LocationRepository locationRepository;
 
@@ -33,29 +33,29 @@ public class LocationServiceTest {
   @InjectMocks private LocationService locationService;
 
   @Nested
-  @DisplayName("Create Location Feature")
-  class CreateLocation {
+  @DisplayName("Create StorageBin Feature")
+  class CreateStorageBin {
 
     @Test
-    @DisplayName("Should successfully create a Location")
+    @DisplayName("Should successfully create a StorageBin")
     void createLocation_ShouldReturnResponse_WhenRequestIsValid() {
       LocationRequest locationRequest = new LocationRequest(40.71F, -74.07F);
 
-      Location location = new Location();
-      location.setLatitude(40.71F);
-      location.setLongitude(-74.07F);
+      StorageBin storageBin = new StorageBin();
+      storageBin.setLatitude(40.71F);
+      storageBin.setLongitude(-74.07F);
 
-      when(locationMapper.toEntity(locationRequest)).thenReturn(location);
+      when(locationMapper.toEntity(locationRequest)).thenReturn(storageBin);
 
-      Location savedLocation = new Location();
-      savedLocation.setId(1L);
-      savedLocation.setLatitude(40.71F);
-      savedLocation.setLongitude(-74.07F);
+      StorageBin savedStorageBin = new StorageBin();
+      savedStorageBin.setId(1L);
+      savedStorageBin.setLatitude(40.71F);
+      savedStorageBin.setLongitude(-74.07F);
 
-      when(locationRepository.save(any(Location.class))).thenReturn(savedLocation);
+      when(locationRepository.save(any(StorageBin.class))).thenReturn(savedStorageBin);
 
       LocationResponse mockResponse = new LocationResponse(1L, 40.71F, -74.07F);
-      when(locationMapper.toResponse(savedLocation)).thenReturn(mockResponse);
+      when(locationMapper.toResponse(savedStorageBin)).thenReturn(mockResponse);
 
       LocationResponse result = locationService.createLocation(locationRequest);
 
@@ -67,22 +67,22 @@ public class LocationServiceTest {
   }
 
   @Nested
-  @DisplayName("Find Location by ID Feature")
-  class FindLocationById {
+  @DisplayName("Find StorageBin by ID Feature")
+  class FindStorageBinById {
     private final Long locationId = 1L;
 
     @Test
-    @DisplayName("Should return LocationResponse when location exists")
+    @DisplayName("Should return LocationResponse when storagebin exists")
     void findById_ShouldReturnResponse_WhenLocationExists() {
-      Location existingLocation = new Location();
-      existingLocation.setId(locationId);
-      existingLocation.setLatitude(40.71F);
-      existingLocation.setLongitude(-74.07F);
+      StorageBin existingStorageBin = new StorageBin();
+      existingStorageBin.setId(locationId);
+      existingStorageBin.setLatitude(40.71F);
+      existingStorageBin.setLongitude(-74.07F);
 
-      when(locationRepository.findById(locationId)).thenReturn(Optional.of(existingLocation));
+      when(locationRepository.findById(locationId)).thenReturn(Optional.of(existingStorageBin));
 
       LocationResponse mockResponse = new LocationResponse(locationId, 40.71F, -74.07F);
-      when(locationMapper.toResponse(existingLocation)).thenReturn(mockResponse);
+      when(locationMapper.toResponse(existingStorageBin)).thenReturn(mockResponse);
 
       LocationResponse result = locationService.findById(locationId);
 
@@ -92,13 +92,13 @@ public class LocationServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when location does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when storagebin does not exist")
     void findById_ShouldThrowException_WhenLocationDoesNotExist() {
       when(locationRepository.findById(locationId)).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> locationService.findById(locationId))
           .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("Location  with " + locationId + " not found.");
+          .hasMessageContaining("StorageBin  with " + locationId + " not found.");
 
       verifyNoInteractions(locationMapper);
     }
@@ -111,15 +111,15 @@ public class LocationServiceTest {
     @DisplayName("Should return paginated LocationResponses")
     void findAll_ShouldReturnPage_WhenCalled() {
       Pageable pageable = Pageable.unpaged();
-      Location location = new Location();
-      location.setId(1L);
-      Page<Location> mockPage =
-          new org.springframework.data.domain.PageImpl<>(java.util.List.of(location));
+      StorageBin storageBin = new StorageBin();
+      storageBin.setId(1L);
+      Page<StorageBin> mockPage =
+          new org.springframework.data.domain.PageImpl<>(java.util.List.of(storageBin));
 
       when(locationRepository.findAll(pageable)).thenReturn(mockPage);
 
       LocationResponse mockResponse = new LocationResponse(1L, 40.71F, -74.07F);
-      when(locationMapper.toResponse(location)).thenReturn(mockResponse);
+      when(locationMapper.toResponse(storageBin)).thenReturn(mockResponse);
 
       Page<LocationResponse> result = locationService.findAll(pageable);
 
