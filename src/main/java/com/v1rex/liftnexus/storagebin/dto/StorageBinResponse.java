@@ -7,5 +7,4 @@ public record StorageBinResponse(
     String binCode,
     CoordinateDto coordinate,
     ZoneType zoneType,
-    Integer maxWeightCapacityKg
-) {}
+    Integer maxWeightCapacityKg) {}

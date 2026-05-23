@@ -21,33 +21,31 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequiredArgsConstructor
 public class StorageBinController {
 
-    private final StorageBinService storageBinService;
+  private final StorageBinService storageBinService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StorageBinResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(storageBinService.findById(id));
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<StorageBinResponse> findById(@PathVariable Long id) {
+    return ResponseEntity.ok(storageBinService.findById(id));
+  }
 
-    @GetMapping
-    public ResponseEntity<Page<StorageBinResponse>> findAllStorageBins(
-            @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.ok(storageBinService.findAll(pageable));
-    }
+  @GetMapping
+  public ResponseEntity<Page<StorageBinResponse>> findAllStorageBins(
+      @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    return ResponseEntity.ok(storageBinService.findAll(pageable));
+  }
 
+  @PostMapping
+  public ResponseEntity<StorageBinResponse> createStorageBin(
+      @RequestBody @Valid StorageBinRequest request) {
 
-    @PostMapping
-    public ResponseEntity<StorageBinResponse> createStorageBin(
-            @RequestBody @Valid StorageBinRequest request) {
+    StorageBinResponse savedBin = storageBinService.createStorageBin(request);
 
-        StorageBinResponse savedBin = storageBinService.createStorageBin(request);
+    URI location =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(savedBin.id())
+            .toUri();
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedBin.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(savedBin);
-    }
-
-
+    return ResponseEntity.created(location).body(savedBin);
+  }
 }

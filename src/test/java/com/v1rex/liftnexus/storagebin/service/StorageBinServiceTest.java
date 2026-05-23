@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
-import com.v1rex.liftnexus.storagebin.domain.Coordinate3D;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.domain.ZoneType;
 import com.v1rex.liftnexus.storagebin.dto.CoordinateDto;
@@ -30,210 +29,157 @@ import org.springframework.data.domain.Pageable;
 @DisplayName("StorageBin Service Unit Tests")
 public class StorageBinServiceTest {
 
-    @Mock private StorageBinRepository storageBinRepository;
-    @Mock private StorageBinMapper storageBinMapper;
-    @InjectMocks private StorageBinService storageBinService;
+  @Mock private StorageBinRepository storageBinRepository;
+  @Mock private StorageBinMapper storageBinMapper;
+  @InjectMocks private StorageBinService storageBinService;
 
-    @Nested
-    @DisplayName("Create StorageBin Operations")
-    class CreateStorageBin {
+  @Nested
+  @DisplayName("Create StorageBin Operations")
+  class CreateStorageBin {
 
-        @Test
-        @DisplayName("Should save entity and return payload when registration criteria are met")
-        void shouldCreateBin_WhenRequestIsValid() {
-            // Arrange
-            CoordinateDto dtoCoord = new CoordinateDto(1, 2, 3);
-            StorageBinRequest request = new
-                    StorageBinRequest("B-01-02-03",
-                                                                        dtoCoord,
-                                                                        ZoneType.STORAGE,
-                                                                        1200);
+    @Test
+    @DisplayName("Should save entity and return payload when registration criteria are met")
+    void shouldCreateBin_WhenRequestIsValid() {
+      // Arrange
+      CoordinateDto dtoCoord = new CoordinateDto(1, 2, 3);
+      StorageBinRequest request =
+          new StorageBinRequest("B-01-02-03", dtoCoord, ZoneType.STORAGE, 1200);
 
+      StorageBin mockEntity = StorageBin.builder().binCode("B-01-02-03").build();
 
-            StorageBin mockEntity = StorageBin
-                                                        .builder()
-                                                        .binCode("B-01-02-03").build();
+      StorageBin savedEntity = StorageBin.builder().id(100L).binCode("B-01-02-03").build();
 
-            StorageBin savedEntity = StorageBin
-                                                        .builder()
-                                                        .id(100L)
-                                                        .binCode("B-01-02-03")
-                                                        .build();
+      StorageBinResponse expectedResponse =
+          new StorageBinResponse(100L, "B-01-02-03", dtoCoord, ZoneType.STORAGE, 1200);
 
-            StorageBinResponse expectedResponse = new
-                                StorageBinResponse(100L,
-                                                      "B-01-02-03",
-                                                                        dtoCoord,
-                                                                        ZoneType.STORAGE,
-                                1200);
+      when(storageBinRepository.existsByBinCode("B-01-02-03")).thenReturn(false);
+      when(storageBinMapper.toEntity(request)).thenReturn(mockEntity);
+      when(storageBinRepository.save(mockEntity)).thenReturn(savedEntity);
+      when(storageBinMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
 
+      // Act
+      StorageBinResponse output = storageBinService.createStorageBin(request);
 
-            when(storageBinRepository.existsByBinCode("B-01-02-03"))
-                    .thenReturn(false);
-            when(storageBinMapper.toEntity(request))
-                    .thenReturn(mockEntity);
-            when(storageBinRepository.save(mockEntity))
-                    .thenReturn(savedEntity);
-            when(storageBinMapper.toResponse(savedEntity))
-                    .thenReturn(expectedResponse);
-
-            // Act
-            StorageBinResponse output = storageBinService.createStorageBin(request);
-
-            // Assert
-            assertThat(output).isNotNull();
-            assertThat(output.id()).isEqualTo(100L);
-            assertThat(output.binCode()).isEqualTo("B-01-02-03");
-            verify(storageBinRepository, times(1))
-                    .save(any(StorageBin.class));
-        }
-
-        @Test
-        @DisplayName("Should prevent instantiation if a target code collision occurs")
-        void shouldThrowException_WhenBinCodeAlreadyExists() {
-            // Arrange
-            StorageBinRequest request = new
-                    StorageBinRequest("EXISTS",
-                                                                        new CoordinateDto(1,1,1),
-                                                                        ZoneType.STORAGE,
-                                500);
-
-
-            // Act
-            when(storageBinRepository.existsByBinCode("EXISTS")).thenReturn(true);
-
-
-            // Assert
-            assertThatThrownBy(() ->
-                    storageBinService.createStorageBin(request))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("already exists");
-
-            verify(storageBinRepository, never()).save(any());
-        }
+      // Assert
+      assertThat(output).isNotNull();
+      assertThat(output.id()).isEqualTo(100L);
+      assertThat(output.binCode()).isEqualTo("B-01-02-03");
+      verify(storageBinRepository, times(1)).save(any(StorageBin.class));
     }
 
-    @Nested
-    @DisplayName("Query Isolation Verification")
-    class FindStorageBinById {
+    @Test
+    @DisplayName("Should prevent instantiation if a target code collision occurs")
+    void shouldThrowException_WhenBinCodeAlreadyExists() {
+      // Arrange
+      StorageBinRequest request =
+          new StorageBinRequest("EXISTS", new CoordinateDto(1, 1, 1), ZoneType.STORAGE, 500);
 
-        @Test
-        @DisplayName("Should extract mapped payload cleanly from persistent state records")
-        void shouldReturnResponse_WhenStorageBinExists() {
-            // Arrange
-            Long targetId = 1L;
-            StorageBin storedBin = StorageBin
-                                                    .builder()
-                                                    .id(targetId)
-                                                    .binCode("TEST")
-                                                    .build();
+      // Act
+      when(storageBinRepository.existsByBinCode("EXISTS")).thenReturn(true);
 
-            StorageBinResponse responseDto = new
-                    StorageBinResponse(targetId,
-                                        "TEST",
-                                                        new CoordinateDto(1,1,1),
-                                                        ZoneType.STORAGE,
-                10);
+      // Assert
+      assertThatThrownBy(() -> storageBinService.createStorageBin(request))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("already exists");
 
-            when(storageBinRepository.findById(targetId)).thenReturn(Optional.of(storedBin));
-            when(storageBinMapper.toResponse(storedBin)).thenReturn(responseDto);
+      verify(storageBinRepository, never()).save(any());
+    }
+  }
 
-            // Act
-            StorageBinResponse operationalResult = storageBinService.findById(targetId);
+  @Nested
+  @DisplayName("Query Isolation Verification")
+  class FindStorageBinById {
 
-            // Assert
-            assertThat(operationalResult).isNotNull();
-            verify(storageBinRepository).findById(targetId);
-        }
+    @Test
+    @DisplayName("Should extract mapped payload cleanly from persistent state records")
+    void shouldReturnResponse_WhenStorageBinExists() {
+      // Arrange
+      Long targetId = 1L;
+      StorageBin storedBin = StorageBin.builder().id(targetId).binCode("TEST").build();
 
-        @Test
-        @DisplayName("Should surface structural missing resource exceptions up through operations")
-        void shouldThrowException_WhenStorageBinMissing() {
-            // Arrange
-            Long failingId = 99L;
-            when(storageBinRepository.findById(failingId))
-                    .thenReturn(Optional.empty());
+      StorageBinResponse responseDto =
+          new StorageBinResponse(
+              targetId, "TEST", new CoordinateDto(1, 1, 1), ZoneType.STORAGE, 10);
 
-            // Act and Assert
-            assertThatThrownBy(() -> storageBinService.findById(failingId))
-                    .isInstanceOf(ResourceNotFoundException.class);
-        }
+      when(storageBinRepository.findById(targetId)).thenReturn(Optional.of(storedBin));
+      when(storageBinMapper.toResponse(storedBin)).thenReturn(responseDto);
+
+      // Act
+      StorageBinResponse operationalResult = storageBinService.findById(targetId);
+
+      // Assert
+      assertThat(operationalResult).isNotNull();
+      verify(storageBinRepository).findById(targetId);
     }
 
+    @Test
+    @DisplayName("Should surface structural missing resource exceptions up through operations")
+    void shouldThrowException_WhenStorageBinMissing() {
+      // Arrange
+      Long failingId = 99L;
+      when(storageBinRepository.findById(failingId)).thenReturn(Optional.empty());
 
-    @Nested
-    @DisplayName("Find All StorageBins Operations")
-    class FindAllStorageBins {
+      // Act and Assert
+      assertThatThrownBy(() -> storageBinService.findById(failingId))
+          .isInstanceOf(ResourceNotFoundException.class);
+    }
+  }
 
-        @Test
-        @DisplayName("Should return a paginated list of StorageBinResponses")
-        void shouldReturnPageOfStorageBinResponses() {
-            // Arrange
-            Pageable pageable = Pageable.unpaged();
+  @Nested
+  @DisplayName("Find All StorageBins Operations")
+  class FindAllStorageBins {
 
-            StorageBin entity = StorageBin
-                                                .builder()
-                                                .id(1L)
-                                                .binCode("A-01")
-                                                .build();
+    @Test
+    @DisplayName("Should return a paginated list of StorageBinResponses")
+    void shouldReturnPageOfStorageBinResponses() {
+      // Arrange
+      Pageable pageable = Pageable.unpaged();
 
+      StorageBin entity = StorageBin.builder().id(1L).binCode("A-01").build();
 
-            Page<StorageBin> entityPage =
-                new PageImpl<>(java.util.List.of(entity));
+      Page<StorageBin> entityPage = new PageImpl<>(java.util.List.of(entity));
 
-            CoordinateDto dtoCoord = new CoordinateDto(1, 1, 1);
-            StorageBinResponse responseDto = new
-                    StorageBinResponse(1L,
-                                        "A-01",
-                                                        dtoCoord,
-                                                        ZoneType.STORAGE,
-                1000);
+      CoordinateDto dtoCoord = new CoordinateDto(1, 1, 1);
+      StorageBinResponse responseDto =
+          new StorageBinResponse(1L, "A-01", dtoCoord, ZoneType.STORAGE, 1000);
 
-            when(storageBinRepository.findAll(pageable)).thenReturn(entityPage);
-            when(storageBinMapper.toResponse(entity)).thenReturn(responseDto);
+      when(storageBinRepository.findAll(pageable)).thenReturn(entityPage);
+      when(storageBinMapper.toResponse(entity)).thenReturn(responseDto);
 
-            // Act
-            Page<StorageBinResponse> result = storageBinService.findAll(pageable);
+      // Act
+      Page<StorageBinResponse> result = storageBinService.findAll(pageable);
 
-            // Assert
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).binCode()).isEqualTo("A-01");
+      // Assert
+      assertThat(result).isNotNull();
+      assertThat(result.getContent()).hasSize(1);
+      assertThat(result.getContent().get(0).binCode()).isEqualTo("A-01");
 
-            verify(storageBinRepository).findAll(pageable);
-            verify(storageBinMapper).toResponse(entity);
-        }
-
-        @Test
-        @DisplayName("Should return a paginated list of underlying entities directly")
-        void shouldReturnPageOfStorageBinEntities() {
-            // Arrange
-            Pageable pageable = Pageable.unpaged();
-
-            StorageBin entity = StorageBin
-                                                .builder()
-                                                .id(2L)
-                                                .binCode("B-02")
-                                                .build();
-
-            Page<StorageBin> entityPage =
-                new PageImpl<>(java.util.List.of(entity));
-
-            when(storageBinRepository.findAll(pageable))
-                    .thenReturn(entityPage);
-
-            // Act
-            Page<StorageBin> result = storageBinService.findAllEntities(pageable);
-
-            // Assert
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).getBinCode())
-                    .isEqualTo("B-02");
-
-            verify(storageBinRepository).findAll(pageable);
-            verifyNoMoreInteractions(storageBinMapper);
-        }
+      verify(storageBinRepository).findAll(pageable);
+      verify(storageBinMapper).toResponse(entity);
     }
 
+    @Test
+    @DisplayName("Should return a paginated list of underlying entities directly")
+    void shouldReturnPageOfStorageBinEntities() {
+      // Arrange
+      Pageable pageable = Pageable.unpaged();
+
+      StorageBin entity = StorageBin.builder().id(2L).binCode("B-02").build();
+
+      Page<StorageBin> entityPage = new PageImpl<>(java.util.List.of(entity));
+
+      when(storageBinRepository.findAll(pageable)).thenReturn(entityPage);
+
+      // Act
+      Page<StorageBin> result = storageBinService.findAllEntities(pageable);
+
+      // Assert
+      assertThat(result).isNotNull();
+      assertThat(result.getContent()).hasSize(1);
+      assertThat(result.getContent().get(0).getBinCode()).isEqualTo("B-02");
+
+      verify(storageBinRepository).findAll(pageable);
+      verifyNoMoreInteractions(storageBinMapper);
+    }
+  }
 }

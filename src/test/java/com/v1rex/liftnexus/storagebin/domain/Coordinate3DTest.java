@@ -11,37 +11,38 @@ import org.springframework.context.annotation.Profile;
 @Profile("test")
 class Coordinate3DTest {
 
-    @Test
-    @DisplayName("Should correctly calculate Manhattan distance on a flat plane (same tier)")
-    void shouldCalculateFlatManhattanDistance() {
-        Coordinate3D binA = new Coordinate3D(2, 5, 1);
-        Coordinate3D binB = new Coordinate3D(5, 10, 1);
+  @Test
+  @DisplayName("Should correctly calculate Manhattan distance on a flat plane (same tier)")
+  void shouldCalculateFlatManhattanDistance() {
+    Coordinate3D binA = new Coordinate3D(2, 5, 1);
+    Coordinate3D binB = new Coordinate3D(5, 10, 1);
 
-        double distance = binA.calculateDistance(binB);
+    double distance = binA.calculateDistance(binB);
 
-        assertThat(distance).isEqualTo(8.0);
-    }
+    assertThat(distance).isEqualTo(8.0);
+  }
 
-    @Test
-    @DisplayName("Should apply default vertical penalty factor when transitioning across tiers")
-    void shouldApplyVerticalPenalty() {
-        Coordinate3D groundBin = new Coordinate3D(2, 5, 1);
-        Coordinate3D highBin = new Coordinate3D(2, 5, 4);
+  @Test
+  @DisplayName("Should apply default vertical penalty factor when transitioning across tiers")
+  void shouldApplyVerticalPenalty() {
+    Coordinate3D groundBin = new Coordinate3D(2, 5, 1);
+    Coordinate3D highBin = new Coordinate3D(2, 5, 4);
 
-        double distance = groundBin.calculateDistance(highBin);
+    double distance = groundBin.calculateDistance(highBin);
 
-        assertThat(distance).isEqualTo(7.5);
-    }
+    assertThat(distance).isEqualTo(7.5);
+  }
 
-    @Test
-    @DisplayName("Should accept custom vertical penalties for specialized material handling equipment")
-    void shouldAcceptCustomPenalty() {
-        Coordinate3D groundBin = new Coordinate3D(1, 1, 1);
-        Coordinate3D highBin = new Coordinate3D(1, 1, 3);
-        double fastLiftTruckPenalty = 1.2;
+  @Test
+  @DisplayName(
+      "Should accept custom vertical penalties for specialized material handling equipment")
+  void shouldAcceptCustomPenalty() {
+    Coordinate3D groundBin = new Coordinate3D(1, 1, 1);
+    Coordinate3D highBin = new Coordinate3D(1, 1, 3);
+    double fastLiftTruckPenalty = 1.2;
 
-        double distance = groundBin.calculateDistance(highBin, fastLiftTruckPenalty);
+    double distance = groundBin.calculateDistance(highBin, fastLiftTruckPenalty);
 
-        assertThat(distance).isEqualTo(2.4, within(0.01));
-    }
+    assertThat(distance).isEqualTo(2.4, within(0.01));
+  }
 }

@@ -18,53 +18,60 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StorageBinService {
 
-    private final StorageBinRepository storageBinRepository;
-    private final StorageBinMapper storageBinMapper;
+  private final StorageBinRepository storageBinRepository;
+  private final StorageBinMapper storageBinMapper;
 
-    // =====================================================================
-    // EXTERNAL API BOUNDARY (Returns DTOs to Controllers)
-    // =====================================================================
-    @Transactional
-    public StorageBinResponse createStorageBin(StorageBinRequest request) {
-        log.info("Creating storage bin with code: {} at [X:{}, Y:{}, Z:{}]",
-            request.binCode(), request.coordinate().x(), request.coordinate().y(), request.coordinate().z());
+  // =====================================================================
+  // EXTERNAL API BOUNDARY (Returns DTOs to Controllers)
+  // =====================================================================
+  @Transactional
+  public StorageBinResponse createStorageBin(StorageBinRequest request) {
+    log.info(
+        "Creating storage bin with code: {} at [X:{}, Y:{}, Z:{}]",
+        request.binCode(),
+        request.coordinate().x(),
+        request.coordinate().y(),
+        request.coordinate().z());
 
-        if (storageBinRepository.existsByBinCode(request.binCode())) {
-            throw new IllegalArgumentException("Storage bin with code "
-                    + request.binCode() + " already exists.");
-        }
-
-        StorageBin storageBin = storageBinMapper.toEntity(request);
-        StorageBin savedBin = storageBinRepository.save(storageBin);
-
-        log.info("Successfully created storage bin with Id: {}, code: {}", savedBin.getId(), savedBin.getBinCode());
-        return storageBinMapper.toResponse(savedBin);
+    if (storageBinRepository.existsByBinCode(request.binCode())) {
+      throw new IllegalArgumentException(
+          "Storage bin with code " + request.binCode() + " already exists.");
     }
 
-    @Transactional(readOnly = true)
-    public StorageBinResponse findById(Long id) {
-        return storageBinMapper.toResponse(findEntityById(id));
-    }
+    StorageBin storageBin = storageBinMapper.toEntity(request);
+    StorageBin savedBin = storageBinRepository.save(storageBin);
 
-    @Transactional(readOnly = true)
-    public Page<StorageBinResponse> findAll(Pageable pageable) {
-        return findAllEntities(pageable).map(storageBinMapper::toResponse);
-    }
+    log.info(
+        "Successfully created storage bin with Id: {}, code: {}",
+        savedBin.getId(),
+        savedBin.getBinCode());
+    return storageBinMapper.toResponse(savedBin);
+  }
 
+  @Transactional(readOnly = true)
+  public StorageBinResponse findById(Long id) {
+    return storageBinMapper.toResponse(findEntityById(id));
+  }
 
+  @Transactional(readOnly = true)
+  public Page<StorageBinResponse> findAll(Pageable pageable) {
+    return findAllEntities(pageable).map(storageBinMapper::toResponse);
+  }
 
-    // =====================================================================
-    // INTERNAL DOMAIN BOUNDARY (Returns Entities to other Services/Timefold)
-    // =====================================================================
-    public StorageBin findEntityById(Long id) {
-        return storageBinRepository.findById(id)
-            .orElseThrow(() -> {
-                log.warn("Storage bin with id: {} not found.", id);
-                return new ResourceNotFoundException("Storage bin with " + id + " not found.");
+  // =====================================================================
+  // INTERNAL DOMAIN BOUNDARY (Returns Entities to other Services/Timefold)
+  // =====================================================================
+  public StorageBin findEntityById(Long id) {
+    return storageBinRepository
+        .findById(id)
+        .orElseThrow(
+            () -> {
+              log.warn("Storage bin with id: {} not found.", id);
+              return new ResourceNotFoundException("Storage bin with " + id + " not found.");
             });
-    }
+  }
 
-    public Page<StorageBin> findAllEntities(Pageable pageable) {
-        return storageBinRepository.findAll(pageable);
-    }
+  public Page<StorageBin> findAllEntities(Pageable pageable) {
+    return storageBinRepository.findAll(pageable);
+  }
 }

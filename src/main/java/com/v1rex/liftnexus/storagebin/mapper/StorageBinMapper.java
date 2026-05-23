@@ -10,44 +10,41 @@ import org.springframework.stereotype.Component;
 @Component
 public class StorageBinMapper {
 
-    public StorageBin toEntity(StorageBinRequest request) {
-        if (request == null) return null;
+  public StorageBin toEntity(StorageBinRequest request) {
+    if (request == null) return null;
 
-        Coordinate3D domainCoordinate = null;
-        if (request.coordinate() != null) {
-            domainCoordinate = new Coordinate3D(
-                request.coordinate().x(),
-                request.coordinate().y(),
-                request.coordinate().z()
-            );
-        }
-
-        return StorageBin.builder()
-                .binCode(request.binCode())
-                .coordinate(domainCoordinate)
-                .zoneType(request.zoneType())
-                .maxWeightCapacityKg(request.maxWeightCapacityKg())
-                .build();
+    Coordinate3D domainCoordinate = null;
+    if (request.coordinate() != null) {
+      domainCoordinate =
+          new Coordinate3D(
+              request.coordinate().x(), request.coordinate().y(), request.coordinate().z());
     }
 
-    public StorageBinResponse toResponse(StorageBin entity) {
-        if (entity == null) return null;
+    return StorageBin.builder()
+        .binCode(request.binCode())
+        .coordinate(domainCoordinate)
+        .zoneType(request.zoneType())
+        .maxWeightCapacityKg(request.maxWeightCapacityKg())
+        .build();
+  }
 
-        CoordinateDto dtoCoordinate = null;
-        if (entity.getCoordinate() != null) {
-            dtoCoordinate = new CoordinateDto(
-                entity.getCoordinate().getX(),
-                entity.getCoordinate().getY(),
-                entity.getCoordinate().getZ()
-            );
-        }
+  public StorageBinResponse toResponse(StorageBin entity) {
+    if (entity == null) return null;
 
-        return new StorageBinResponse(
-                entity.getId(),
-                entity.getBinCode(),
-                dtoCoordinate,
-                entity.getZoneType(),
-                entity.getMaxWeightCapacityKg()
-        );
+    CoordinateDto dtoCoordinate = null;
+    if (entity.getCoordinate() != null) {
+      dtoCoordinate =
+          new CoordinateDto(
+              entity.getCoordinate().getX(),
+              entity.getCoordinate().getY(),
+              entity.getCoordinate().getZ());
     }
+
+    return new StorageBinResponse(
+        entity.getId(),
+        entity.getBinCode(),
+        dtoCoordinate,
+        entity.getZoneType(),
+        entity.getMaxWeightCapacityKg());
+  }
 }
