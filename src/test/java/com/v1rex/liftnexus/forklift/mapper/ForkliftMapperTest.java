@@ -1,134 +1,120 @@
-/*
 package com.v1rex.liftnexus.forklift.mapper;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
+import com.v1rex.liftnexus.forklift.domain.ForkliftType;
+import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
-import com.v1rex.liftnexus.storagebin.mapper.StorageBinMapper;
 import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
-import com.v1rex.liftnexus.transportorder.dto.TransportOrderResponse;
-import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
-import com.v1rex.liftnexus.transportorder.mapper.TransportOrderMapper;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 public class ForkliftMapperTest {
 
-  @Mock private TransportOrderMapper taskMapper;
-
-  @Mock private StorageBinMapper storageBinMapper;
-
-  @InjectMocks private ForkliftMapper mapper;
+  private final ForkliftMapper mapper = new ForkliftMapper();
 
   @Nested
-  @DisplayName("Tests for toEntity mapping")
-  class ToEntityTests {
+  @DisplayName("Tests - toEntity(ForkliftRequest)")
+  class ToEntityTest {
 
     @Test
-    @DisplayName("Should correctly map StorageBinRequest to StorageBin Entity")
-    void shouldMapRequestToEntity() {
-      ForkliftRequest request = new ForkliftRequest(1, EquipmentType.STANDARD);
+    @DisplayName("Should map request to entity with default fallback values")
+    void shouldMapToEntityWithDefaults() {
+      ForkliftRequest request = new ForkliftRequest("FL-01", 1L, null, null, null);
 
       Forklift entity = mapper.toEntity(request);
 
       assertNotNull(entity);
-      assertNull(entity.getId(), "New entities mapped from a request should not have an ID yet");
-      assertEquals(1, entity.getWeightCapacity());
-      assertEquals(EquipmentType.STANDARD, entity.getEquipmentType());
+      assertEquals("FL-01", entity.getFleetNumber());
+      assertEquals(OperationalStatus.OFFLINE, entity.getStatus()); // Default branch hit
+      assertEquals(100.0, entity.getCurrentBatteryPercentage()); // Default branch hit
     }
 
     @Test
-    @DisplayName("Should return null when StorageBinRequest is null")
-    void shouldReturnNull_WhenRequestIsNull() {
-      Forklift entity = mapper.toEntity(null);
+    @DisplayName("Should map request to entity with explicit values")
+    void shouldMapToEntityWithExplicitValues() {
+      ForkliftRequest request =
+          new ForkliftRequest("FL-02", 1L, 5L, OperationalStatus.ACTIVE, 85.5);
 
-      assertNull(entity);
+      Forklift entity = mapper.toEntity(request);
+
+      assertEquals("FL-02", entity.getFleetNumber());
+      assertEquals(OperationalStatus.ACTIVE, entity.getStatus());
+      assertEquals(85.5, entity.getCurrentBatteryPercentage());
+    }
+
+    @Test
+    @DisplayName("Should return null when request is null")
+    void shouldReturnNullWhenRequestIsNull() {
+      assertNull(mapper.toEntity(null));
     }
   }
 
   @Nested
-  @DisplayName("Tests for toResponse mapping")
-  class ToResponseTests {
+  @DisplayName("Tests - toResponse(Forklift)")
+  class ToResponseTest {
+
     @Test
-    @DisplayName("Should correctly map " + "Forklift Entity to ForkliftResponse DTO")
-    void shouldMapEntityToResponse() {
-      // Arranging
-      TransportOrder mockTask1 = TransportOrder.builder().id(1L).weight(10).build();
-
-      when(taskMapper.toResponse(mockTask1))
-          .thenReturn(
-              new TransportOrderResponse(1L, null, null, 10, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null));
-
-      TransportOrder mockTask2 = TransportOrder.builder().id(2L).weight(5).build();
-
-      when(taskMapper.toResponse(mockTask2))
-          .thenReturn(
-              new TransportOrderResponse(2L, null, null, 5, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null));
-
-      StorageBin mockStorageBin =
-          StorageBin.builder().id(99L).latitude(51.5136F).longitude(7.4653F).build();
-      when(storageBinMapper.toResponse(mockStorageBin))
-          .thenReturn(new StorageBinResponse(99L, 51.5136F, 7.4653F));
-
-      List<TransportOrder> mockTasks = new ArrayList<>();
-      mockTasks.add(mockTask1);
-      mockTasks.add(mockTask2);
+    @DisplayName("Should map fully populated entity to response")
+    void shouldMapPopulatedEntity() {
+      ForkliftType type =
+          ForkliftType.builder()
+              .id(10L)
+              .modelName("Toyota X")
+              .equipmentType(EquipmentType.STANDARD)
+              .maxCapacityKg(2000)
+              .build();
+      StorageBin bin = StorageBin.builder().id(55L).build();
+      TransportOrder order = TransportOrder.builder().id(100L).build();
 
       Forklift entity =
           Forklift.builder()
-              .id(42L)
-              .weightCapacity(1)
-              .equipmentType(EquipmentType.STANDARD)
-              .transportOrders(mockTasks)
-              .currentStorageBin(mockStorageBin)
+              .id(1L)
+              .fleetNumber("FL-01")
+              .forkliftType(type)
+              .currentStorageBin(bin)
+              .status(OperationalStatus.ACTIVE)
+              .currentBatteryPercentage(90.0)
+              .transportOrders(List.of(order))
               .build();
 
-      // Acting
+      ForkliftResponse response = mapper.toResponse(entity);
 
-      var response = mapper.toResponse(entity);
-
-      // Asserting
-
-      assertNotNull(response);
-      assertEquals(42L, response.id());
-      assertEquals(1, response.weightCapacity());
+      assertEquals(1L, response.id());
+      assertEquals("FL-01", response.fleetNumber());
+      assertEquals(10L, response.forkliftTypeId());
+      assertEquals("Toyota X", response.modelName());
       assertEquals(EquipmentType.STANDARD, response.equipmentType());
-
-      // we take a look at the mocked transportOrders
-      assertEquals(2, response.transportOrders().size());
-      assertEquals(1L, response.transportOrders().get(0).id());
-      assertEquals(10, response.transportOrders().get(0).weight());
-      assertEquals(2L, response.transportOrders().get(1).id());
-      assertEquals(5, response.transportOrders().get(1).weight());
-
-      // we take a look at the mocked storagebin
-      assertEquals(99L, response.currentLocation().id());
-      assertEquals(51.5136F, response.currentLocation().latitude());
-      assertEquals(7.4653F, response.currentLocation().longitude());
+      assertEquals(2000, response.maxCapacityKg());
+      assertEquals(55L, response.currentStorageBinId());
+      assertEquals(OperationalStatus.ACTIVE, response.status());
+      assertEquals(90.0, response.currentBatteryPercentage());
+      assertTrue(response.transportOrderIds().contains(100L));
     }
 
     @Test
-    @DisplayName("Should return null when Forklift Entity is null")
-    void shouldReturnNull_WhenEntityIsNull() {
-      ForkliftResponse response = mapper.toResponse(null);
-      assertNull(response);
+    @DisplayName("Should handle entity with null relationships safely")
+    void shouldHandleNullRelationships() {
+      Forklift entity =
+          Forklift.builder().id(2L).fleetNumber("FL-02").build(); // No relationships attached
+
+      ForkliftResponse response = mapper.toResponse(entity);
+
+      assertNull(response.forkliftTypeId());
+      assertNull(response.currentStorageBinId());
+      assertTrue(response.transportOrderIds().isEmpty()); // Null safe list check
+    }
+
+    @Test
+    @DisplayName("Should return null when entity is null")
+    void shouldReturnNullWhenEntityIsNull() {
+      assertNull(mapper.toResponse(null));
     }
   }
 }
-*/

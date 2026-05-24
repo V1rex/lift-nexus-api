@@ -8,5 +8,4 @@ public record ForkliftTypeResponse(
     EquipmentType equipmentType,
     Integer maxCapacityKg,
     Double totalBatteryCapacitykWh,
-    Double baseEnergyConsumptionPerMeter
-) {}
+    Double baseEnergyConsumptionPerMeter) {}

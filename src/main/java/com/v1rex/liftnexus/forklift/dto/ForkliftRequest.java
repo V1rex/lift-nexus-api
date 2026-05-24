@@ -9,5 +9,4 @@ public record ForkliftRequest(
     @NotNull Long forkliftTypeId,
     Long currentStorageBinId,
     OperationalStatus status,
-    Double currentBatteryPercentage
-) {}
+    Double currentBatteryPercentage) {}

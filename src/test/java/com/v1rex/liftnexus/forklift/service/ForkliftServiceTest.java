@@ -1,23 +1,21 @@
-/*
 package com.v1rex.liftnexus.forklift.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
-import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
+import com.v1rex.liftnexus.forklift.domain.ForkliftType;
+import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
-import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
 import com.v1rex.liftnexus.storagebin.service.StorageBinService;
+import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,248 +24,270 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Forklift Service Unit Tests")
 public class ForkliftServiceTest {
+
   @Mock private ForkliftRepository forkliftRepository;
-
-  @Mock private ForkliftMapper forkliftMapper;
-
+  @Mock private ForkliftTypeService forkliftTypeService;
   @Mock private StorageBinService storageBinService;
+  @Mock private ForkliftMapper forkliftMapper;
 
   @InjectMocks private ForkliftService forkliftService;
 
   @Nested
-  @DisplayName("Create Forklift Feature")
-  class CreateForklift {
+  @DisplayName("Tests - createForklift()")
+  class CreateForkliftTests {
 
     @Test
-    @DisplayName("Should successfully create a Forklift")
-    void createForklift_ShouldReturnResponse_WhenRequestIsValid() {
-      ForkliftRequest forkliftRequest = new ForkliftRequest(1000, EquipmentType.STANDARD);
+    @DisplayName("Should provision a new forklift successfully with a storage bin")
+    void shouldCreateForkliftWithStorageBin() {
+      ForkliftRequest request =
+          new ForkliftRequest("FL-01", 1L, 2L, OperationalStatus.ACTIVE, 100.0);
 
-      Forklift forklift = new Forklift();
-      forklift.setWeightCapacity(1000);
-      forklift.setEquipmentType(EquipmentType.STANDARD);
+      ForkliftType mockType = new ForkliftType();
+      StorageBin mockBin = new StorageBin();
 
-      when(forkliftMapper.toEntity(forkliftRequest)).thenReturn(forklift);
+      Forklift mappedEntity = new Forklift();
+      Forklift savedEntity = new Forklift();
+      savedEntity.setId(99L);
 
-      Forklift savedForklift = new Forklift();
-      savedForklift.setId(1L);
-      savedForklift.setWeightCapacity(1000);
-      savedForklift.setEquipmentType(EquipmentType.STANDARD);
+      ForkliftResponse expectedResponse =
+          new ForkliftResponse(
+              99L, "FL-01", 1L, "Model", null, 1000, 2L, OperationalStatus.ACTIVE, 100.0, null);
 
-      when(forkliftRepository.save(any(Forklift.class))).thenReturn(savedForklift);
+      when(forkliftRepository.existsByFleetNumber("FL-01")).thenReturn(false);
 
-      ForkliftResponse mockResponse =
-          new ForkliftResponse(1L, 1000, EquipmentType.STANDARD, null, null);
+      when(forkliftTypeService.findEntityById(1L)).thenReturn(mockType);
 
-      when(forkliftMapper.toResponse(savedForklift)).thenReturn(mockResponse);
+      when(storageBinService.findEntityById(2L)).thenReturn(mockBin);
 
-      ForkliftResponse result = forkliftService.createForklift(forkliftRequest);
+      when(forkliftMapper.toEntity(request)).thenReturn(mappedEntity);
 
-      assertThat(result).isNotNull();
-      assertThat(result.id()).isEqualTo(1L);
-      assertThat(result.weightCapacity()).isEqualTo(1000);
-      assertThat(result.equipmentType()).isEqualTo(EquipmentType.STANDARD);
+      when(forkliftRepository.save(mappedEntity)).thenReturn(savedEntity);
 
-      verify(forkliftRepository, times(1)).save(any(Forklift.class));
-    }
-  }
+      when(forkliftMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
 
-  @Nested
-  @DisplayName("Find Forklift by ID Feature")
-  class FindForkliftById {
-    private final Long forkliftId = 1L;
+      ForkliftResponse actualResponse = forkliftService.createForklift(request);
 
-    @Test
-    @DisplayName("Should return ForkliftResponse when forklift exists")
-    void findById_ShouldReturnResponse_WhenForkliftExists() {
-      Forklift existingForklift = new Forklift();
-      existingForklift.setId(forkliftId);
-      existingForklift.setWeightCapacity(1000);
-      existingForklift.setEquipmentType(EquipmentType.STANDARD);
-
-      when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.of(existingForklift));
-
-      ForkliftResponse mockResponse =
-          new ForkliftResponse(forkliftId, 1000, EquipmentType.STANDARD, null, null);
-
-      when(forkliftMapper.toResponse(existingForklift)).thenReturn(mockResponse);
-
-      ForkliftResponse result = forkliftService.findById(forkliftId);
-
-      assertThat(result).isNotNull();
-      assertThat(result.id()).isEqualTo(forkliftId);
-      verify(forkliftRepository, times(1)).findById(forkliftId);
+      assertThat(actualResponse.id()).isEqualTo(99L);
+      assertThat(mappedEntity.getForkliftType()).isEqualTo(mockType);
+      assertThat(mappedEntity.getCurrentStorageBin()).isEqualTo(mockBin);
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when forklift does not exist")
-    void findById_ShouldThrowException_WhenForkliftDoesNotExist() {
-      when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.empty());
+    @DisplayName("Should provision a new forklift successfully without a storage bin (null check)")
+    void shouldCreateForkliftWithoutStorageBin() {
+      ForkliftRequest request =
+          new ForkliftRequest("FL-02", 1L, null, OperationalStatus.ACTIVE, 100.0);
 
-      assertThatThrownBy(() -> forkliftService.findById(forkliftId))
-          .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("Forklift with " + forkliftId + " not found.");
+      ForkliftType mockType = new ForkliftType();
 
-      verifyNoInteractions(forkliftMapper);
-    }
-  }
+      Forklift mappedEntity = new Forklift();
+      Forklift savedEntity = new Forklift();
+      savedEntity.setId(100L);
 
-  @Nested
-  @DisplayName("Find all Forklifts Feature")
-  class FindAllForklifts {
-    @Test
-    @DisplayName("Should return paginated ForkliftResponses")
-    void findAll_ShouldReturnPage_WhenCalled() {
-      Pageable pageable = Pageable.unpaged();
-      Forklift forklift = new Forklift();
-      forklift.setId(1L);
-      forklift.setWeightCapacity(1000);
-      forklift.setEquipmentType(EquipmentType.STANDARD);
+      ForkliftResponse expectedResponse =
+          new ForkliftResponse(
+              100L, "FL-02", 1L, "Model", null, 1000, null, OperationalStatus.ACTIVE, 100.0, null);
 
-      Page<Forklift> mockPage =
-          new org.springframework.data.domain.PageImpl<>(java.util.List.of(forklift));
+      when(forkliftRepository.existsByFleetNumber("FL-02")).thenReturn(false);
+      when(forkliftTypeService.findEntityById(1L)).thenReturn(mockType);
+      when(forkliftMapper.toEntity(request)).thenReturn(mappedEntity);
+      when(forkliftRepository.save(mappedEntity)).thenReturn(savedEntity);
+      when(forkliftMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
 
-      when(forkliftRepository.findAll(pageable)).thenReturn(mockPage);
+      ForkliftResponse actualResponse = forkliftService.createForklift(request);
 
-      ForkliftResponse mockResponse =
-          new ForkliftResponse(1L, 1000, EquipmentType.STANDARD, null, null);
-
-      when(forkliftMapper.toResponse(forklift)).thenReturn(mockResponse);
-
-      Page<ForkliftResponse> result = forkliftService.findAll(pageable);
-
-      assertThat(result).isNotNull();
-      assertThat(result.getContent().get(0).id()).isEqualTo(1L);
-      verify(forkliftRepository, times(1)).findAll(pageable);
-    }
-  }
-
-  @Nested
-  @DisplayName("Find Forklifts with Capacity Greater Than Feature")
-  class FindForkliftsWithCapacityGreaterThan {
-    @Test
-    @DisplayName("Should return paginated ForkliftResponses with capacity greater than threshold")
-    void findWithCapacityGreaterThan_ShouldReturnPage_WhenCriteriaIsValid() {
-      Integer weightCapacity = 800;
-      Pageable pageable = Pageable.unpaged();
-
-      Forklift forklift1 = new Forklift();
-      forklift1.setId(1L);
-      forklift1.setWeightCapacity(1000);
-      forklift1.setEquipmentType(EquipmentType.STANDARD);
-
-      Forklift forklift2 = new Forklift();
-      forklift2.setId(2L);
-      forklift2.setWeightCapacity(1500);
-      forklift2.setEquipmentType(EquipmentType.REACH_TRUCK);
-
-      Page<Forklift> mockPage =
-          new org.springframework.data.domain.PageImpl<>(java.util.List.of(forklift1, forklift2));
-
-      when(forkliftRepository.findByWeightCapacityGreaterThan(weightCapacity, pageable))
-          .thenReturn(mockPage);
-
-      ForkliftResponse response1 =
-          new ForkliftResponse(1L, 1000, EquipmentType.STANDARD, null, null);
-
-      ForkliftResponse response2 =
-          new ForkliftResponse(2L, 1500, EquipmentType.REACH_TRUCK, null, null);
-
-      when(forkliftMapper.toResponse(forklift1)).thenReturn(response1);
-      when(forkliftMapper.toResponse(forklift2)).thenReturn(response2);
-
-      Page<ForkliftResponse> result =
-          forkliftService.findWithCapacityGreaterThan(weightCapacity, pageable);
-
-      assertThat(result).isNotNull();
-      assertThat(result.getTotalElements()).isEqualTo(2);
-      assertThat(result.getContent().get(0).weightCapacity()).isGreaterThan(weightCapacity);
-      assertThat(result.getContent().get(1).weightCapacity()).isGreaterThan(weightCapacity);
-
-      verify(forkliftRepository, times(1))
-          .findByWeightCapacityGreaterThan(weightCapacity, pageable);
-    }
-  }
-
-  @Nested
-  @DisplayName("Update Forklift StorageBin Feature")
-  class UpdateForkliftStorageBin {
-    private final Long forkliftId = 1L;
-    private final Long locationId = 10L;
-
-    @Test
-    @DisplayName(
-        "Should successfully update forklift storagebin when both forklift and storagebin exist")
-    void updateForkliftLocation_ShouldReturnResponse_WhenBothExist() {
-      Forklift existingForklift = new Forklift();
-      existingForklift.setId(forkliftId);
-      existingForklift.setWeightCapacity(1000);
-      existingForklift.setEquipmentType(EquipmentType.STANDARD);
-
-      StorageBin newStorageBin = new StorageBin();
-      newStorageBin.setId(locationId);
-      newStorageBin.setLatitude(40.71F);
-      newStorageBin.setLongitude(-74.07F);
-
-      when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.of(existingForklift));
-      when(storageBinService.findEntityById(locationId)).thenReturn(newStorageBin);
-
-      Forklift updatedForklift = new Forklift();
-      updatedForklift.setId(forkliftId);
-      updatedForklift.setWeightCapacity(1000);
-      updatedForklift.setEquipmentType(EquipmentType.STANDARD);
-      updatedForklift.setCurrentStorageBin(newStorageBin);
-
-      when(forkliftRepository.save(any(Forklift.class))).thenReturn(updatedForklift);
-
-      StorageBinResponse storageBinResponse = new StorageBinResponse(locationId, 40.71F, -74.07F);
-
-      ForkliftResponse mockResponse =
-          new ForkliftResponse(forkliftId, 1000, EquipmentType.STANDARD, null, storageBinResponse);
-
-      when(forkliftMapper.toResponse(updatedForklift)).thenReturn(mockResponse);
-
-      ForkliftResponse result = forkliftService.updateForkliftLocation(forkliftId, locationId);
-
-      assertThat(result).isNotNull();
-      assertThat(result.id()).isEqualTo(forkliftId);
-      assertThat(result.currentLocation()).isEqualTo(storageBinResponse);
-      verify(forkliftRepository, times(1)).save(any(Forklift.class));
-    }
-
-    @Test
-    @DisplayName("Should throw ResourceNotFoundException when forklift does not exist")
-    void updateForkliftLocation_ShouldThrowException_WhenForkliftDoesNotExist() {
-      when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.empty());
-
-      assertThatThrownBy(() -> forkliftService.updateForkliftLocation(forkliftId, locationId))
-          .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("Forklift with " + forkliftId + " not found.");
-
+      assertThat(actualResponse.id()).isEqualTo(100L);
+      assertThat(mappedEntity.getForkliftType()).isEqualTo(mockType);
+      assertThat(mappedEntity.getCurrentStorageBin()).isNull();
       verifyNoInteractions(storageBinService);
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when storagebin does not exist")
-    void updateForkliftLocation_ShouldThrowException_WhenLocationDoesNotExist() {
-      Forklift existingForklift = new Forklift();
-      existingForklift.setId(forkliftId);
+    @DisplayName("Should throw IllegalStateException if fleet number exists")
+    void shouldThrowIfFleetNumberExists() {
+      ForkliftRequest request = new ForkliftRequest("FL-DUP", 1L, null, null, null);
+      when(forkliftRepository.existsByFleetNumber("FL-DUP")).thenReturn(true);
 
-      when(forkliftRepository.findById(forkliftId)).thenReturn(Optional.of(existingForklift));
-      when(storageBinService.findEntityById(locationId))
-          .thenThrow(new ResourceNotFoundException("StorageBin with " + locationId + " not found."));
+      assertThatThrownBy(() -> forkliftService.createForklift(request))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("already exists");
 
-      assertThatThrownBy(() -> forkliftService.updateForkliftLocation(forkliftId, locationId))
+      verifyNoInteractions(forkliftTypeService, storageBinService, forkliftMapper);
+    }
+  }
+
+  @Nested
+  @DisplayName("Tests - findById()")
+  class FindByIdTests {
+
+    @Test
+    @DisplayName("Should find response by ID")
+    void shouldFindById() {
+      Forklift entity = new Forklift();
+      entity.setId(1L);
+      ForkliftResponse expectedResponse =
+          new ForkliftResponse(1L, "FL-01", null, null, null, null, null, null, null, null);
+
+      when(forkliftRepository.findById(1L)).thenReturn(Optional.of(entity));
+      when(forkliftMapper.toResponse(entity)).thenReturn(expectedResponse);
+
+      ForkliftResponse response = forkliftService.findById(1L);
+
+      assertThat(response).isEqualTo(expectedResponse);
+    }
+  }
+
+  @Nested
+  @DisplayName("Tests - Retrieval & Pagination Methods")
+  class RetrievalTests {
+
+    private final Pageable pageable = PageRequest.of(0, 10);
+    private final Forklift entity = new Forklift();
+    private final ForkliftResponse responseDto =
+        new ForkliftResponse(1L, "FL-01", null, null, null, null, null, null, null, null);
+
+    @Test
+    @DisplayName("Should return all forklifts paginated")
+    void shouldFindAll() {
+      Page<Forklift> page = new PageImpl<>(List.of(entity));
+
+      when(forkliftRepository.findAll(pageable)).thenReturn(page);
+      when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
+
+      Page<ForkliftResponse> result = forkliftService.findAll(pageable);
+
+      assertThat(result.getContent()).hasSize(1);
+      assertThat(result.getContent().get(0)).isEqualTo(responseDto);
+    }
+
+    @Test
+    @DisplayName("Should return forklifts filtered by capacity")
+    void shouldFindWithCapacityGreaterThan() {
+      Page<Forklift> page = new PageImpl<>(List.of(entity));
+
+      when(forkliftRepository.findByForkliftType_MaxCapacityKgGreaterThanEqual(2000, pageable))
+          .thenReturn(page);
+      when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
+
+      Page<ForkliftResponse> result = forkliftService.findWithCapacityGreaterThan(2000, pageable);
+
+      assertThat(result.getContent()).hasSize(1);
+      assertThat(result.getContent().get(0)).isEqualTo(responseDto);
+    }
+
+    @Test
+    @DisplayName("Should return forklifts filtered by status")
+    void shouldFindByStatus() {
+      Page<Forklift> page = new PageImpl<>(List.of(entity));
+
+      when(forkliftRepository.findByStatus(OperationalStatus.ACTIVE, pageable)).thenReturn(page);
+      when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
+
+      Page<ForkliftResponse> result =
+          forkliftService.findByStatus(OperationalStatus.ACTIVE, pageable);
+
+      assertThat(result.getContent()).hasSize(1);
+
+      assertThat(result.getContent().get(0)).isEqualTo(responseDto);
+    }
+  }
+
+  @Nested
+  @DisplayName("Tests - State Transitions (Updates)")
+  class UpdateTests {
+
+    @Test
+    @DisplayName("Should update forklift location and save")
+    void shouldUpdateLocation() {
+      Forklift forklift = new Forklift();
+      StorageBin newBin = new StorageBin();
+      ForkliftResponse responseDto =
+          new ForkliftResponse(1L, null, null, null, null, null, 5L, null, null, null);
+
+      when(forkliftRepository.findById(1L)).thenReturn(Optional.of(forklift));
+      when(storageBinService.findEntityById(5L)).thenReturn(newBin);
+      when(forkliftRepository.save(forklift)).thenReturn(forklift);
+      when(forkliftMapper.toResponse(forklift)).thenReturn(responseDto);
+
+      ForkliftResponse result = forkliftService.updateForkliftLocation(1L, 5L);
+
+      assertThat(forklift.getCurrentStorageBin()).isEqualTo(newBin);
+      assertThat(result).isEqualTo(responseDto);
+      verify(forkliftRepository).save(forklift);
+    }
+
+    @Test
+    @DisplayName("Should update operational status and save")
+    void shouldUpdateOperationalStatus() {
+      Forklift forklift = new Forklift();
+      ForkliftResponse responseDto =
+          new ForkliftResponse(
+              1L, null, null, null, null, null, null, OperationalStatus.MAINTENANCE, null, null);
+
+      when(forkliftRepository.findById(1L)).thenReturn(Optional.of(forklift));
+
+      when(forkliftRepository.save(forklift)).thenReturn(forklift);
+
+      when(forkliftMapper.toResponse(forklift)).thenReturn(responseDto);
+
+      ForkliftResponse result =
+          forkliftService.updateOperationalStatus(1L, OperationalStatus.MAINTENANCE);
+
+      assertThat(forklift.getStatus()).isEqualTo(OperationalStatus.MAINTENANCE);
+      assertThat(result).isEqualTo(responseDto);
+      verify(forkliftRepository).save(forklift);
+    }
+  }
+
+  @Nested
+  @DisplayName("Tests - findEntityById()")
+  class FindEntityByIdTests {
+
+    @Test
+    @DisplayName("Should return entity if found")
+    void shouldReturnEntity() {
+      Forklift forklift = new Forklift();
+      when(forkliftRepository.findById(1L)).thenReturn(Optional.of(forklift));
+
+      Forklift result = forkliftService.findEntityById(1L);
+
+      assertThat(result).isEqualTo(forklift);
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException if forklift not found")
+    void shouldThrowIfForkliftNotFound() {
+      when(forkliftRepository.findById(99L)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> forkliftService.findEntityById(99L))
           .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("StorageBin with " + locationId + " not found.");
+          .hasMessageContaining("Forklift with 99 not found.");
+    }
+  }
 
-      verify(forkliftRepository, never()).save(any());
+  @Nested
+  @DisplayName("Tests - findAllEntitiesForPlanning()")
+  class FindAllEntitiesForPlanningTests {
+
+    @Test
+    @DisplayName("Should return raw list of entities for solver")
+    void shouldReturnEntityList() {
+      Forklift forklift1 = new Forklift();
+      Forklift forklift2 = new Forklift();
+      List<Forklift> mockList = List.of(forklift1, forklift2);
+
+      when(forkliftRepository.findAll()).thenReturn(mockList);
+
+      List<Forklift> result = forkliftService.findAllEntitiesForPlanning();
+
+      assertThat(result).hasSize(2);
+      assertThat(result).containsExactly(forklift1, forklift2);
     }
   }
 }
-*/

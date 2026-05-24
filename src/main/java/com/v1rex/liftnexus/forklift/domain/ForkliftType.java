@@ -15,29 +15,28 @@ import lombok.*;
 @Builder
 public class ForkliftType {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotBlank
-    @Column(name = "model_name", nullable = false, unique = true)
-    private String modelName;
+  @NotBlank
+  @Column(name = "model_name", nullable = false, unique = true)
+  private String modelName;
 
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  @Column(name = "equipment_type", nullable = false)
+  private EquipmentType equipmentType;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "equipment_type", nullable = false)
-    private EquipmentType equipmentType;
+  @Positive
+  @Column(name = "max_capacity_kg", nullable = false)
+  private Integer maxCapacityKg;
 
-    @Positive
-    @Column(name = "max_capacity_kg", nullable = false)
-    private Integer maxCapacityKg;
+  @Positive
+  @Column(name = "total_battery_capacity_kwh", nullable = false)
+  private Double totalBatteryCapacitykWh;
 
-    @Positive
-    @Column(name = "total_battery_capacity_kwh", nullable = false)
-    private Double totalBatteryCapacitykWh;
-
-    @Positive
-    @Column(name = "base_energy_consumption_per_meter", nullable = false)
-    private Double baseEnergyConsumptionPerMeter;
+  @Positive
+  @Column(name = "base_energy_consumption_per_meter", nullable = false)
+  private Double baseEnergyConsumptionPerMeter;
 }

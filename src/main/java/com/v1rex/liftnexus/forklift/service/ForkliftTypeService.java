@@ -18,39 +18,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ForkliftTypeService {
 
-    private final ForkliftTypeRepository forkliftTypeRepository;
-    private final ForkliftTypeMapper forkliftTypeMapper;
+  private final ForkliftTypeRepository forkliftTypeRepository;
+  private final ForkliftTypeMapper forkliftTypeMapper;
 
-    @Transactional
-    public ForkliftTypeResponse createForkliftType(ForkliftTypeRequest request) {
-        log.info("Registering new forklift archetype blueprint: {}", request.modelName());
+  @Transactional
+  public ForkliftTypeResponse createForkliftType(ForkliftTypeRequest request) {
+    log.info("Registering new forklift archetype blueprint: {}", request.modelName());
 
-        if (forkliftTypeRepository.existsByModelName(request.modelName())) {
-            throw new IllegalStateException("A forklift type model named '"
-                    + request.modelName() + "' already exists.");
-        }
-
-        ForkliftType forkliftType = forkliftTypeMapper.toEntity(request);
-        ForkliftType savedType = forkliftTypeRepository.save(forkliftType);
-
-        return forkliftTypeMapper.toResponse(savedType);
+    if (forkliftTypeRepository.existsByModelName(request.modelName())) {
+      throw new IllegalStateException(
+          "A forklift type model named '" + request.modelName() + "' already exists.");
     }
 
-    @Transactional(readOnly = true)
-    public ForkliftTypeResponse findById(Long id) {
-        return forkliftTypeMapper.toResponse(findEntityById(id));
+    ForkliftType forkliftType = forkliftTypeMapper.toEntity(request);
+    ForkliftType savedType = forkliftTypeRepository.save(forkliftType);
 
-    }
+    return forkliftTypeMapper.toResponse(savedType);
+  }
 
-    @Transactional(readOnly = true)
-    public Page<ForkliftTypeResponse> findAll(Pageable pageable) {
-        return forkliftTypeRepository.findAll(pageable)
-                .map(forkliftTypeMapper::toResponse);
-    }
+  @Transactional(readOnly = true)
+  public ForkliftTypeResponse findById(Long id) {
+    return forkliftTypeMapper.toResponse(findEntityById(id));
+  }
 
-    @Transactional(readOnly = true)
-    public ForkliftType findEntityById(Long id){
-        return forkliftTypeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ForkliftType with ID " + id + " not found."));
-    }
+  @Transactional(readOnly = true)
+  public Page<ForkliftTypeResponse> findAll(Pageable pageable) {
+    return forkliftTypeRepository.findAll(pageable).map(forkliftTypeMapper::toResponse);
+  }
+
+  @Transactional(readOnly = true)
+  public ForkliftType findEntityById(Long id) {
+    return forkliftTypeRepository
+        .findById(id)
+        .orElseThrow(
+            () -> new ResourceNotFoundException("ForkliftType with ID " + id + " not found."));
+  }
 }

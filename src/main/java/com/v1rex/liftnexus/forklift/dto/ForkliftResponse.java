@@ -2,7 +2,6 @@ package com.v1rex.liftnexus.forklift.dto;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
-
 import java.util.List;
 
 public record ForkliftResponse(
@@ -15,5 +14,4 @@ public record ForkliftResponse(
     Long currentStorageBinId,
     OperationalStatus status,
     Double currentBatteryPercentage,
-    List<Long> transportOrderIds
-) {}
+    List<Long> transportOrderIds) {}

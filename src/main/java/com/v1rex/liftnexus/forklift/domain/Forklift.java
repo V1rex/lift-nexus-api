@@ -21,37 +21,34 @@ import lombok.*;
 @Builder
 public class Forklift {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotBlank
-    @Column(name = "fleet_number", nullable = false, unique = true)
-    private String fleetNumber;
+  @NotBlank
+  @Column(name = "fleet_number", nullable = false, unique = true)
+  private String fleetNumber;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "forklift_type_id", nullable = false)
-    private ForkliftType forkliftType;
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "forklift_type_id", nullable = false)
+  private ForkliftType forkliftType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_storage_bin_id")
-    private StorageBin currentStorageBin;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "current_storage_bin_id")
+  private StorageBin currentStorageBin;
 
-    @Builder.Default
-    @Enumerated(EnumType.STRING)
-    @Column(name = "operational_status", nullable = false)
-    private OperationalStatus status = OperationalStatus.OFFLINE;
+  @Builder.Default
+  @Enumerated(EnumType.STRING)
+  @Column(name = "operational_status", nullable = false)
+  private OperationalStatus status = OperationalStatus.OFFLINE;
 
-    @Builder.Default
-    @Column(name = "current_battery_percentage", nullable = false)
-    private Double currentBatteryPercentage = 100.0;
+  @Builder.Default
+  @Column(name = "current_battery_percentage", nullable = false)
+  private Double currentBatteryPercentage = 100.0;
 
-    @PlanningListVariable(valueRangeProviderRefs = "taskPoolRange")
-    @OneToMany(
-            mappedBy = "assignedForklift",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<TransportOrder> transportOrders = new ArrayList<>();
+  @PlanningListVariable(valueRangeProviderRefs = "taskPoolRange")
+  @OneToMany(mappedBy = "assignedForklift", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<TransportOrder> transportOrders = new ArrayList<>();
 }
