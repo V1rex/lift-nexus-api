@@ -49,58 +49,29 @@ class TransportOrderServiceTest {
     @DisplayName("Should successfully validate physical locations and create order")
     void shouldCreateOrderSuccessfully() {
       TransportOrderRequest request =
-          new TransportOrderRequest(
-                  10L,
-                  1L,
-                  2L,
-                  EquipmentType.STANDARD);
+          new TransportOrderRequest(10L, 1L, 2L, EquipmentType.STANDARD);
 
+      StorageBin sourceBin = StorageBin.builder().id(1L).build();
 
-      StorageBin sourceBin = StorageBin
-                                                .builder()
-                                                .id(1L)
-                                                .build();
+      StorageBin targetBin = StorageBin.builder().id(2L).build();
 
-      StorageBin targetBin = StorageBin
-                                                .builder()
-                                                .id(2L)
-                                                .build();
-
-      LoadUnit loadUnit = LoadUnit
-                                            .builder()
-                                            .id(10L)
-                                            .currentBin(sourceBin)
-                                            .build();
+      LoadUnit loadUnit = LoadUnit.builder().id(10L).currentBin(sourceBin).build();
 
       TransportOrder mappedEntity = new TransportOrder();
 
-      TransportOrder savedEntity = TransportOrder
-                                                            .builder()
-                                                            .id(99L)
-                                                            .build();
+      TransportOrder savedEntity = TransportOrder.builder().id(99L).build();
 
       TransportOrderResponse expectedResponse =
           new TransportOrderResponse(
-              99L,
-              "LU-SKU",
-              10L,
-              2L,
-              1L,
-              EquipmentType.STANDARD,
-              TransportOrderStatus.OPEN,
-              null);
+              99L, "LU-SKU", 10L, 2L, 1L, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null);
 
-      when(loadUnitService.findEntityById(10L))
-              .thenReturn(loadUnit);
+      when(loadUnitService.findEntityById(10L)).thenReturn(loadUnit);
 
-      when(storageBinService.findEntityById(1L))
-              .thenReturn(sourceBin);
+      when(storageBinService.findEntityById(1L)).thenReturn(sourceBin);
 
-      when(storageBinService.findEntityById(2L))
-              .thenReturn(targetBin);
+      when(storageBinService.findEntityById(2L)).thenReturn(targetBin);
 
-      when(transportOrderMapper.toEntity(request))
-              .thenReturn(mappedEntity);
+      when(transportOrderMapper.toEntity(request)).thenReturn(mappedEntity);
       when(transportOrderRepository.save(any())).thenReturn(savedEntity);
       when(transportOrderMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
 
@@ -114,28 +85,16 @@ class TransportOrderServiceTest {
     @DisplayName("Should throw exception if LoadUnit currently has no bin assigned (null)")
     void shouldThrowException_WhenLoadUnitHasNoBin() {
       TransportOrderRequest request =
-          new TransportOrderRequest(
-                  10L,
-                  1L,
-                  2L,
-                  EquipmentType.STANDARD);
+          new TransportOrderRequest(10L, 1L, 2L, EquipmentType.STANDARD);
 
       StorageBin sourceBin = StorageBin.builder().id(1L).build();
       StorageBin targetBin = StorageBin.builder().id(2L).build();
       LoadUnit loadUnit =
-          LoadUnit
-              .builder()
-              .id(10L)
-              .trackingCode("LU-NULL")
-              .currentBin(null)
-              .build();
+          LoadUnit.builder().id(10L).trackingCode("LU-NULL").currentBin(null).build();
 
-      when(loadUnitService.findEntityById(10L))
-              .thenReturn(loadUnit);
-      when(storageBinService.findEntityById(1L))
-              .thenReturn(sourceBin);
-      when(storageBinService.findEntityById(2L))
-              .thenReturn(targetBin);
+      when(loadUnitService.findEntityById(10L)).thenReturn(loadUnit);
+      when(storageBinService.findEntityById(1L)).thenReturn(sourceBin);
+      when(storageBinService.findEntityById(2L)).thenReturn(targetBin);
 
       assertThatThrownBy(() -> transportOrderService.createTransportOrder(request))
           .isInstanceOf(IllegalStateException.class)
@@ -148,43 +107,22 @@ class TransportOrderServiceTest {
     @DisplayName("Should throw exception if LoadUnit is in a different physical bin than requested")
     void shouldThrowException_WhenLoadUnitInWrongBin() {
       TransportOrderRequest request =
-          new TransportOrderRequest(
-                  10L,
-                  1L,
-                  2L,
-                  EquipmentType.STANDARD);
+          new TransportOrderRequest(10L, 1L, 2L, EquipmentType.STANDARD);
 
-      StorageBin sourceBin = StorageBin
-                                                .builder()
-                                                .id(1L)
-                                                .build();
+      StorageBin sourceBin = StorageBin.builder().id(1L).build();
 
-      StorageBin targetBin = StorageBin
-                                                .builder()
-                                                .id(2L)
-                                                .build();
+      StorageBin targetBin = StorageBin.builder().id(2L).build();
 
+      StorageBin actualBin = StorageBin.builder().id(99L).build();
 
-      StorageBin actualBin = StorageBin
-                                                .builder()
-                                                .id(99L)
-                                                .build();
+      LoadUnit loadUnit =
+          LoadUnit.builder().id(10L).trackingCode("LU-WRONG").currentBin(actualBin).build();
 
-      LoadUnit loadUnit = LoadUnit
-                                            .builder()
-                                            .id(10L)
-                                            .trackingCode("LU-WRONG")
-                                            .currentBin(actualBin)
-                                            .build();
+      when(loadUnitService.findEntityById(10L)).thenReturn(loadUnit);
 
-      when(loadUnitService.findEntityById(10L))
-              .thenReturn(loadUnit);
+      when(storageBinService.findEntityById(1L)).thenReturn(sourceBin);
 
-      when(storageBinService.findEntityById(1L))
-              .thenReturn(sourceBin);
-
-      when(storageBinService.findEntityById(2L))
-              .thenReturn(targetBin);
+      when(storageBinService.findEntityById(2L)).thenReturn(targetBin);
 
       assertThatThrownBy(() -> transportOrderService.createTransportOrder(request))
           .isInstanceOf(IllegalStateException.class)
@@ -219,17 +157,14 @@ class TransportOrderServiceTest {
               TransportOrderStatus.ASSIGNED,
               null);
 
-      when(transportOrderRepository.findById(1L))
-              .thenReturn(Optional.of(order));
+      when(transportOrderRepository.findById(1L)).thenReturn(Optional.of(order));
 
-      when(transportOrderMapper.toResponse(order))
-              .thenReturn(expectedResponse);
+      when(transportOrderMapper.toResponse(order)).thenReturn(expectedResponse);
 
       TransportOrderResponse response = transportOrderService.updateOrderStatus(1L, request);
 
       assertThat(response.status()).isEqualTo(TransportOrderStatus.ASSIGNED);
-      assertThat(order.getStatus())
-          .isEqualTo(TransportOrderStatus.ASSIGNED);
+      assertThat(order.getStatus()).isEqualTo(TransportOrderStatus.ASSIGNED);
     }
 
     @Test
@@ -256,14 +191,12 @@ class TransportOrderServiceTest {
       order.setId(2L);
       order.setStatus(TransportOrderStatus.IN_PROGRESS);
 
-      when(transportOrderRepository.findById(2L))
-              .thenReturn(Optional.of(order));
+      when(transportOrderRepository.findById(2L)).thenReturn(Optional.of(order));
 
       TransportOrderStatusUpdateRequest request =
           new TransportOrderStatusUpdateRequest(TransportOrderStatus.OPEN);
 
-      assertThatThrownBy(() ->
-          transportOrderService.updateOrderStatus(2L, request))
+      assertThatThrownBy(() -> transportOrderService.updateOrderStatus(2L, request))
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("Cannot roll back TransportOrder 2 from ACTIVE to OPEN.");
     }
@@ -280,8 +213,7 @@ class TransportOrderServiceTest {
       TransportOrderStatusUpdateRequest request =
           new TransportOrderStatusUpdateRequest(TransportOrderStatus.OPEN);
 
-      assertThatThrownBy(() ->
-              transportOrderService.updateOrderStatus(3L, request))
+      assertThatThrownBy(() -> transportOrderService.updateOrderStatus(3L, request))
           .isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("Cannot roll back TransportOrder 3 from ASSIGNED to OPEN.");
     }
@@ -298,20 +230,11 @@ class TransportOrderServiceTest {
       order.setId(5L);
       TransportOrderResponse expectedResponse =
           new TransportOrderResponse(
-              5L,
-              "LU-123",
-              10L,
-              2L,
-              1L,
-              EquipmentType.STANDARD,
-              TransportOrderStatus.OPEN,
-              null);
+              5L, "LU-123", 10L, 2L, 1L, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null);
 
-      when(transportOrderRepository.findById(5L))
-              .thenReturn(Optional.of(order));
+      when(transportOrderRepository.findById(5L)).thenReturn(Optional.of(order));
 
-      when(transportOrderMapper.toResponse(order))
-              .thenReturn(expectedResponse);
+      when(transportOrderMapper.toResponse(order)).thenReturn(expectedResponse);
 
       TransportOrderResponse result = transportOrderService.findById(5L);
 
@@ -321,11 +244,9 @@ class TransportOrderServiceTest {
     @Test
     @DisplayName("Should throw ResourceNotFoundException when ID does not exist in DB")
     void shouldThrowResourceNotFound_WhenMissing() {
-      when(transportOrderRepository.findById(99L))
-              .thenReturn(Optional.empty());
+      when(transportOrderRepository.findById(99L)).thenReturn(Optional.empty());
 
-      assertThatThrownBy(() ->
-              transportOrderService.findById(99L))
+      assertThatThrownBy(() -> transportOrderService.findById(99L))
           .isInstanceOf(ResourceNotFoundException.class)
           .hasMessageContaining("TransportOrder with ID 99 not found.");
     }
@@ -345,22 +266,14 @@ class TransportOrderServiceTest {
       TransportOrder transportOrder = new TransportOrder();
       transportOrder.setId(100L);
 
-      Page<TransportOrder> mockTaskPage =
-          new PageImpl<>(java.util.List.of(transportOrder));
+      Page<TransportOrder> mockTaskPage = new PageImpl<>(java.util.List.of(transportOrder));
 
       when(transportOrderRepository.searchOrders(status, minWeight, pageable))
           .thenReturn(mockTaskPage);
 
       TransportOrderResponse mockResponse =
           new TransportOrderResponse(
-              100L,
-              "LU-123",
-              10L,
-              2L,
-              1L,
-              EquipmentType.STANDARD,
-              TransportOrderStatus.OPEN,
-              null);
+              100L, "LU-123", 10L, 2L, 1L, EquipmentType.STANDARD, TransportOrderStatus.OPEN, null);
 
       when(transportOrderMapper.toResponse(transportOrder)).thenReturn(mockResponse);
 
@@ -368,20 +281,15 @@ class TransportOrderServiceTest {
           transportOrderService.searchOrders(status, minWeight, pageable);
 
       assertThat(result).isNotNull();
-      assertThat(result.getTotalElements())
-              .isEqualTo(1);
+      assertThat(result.getTotalElements()).isEqualTo(1);
 
-      TransportOrderResponse mappedResponse =
-              result.getContent().get(0);
+      TransportOrderResponse mappedResponse = result.getContent().get(0);
 
-      assertThat(mappedResponse.id())
-              .isEqualTo(100L);
+      assertThat(mappedResponse.id()).isEqualTo(100L);
 
-      assertThat(mappedResponse.status())
-              .isEqualTo(TransportOrderStatus.OPEN);
+      assertThat(mappedResponse.status()).isEqualTo(TransportOrderStatus.OPEN);
 
-      verify(transportOrderRepository, times(1))
-              .searchOrders(status, minWeight, pageable);
+      verify(transportOrderRepository, times(1)).searchOrders(status, minWeight, pageable);
     }
   }
 }
