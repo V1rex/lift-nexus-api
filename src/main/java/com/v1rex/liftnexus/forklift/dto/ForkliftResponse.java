@@ -1,13 +1,19 @@
 package com.v1rex.liftnexus.forklift.dto;
 
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
-import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
-import com.v1rex.liftnexus.transportorder.dto.TransportOrderResponse;
+import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
+
 import java.util.List;
 
 public record ForkliftResponse(
     Long id,
-    Integer weightCapacity,
+    String fleetNumber,
+    Long forkliftTypeId,
+    String modelName,
     EquipmentType equipmentType,
-    List<TransportOrderResponse> tasks,
-    StorageBinResponse currentLocation) {}
+    Integer maxCapacityKg,
+    Long currentStorageBinId,
+    OperationalStatus status,
+    Double currentBatteryPercentage,
+    List<Long> transportOrderIds
+) {}
