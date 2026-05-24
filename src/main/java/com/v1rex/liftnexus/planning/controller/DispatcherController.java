@@ -1,3 +1,4 @@
+/*
 package com.v1rex.liftnexus.planning.controller;
 
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
@@ -26,3 +27,4 @@ public class DispatcherController {
     return dispatcherService.buildCurrentState();
   }
 }
+*/

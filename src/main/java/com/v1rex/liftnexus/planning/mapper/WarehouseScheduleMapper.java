@@ -20,7 +20,9 @@ public class WarehouseScheduleMapper {
   private final TransportOrderMapper transportOrderMapper;
 
   public WarehouseScheduleResponse toResponse(
-      List<StorageBin> storageBins, List<Forklift> forklifts, List<TransportOrder> unassignedTransportOrders) {
+      List<StorageBin> storageBins,
+      List<Forklift> forklifts,
+      List<TransportOrder> unassignedTransportOrders) {
 
     return new WarehouseScheduleResponse(
         storageBins.stream().map(storageBinMapper::toResponse).toList(),

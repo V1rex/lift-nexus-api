@@ -32,7 +32,7 @@ public class Forklift {
   private Integer weightCapacity;
 
   @PlanningListVariable(valueRangeProviderRefs = "taskPoolRange")
-  @OneToMany(mappedBy = "forklift", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "assignedForklift", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<TransportOrder> transportOrders = new ArrayList<>();
 
   @Builder.Default

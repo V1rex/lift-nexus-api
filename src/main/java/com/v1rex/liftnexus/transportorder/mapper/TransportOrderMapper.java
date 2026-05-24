@@ -10,25 +10,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransportOrderMapper {
 
-    public TransportOrder toEntity(TransportOrderRequest request) {
-        if (request == null) return null;
-        return TransportOrder.builder()
-            .status(TransportOrderStatus.OPEN)
-            .requiredEquipment(request.requiredEquipment() != null ? request.requiredEquipment() : EquipmentType.STANDARD)
-            .build();
-    }
+  public TransportOrder toEntity(TransportOrderRequest request) {
+    if (request == null) return null;
+    return TransportOrder.builder()
+        .status(TransportOrderStatus.OPEN)
+        .requiredEquipment(
+            request.requiredEquipment() != null
+                ? request.requiredEquipment()
+                : EquipmentType.STANDARD)
+        .build();
+  }
 
-    public TransportOrderResponse toResponse(TransportOrder entity) {
-        if (entity == null) return null;
-        return new TransportOrderResponse(
-            entity.getId(),
-            entity.getTargetLoadUnit() != null ? entity.getTargetLoadUnit().getTrackingCode() : null,
-            entity.getTargetLoadUnit() != null ? entity.getTargetLoadUnit().getId() : null,
-            entity.getTargetBin() != null ? entity.getTargetBin().getId() : null,
-            entity.getSourceBin() != null ? entity.getSourceBin().getId() : null,
-            entity.getRequiredEquipment(),
-            entity.getStatus(),
-            entity.getAssignedForklift() != null ? entity.getAssignedForklift().getId() : null
-        );
-    }
+  public TransportOrderResponse toResponse(TransportOrder entity) {
+    if (entity == null) return null;
+    return new TransportOrderResponse(
+        entity.getId(),
+        entity.getTargetLoadUnit() != null ? entity.getTargetLoadUnit().getTrackingCode() : null,
+        entity.getTargetLoadUnit() != null ? entity.getTargetLoadUnit().getId() : null,
+        entity.getTargetBin() != null ? entity.getTargetBin().getId() : null,
+        entity.getSourceBin() != null ? entity.getSourceBin().getId() : null,
+        entity.getRequiredEquipment(),
+        entity.getStatus(),
+        entity.getAssignedForklift() != null ? entity.getAssignedForklift().getId() : null);
+  }
 }
