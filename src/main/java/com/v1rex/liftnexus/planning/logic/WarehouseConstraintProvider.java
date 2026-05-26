@@ -1,4 +1,3 @@
-/*
 package com.v1rex.liftnexus.planning.logic;
 
 import ai.timefold.solver.core.api.score.HardSoftScore;
@@ -14,19 +13,23 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
   @Override
   public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
     return new Constraint[] {
-      forkliftCapacity(constraintFactory),
+/*      forkliftCapacity(constraintFactory)
       minimizeTravelDistance(constraintFactory),
-      taskEquipmentRequirement(constraintFactory)
+      taskEquipmentRequirement(constraintFactory)*/
+
     };
   }
+/*
 
   // Hard constraint: check if all the assigned transportOrders to a Forklift does
   // not exceed the capacity of the forklift
   private Constraint forkliftCapacity(ConstraintFactory factory) {
     return factory
-        .forEach(TransportOrder.class) // Start with the TransportOrder
-        .filter(transportorder -> transportorder.getForklift() != null)
-        .filter(transportorder -> transportorder.getWeight() > transportorder.getForklift().getWeightCapacity())
+        .forEach(TransportOrder.class)
+        .filter(transportorder -> transportorder.getAssignedForklift() != null)
+        .filter(transportorder ->
+                transportorder.getTargetLoadUnit().getWeightKg() >
+                transportorder.getAssignedForklift().getForkliftType().getMaxCapacityKg())
         .penalize(HardSoftScore.ONE_HARD)
         .asConstraint("Forklift capacity limit");
   }
@@ -79,5 +82,6 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
             })
         .asConstraint("Minimize travel distance");
   }
-}
 */
+
+}

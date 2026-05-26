@@ -1,4 +1,3 @@
-/*
 package com.v1rex.liftnexus.planning.service;
 
 import ai.timefold.solver.core.api.solver.SolverManager;
@@ -30,6 +29,7 @@ public class WarehouseDispatcherService {
   private WarehouseSchedule bestSolution;
   private static final Long SINGLETON_JOB_ID = 1L;
 
+/*
   public WarehouseSchedule buildCurrentState() {
     log.info("Building current warehouse state for optimization...");
     List<StorageBin> storageBins = storageBinRepository.findAll();
@@ -57,7 +57,8 @@ public class WarehouseDispatcherService {
     try {
       WarehouseSchedule problem = buildCurrentState();
       // 2. Start Solving
-      solverManager.solveAndListen(SINGLETON_JOB_ID, problem, this::saveSolution);
+      solverManager.solveAndListen(SINGLETON_JOB_ID,
+              problem, this::saveSolution);
 
       log.info("Solver successfully started in background thread.");
 
@@ -72,8 +73,9 @@ public class WarehouseDispatcherService {
   public WarehouseSchedule getSolution() {
     return bestSolution != null ? bestSolution : buildCurrentState();
   }
+*/
 
-  @Transactional
+/*  @Transactional
   public void saveSolution(WarehouseSchedule solution) {
 
     MDC.put("jobId", SINGLETON_JOB_ID.toString());
@@ -100,6 +102,5 @@ public class WarehouseDispatcherService {
 
     this.bestSolution = solution;
     MDC.remove("jobId");
-  }
+  }*/
 }
-*/

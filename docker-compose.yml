@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16
-    container_name: warehouse-postgres
+    container_name: lift-nexus-postgres
     ports:
       - "5432:5432"
     environment:
