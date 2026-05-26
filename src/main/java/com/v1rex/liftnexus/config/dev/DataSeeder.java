@@ -100,16 +100,29 @@ public class DataSeeder implements CommandLineRunner {
 
     storageBinRepository.saveAll(List.of(dock, zoneA, zoneB, shipping));
 
-
     LoadUnit lu1 =
-        LoadUnit.builder().trackingCode("LU-1000").weightKg(500).status(LoadUnitStatus.STAGED).currentBin(zoneB).build();
+        LoadUnit.builder()
+            .trackingCode("LU-1000")
+            .weightKg(500)
+            .status(LoadUnitStatus.STAGED)
+            .currentBin(zoneB)
+            .build();
     LoadUnit lu2 =
-        LoadUnit.builder().trackingCode("LU-2000").weightKg(4000).status(LoadUnitStatus.STAGED).currentBin(zoneA).build();
+        LoadUnit.builder()
+            .trackingCode("LU-2000")
+            .weightKg(4000)
+            .status(LoadUnitStatus.STAGED)
+            .currentBin(zoneA)
+            .build();
     LoadUnit lu3 =
-        LoadUnit.builder().trackingCode("LU-3000").weightKg(100).status(LoadUnitStatus.STAGED).currentBin(dock).build();
+        LoadUnit.builder()
+            .trackingCode("LU-3000")
+            .weightKg(100)
+            .status(LoadUnitStatus.STAGED)
+            .currentBin(dock)
+            .build();
 
     loadUnitRepository.saveAll(List.of(lu1, lu2, lu3));
-
 
     Forklift heavyTruck =
         Forklift.builder()
@@ -132,7 +145,6 @@ public class DataSeeder implements CommandLineRunner {
             .build();
 
     forkliftRepository.saveAll(List.of(heavyTruck, reachTruck));
-
 
     TransportOrder activeOrder =
         TransportOrder.builder()
