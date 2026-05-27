@@ -9,7 +9,7 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
   @Override
   public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
     return new Constraint[] {
-        ForkliftCapacityConstraint.forkliftCapacity(constraintFactory),
+      ForkliftCapacityConstraint.forkliftCapacity(constraintFactory),
     };
   }
 

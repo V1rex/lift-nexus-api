@@ -29,24 +29,24 @@ public class ForkliftCapacityConstraintTest {
 
   @BeforeEach
   void setUp() {
-        this.constraintVerifier =
+    this.constraintVerifier =
         ConstraintVerifier.build(
             new ForkliftCapacityTestConstraintProvider(),
             WarehouseSchedule.class,
             TransportOrder.class,
             Forklift.class);
 
-        loadingDock =
-          StorageBin.builder()
-          .id(1L)
-          .binCode("DOCK-01")
-          .coordinate(new Coordinate3D(0, 0, 0))
-          .zoneType(ZoneType.STAGING_OUT)
-          .maxWeightCapacityKg(10_000)
-          .build();
+    loadingDock =
+        StorageBin.builder()
+            .id(1L)
+            .binCode("DOCK-01")
+            .coordinate(new Coordinate3D(0, 0, 0))
+            .zoneType(ZoneType.STAGING_OUT)
+            .maxWeightCapacityKg(10_000)
+            .build();
 
-        smallType =
-            ForkliftType.builder()
+    smallType =
+        ForkliftType.builder()
             .id(1L)
             .modelName("SMALL-01")
             .equipmentType(EquipmentType.STANDARD)
@@ -55,8 +55,8 @@ public class ForkliftCapacityConstraintTest {
             .baseEnergyConsumptionPerMeter(0.25)
             .build();
 
-        bigType =
-            ForkliftType.builder()
+    bigType =
+        ForkliftType.builder()
             .id(2L)
             .modelName("BIG-01")
             .equipmentType(EquipmentType.STANDARD)
@@ -64,12 +64,11 @@ public class ForkliftCapacityConstraintTest {
             .totalBatteryCapacitykWh(50.0)
             .baseEnergyConsumptionPerMeter(0.25)
             .build();
-
-
   }
 
   @Test
-  @DisplayName("Forklift capacity should penalize when assigned load exceeds forklift's max capacity")
+  @DisplayName(
+      "Forklift capacity should penalize when assigned load exceeds forklift's max capacity")
   void forkliftCapacity_shouldPenalize_whenOverloaded() {
 
     Forklift smallForklift =
@@ -106,7 +105,8 @@ public class ForkliftCapacityConstraintTest {
   }
 
   @Test
-  @DisplayName("Forklift capacity should not penalize when assigned load is within forklift's max capacity")
+  @DisplayName(
+      "Forklift capacity should not penalize when assigned load is within forklift's max capacity")
   void forkliftCapacity_shouldNotPenalize_whenNotOverloaded() {
     Forklift bigForklift =
         Forklift.builder()
@@ -168,7 +168,7 @@ public class ForkliftCapacityConstraintTest {
             .sourceBin(loadingDock)
             .targetBin(loadingDock)
             .targetLoadUnit(heavyLoad)
-            //.assignedForklift(bigForklift) - we do not assign the order to a forklift
+            // .assignedForklift(bigForklift) - we do not assign the order to a forklift
             .build();
 
     constraintVerifier
