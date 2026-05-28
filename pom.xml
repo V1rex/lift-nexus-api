@@ -187,7 +187,6 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/config/**</exclude>
-                                <exclude>**/planning/**</exclude>
                                 <exclude>**/common/exception/**</exclude>
                             </excludes>
                         </configuration>
