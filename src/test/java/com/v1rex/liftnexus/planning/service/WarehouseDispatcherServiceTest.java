@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import ai.timefold.solver.core.api.score.HardSoftScore;
 import ai.timefold.solver.core.api.solver.SolverManager;
 import com.v1rex.liftnexus.forklift.service.ForkliftService;
 import com.v1rex.liftnexus.planning.DispatchJobRepository;
@@ -208,6 +209,69 @@ public class WarehouseDispatcherServiceTest {
           .hasMessageContaining("Job not found: " + nonExistentJobId);
 
       verify(jobRepository, never()).save(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("Feature: Save Final Solution Callback")
+  class SaveFinalSolution {
+
+    @Test
+    void shouldDiscardResultsAndNotUpdateDatabaseIfJobWasAborted() {
+      UUID jobId = UUID.randomUUID();
+      DispatchJob abortedJob =
+          DispatchJob.builder()
+              .id(jobId)
+              .status(JobStatus.ABORTED)
+              .createdAt(Instant.now().minusSeconds(120))
+              .build();
+
+      when(jobRepository.findById(jobId)).thenReturn(Optional.of(abortedJob));
+
+      WarehouseSchedule dummySchedule = new WarehouseSchedule();
+
+      warehouseDispatcherService.saveFinalSolution(dummySchedule, jobId);
+
+      verify(transportOrderService, never()).updateForkliftAssignments(any());
+      verify(forkliftService, never()).updateAssignedOrders(any());
+
+      verify(jobRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldSaveAssignmentsAndTransitionJobToCompleted() {
+      UUID jobId = UUID.randomUUID();
+      DispatchJob activeJob =
+          DispatchJob.builder()
+              .id(jobId)
+              .status(JobStatus.SOLVING)
+              .createdAt(Instant.now().minusSeconds(30))
+              .build();
+
+      when(jobRepository.findById(jobId)).thenReturn(Optional.of(activeJob));
+      when(jobRepository.save(any(DispatchJob.class))).thenAnswer(i -> i.getArgument(0));
+
+      WarehouseSchedule mockSchedule = mock(WarehouseSchedule.class);
+
+      HardSoftScore realScore = HardSoftScore.of(0, 150);
+
+      when(mockSchedule.getScore()).thenReturn(realScore);
+      when(mockSchedule.getTransportOrderPool()).thenReturn(Collections.emptyList());
+      when(mockSchedule.getForklifts()).thenReturn(Collections.emptyList());
+
+      warehouseDispatcherService.saveFinalSolution(mockSchedule, jobId);
+
+      verify(transportOrderService, times(1)).updateForkliftAssignments(any());
+      verify(forkliftService, times(1)).updateAssignedOrders(any());
+
+      ArgumentCaptor<DispatchJob> jobCaptor = ArgumentCaptor.forClass(DispatchJob.class);
+      verify(jobRepository, times(1)).save(jobCaptor.capture());
+
+      DispatchJob finalizedJob = jobCaptor.getValue();
+      assertThat(finalizedJob.getStatus()).isEqualTo(JobStatus.COMPLETED);
+      assertThat(finalizedJob.getCompletedAt()).isNotNull();
+
+      assertThat(finalizedJob.getFinalScore()).isEqualTo("0hard/150soft");
     }
   }
 }
