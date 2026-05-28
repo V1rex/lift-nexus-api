@@ -103,6 +103,19 @@ public class TransportOrderService {
     return transportOrderRepository.findAll();
   }
 
+  @Transactional
+  public void updateForkliftAssignments(List<TransportOrder> orders) {
+    for (TransportOrder order : orders) {
+      TransportOrder databaseOrder = findEntityById(order.getId());
+
+      databaseOrder.setAssignedForklift(order.getAssignedForklift());
+
+      updateOrderStatus(
+          databaseOrder.getId(),
+          new TransportOrderStatusUpdateRequest(TransportOrderStatus.ASSIGNED));
+    }
+  }
+
   private void checkStatusBeforeUpdate(
       Long id, TransportOrderStatus currentStatus, TransportOrderStatus newStatus) {
     if (currentStatus == TransportOrderStatus.COMPLETED) {

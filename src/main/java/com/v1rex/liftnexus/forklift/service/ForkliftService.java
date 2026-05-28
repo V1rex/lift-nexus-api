@@ -125,4 +125,19 @@ public class ForkliftService {
     log.info("Fetching all managed forklift entities without pagination");
     return forkliftRepository.findAll();
   }
+
+  @Transactional
+  public void updateAssignedOrders(List<Forklift> forklifts) {
+    log.info("Updating assigned transport orders for Forklifts");
+    // TODO: write here a better log
+
+    for (Forklift newForklift : forklifts) {
+      Forklift databaseForklift = findEntityById(newForklift.getId());
+
+      databaseForklift.getTransportOrders().clear();
+      if (newForklift.getTransportOrders() != null) {
+        databaseForklift.getTransportOrders().addAll(newForklift.getTransportOrders());
+      }
+    }
+  }
 }

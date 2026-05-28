@@ -33,6 +33,16 @@ public class WarehouseDispatcherService {
 
   public WarehouseSchedule buildCurrentState() {
     log.info("Building current warehouse state for optimization...");
+
+    // TODO: this is a really great performance bottleneck.
+    //  If the database contains thousands of storage bins,
+    //  forklifts, and transport orders, this method will take a long
+    //  time to execute and may cause the worker thread to time out before optimization can even
+    // begin.
+    //  Action: Create in Milestone 2 an issue to fix the fetching of storageBins, forklifts, and
+    // transportOrders
+    //  by implementing a more efficient data retrieval strategy (e.g., pagination, selective field
+    // fetching, or caching).
     List<StorageBin> storageBins = storageBinService.findAllEntities();
     List<Forklift> forklifts = forkliftService.findAllEntities();
     List<TransportOrder> transportOrders = transportOrderService.findAllEntities();
@@ -75,7 +85,6 @@ public class WarehouseDispatcherService {
 
     DispatchJob job = findJobEntityById(jobId);
 
-    // Defensive Guard: Only active jobs can be aborted
     if (job.getStatus() != JobStatus.QUEUED && job.getStatus() != JobStatus.SOLVING) {
       throw new IllegalStateException(
           "Cannot terminate job " + jobId + " because it is already in status: " + job.getStatus());
@@ -105,9 +114,45 @@ public class WarehouseDispatcherService {
   @Transactional
   public void saveFinalSolution(WarehouseSchedule solution, UUID jobId) {
     log.info("Optimization completed for Job: {}", jobId);
-    // TODO: implement solution persistence logic here (e.g. save to DB, publish events, etc.)
 
+    DispatchJob job = findJobEntityById(jobId);
+
+    if (job.getStatus() == JobStatus.ABORTED) {
+      log.warn("Job {} was aborted during optimization. Final solution will not be saved.", jobId);
+      return;
+    }
+
+    if (solution.getScore() != null && solution.getScore().isFeasible()) {
+      log.info("Solution is feasible (Score: {}). Saving assignments to DB.", solution.getScore());
+    } else {
+      log.warn(
+          "Solution is INFEASIBLE (Score: {}). Saving best-effort assignments anyway.",
+          solution.getScore());
+    }
+
+    // TODO: Wrap data updates in a try-catch block. If transportOrderService or forkliftService
+    //       throws an exception here, the job status will remain stuck in 'SOLVING'.
+    //       Catch exceptions and mark the job status as JobStatus.FAILED.
+
+    transportOrderService.updateForkliftAssignments(solution.getTransportOrderPool());
+    forkliftService.updateAssignedOrders(solution.getForklifts());
+
+    job.setStatus(JobStatus.COMPLETED);
+    job.setCompletedAt(Instant.now());
+
+    if (solution.getScore() != null) {
+      job.setFinalScore(solution.getScore().toString());
+    }
+    jobRepository.save(job);
+    log.info("Job {} successfully wrapped and saved.", jobId);
   }
+
+  // TODO: Implement a passive reconciliation method for status polling (e.g.,
+  // getJobStatusAndReconcile)
+  //       Because solveAndListen handles exceptions internally and logs them without a callback,
+  //       we must check if (job.getStatus == SOLVING && solverManager.getSolverStatus(jobId) ==
+  // NOT_SOLVING).
+  //       If that condition is met, programmatically flip the database status to JobStatus.FAILED.
 
   public DispatchJob findJobEntityById(UUID jobId) {
     return jobRepository
