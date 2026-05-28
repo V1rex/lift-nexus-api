@@ -7,6 +7,8 @@ import com.v1rex.liftnexus.planning.DispatchJobRepository;
 import com.v1rex.liftnexus.planning.domain.DispatchJob;
 import com.v1rex.liftnexus.planning.domain.JobStatus;
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
+import com.v1rex.liftnexus.planning.dto.DispatchJobResponse;
+import com.v1rex.liftnexus.planning.mapper.DispatchJobMapper;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
@@ -28,8 +30,28 @@ public class WarehouseDispatcherService {
   private final TransportOrderService transportOrderService;
 
   private final DispatchJobRepository jobRepository;
+  private final DispatchJobMapper dispatchJobMapper;
 
   private final SolverManager<WarehouseSchedule> solverManager;
+
+  public DispatchJobResponse getJobStatusAndReconcile(UUID jobId) {
+    DispatchJob job = findJobEntityById(jobId);
+    // TODO: look for a better way to update the job status in case of TimeFold failure
+    /*
+     SolverStatus timefoldStatus = solverManager.getSolverStatus(jobId);
+     if (job.getStatus() == JobStatus.SOLVING && timefoldStatus == SolverStatus.NOT_SOLVING) {
+        log.error("Reconciliation Alert: Job {} is {} in DB, " +
+                        "but Timefold is NOT_SOLVING. Marking job as FAILED.",
+        jobId, job.getStatus());
+
+        job.setStatus(JobStatus.FAILED);
+        job.setCompletedAt(Instant.now());
+        jobRepository.save(job);
+
+    }*/
+
+    return dispatchJobMapper.toResponse(job);
+  }
 
   public WarehouseSchedule buildCurrentState() {
     log.info("Building current warehouse state for optimization...");
@@ -146,13 +168,6 @@ public class WarehouseDispatcherService {
     jobRepository.save(job);
     log.info("Job {} successfully wrapped and saved.", jobId);
   }
-
-  // TODO: Implement a passive reconciliation method for status polling (e.g.,
-  // getJobStatusAndReconcile)
-  //       Because solveAndListen handles exceptions internally and logs them without a callback,
-  //       we must check if (job.getStatus == SOLVING && solverManager.getSolverStatus(jobId) ==
-  // NOT_SOLVING).
-  //       If that condition is met, programmatically flip the database status to JobStatus.FAILED.
 
   public DispatchJob findJobEntityById(UUID jobId) {
     return jobRepository
