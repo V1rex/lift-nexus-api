@@ -3,15 +3,21 @@ package com.v1rex.liftnexus.planning.service;
 import ai.timefold.solver.core.api.solver.SolverManager;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.service.ForkliftService;
+import com.v1rex.liftnexus.planning.DispatchJobRepository;
+import com.v1rex.liftnexus.planning.domain.DispatchJob;
+import com.v1rex.liftnexus.planning.domain.JobStatus;
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
 import com.v1rex.liftnexus.transportorder.service.TransportOrderService;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -21,10 +27,9 @@ public class WarehouseDispatcherService {
   private final ForkliftService forkliftService;
   private final TransportOrderService transportOrderService;
 
-  private final SolverManager<WarehouseSchedule> solverManager;
+  private final DispatchJobRepository jobRepository;
 
-  private WarehouseSchedule bestSolution;
-  private static final Long SINGLETON_JOB_ID = 1L;
+  private final SolverManager<WarehouseSchedule> solverManager;
 
   public WarehouseSchedule buildCurrentState() {
     log.info("Building current warehouse state for optimization...");
@@ -46,55 +51,43 @@ public class WarehouseDispatcherService {
     return schedule;
   }
 
-  /*    public void startSolving() {
-      MDC.put("jobId", SINGLETON_JOB_ID.toString());
-      log.info("Attempting to start solver...");
-      try {
-        WarehouseSchedule problem = buildCurrentState();
-        // 2. Start Solving
-        solverManager.solveAndListen(SINGLETON_JOB_ID,
-                problem, this::saveSolution);
+  public UUID submitOptimizationJob() {
+    UUID ticketId = UUID.randomUUID();
+    DispatchJob job =
+        DispatchJob.builder()
+            .id(ticketId)
+            .status(JobStatus.QUEUED)
+            .createdAt(Instant.now())
+            .build();
+    jobRepository.save(job);
 
-        log.info("Solver successfully started in background thread.");
+    solverManager.solveAndListen(
+        ticketId,
+        buildCurrentProblemAndSetSolvingStatus(ticketId),
+        solution -> saveFinalSolution(solution, ticketId));
 
-      } catch (Exception e) {
-        log.error("Critical failure while starting the solver: ", e);
-      } finally {
-        // Clear MDC so other logs don't get 'polluted' with this JobId
-        MDC.remove("jobId");
-      }
-    }
+    return ticketId;
+  }
 
-    public WarehouseSchedule getSolution() {
-      return bestSolution != null ? bestSolution : buildCurrentState();
-    }
+  @Transactional
+  public WarehouseSchedule buildCurrentProblemAndSetSolvingStatus(UUID jobId) {
+    log.info("Worker thread starting optimization for Job: {}", jobId);
 
-    @Transactional
-    public void saveSolution(WarehouseSchedule solution) {
+    DispatchJob job =
+        jobRepository
+            .findById(jobId)
+            // TODO: implement proper Custom Exception in the API
+            .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
+    job.setStatus(JobStatus.SOLVING);
+    jobRepository.save(job);
 
-    MDC.put("jobId", SINGLETON_JOB_ID.toString());
+    return buildCurrentState();
+  }
 
-    log.info("New best solution found! Score: {}", solution.getScore());
+  @Transactional
+  public void saveFinalSolution(WarehouseSchedule solution, UUID jobId) {
+    log.info("Optimization completed for Job: {}", jobId);
+    // TODO: implement solution persistence logic here (e.g. save to DB, publish events, etc.)
 
-    if (solution.getScore().isFeasible()) {
-      log.info("Solution is feasible. Updating transportorder assignments in database.");
-      try {
-        for (Forklift forklift : solution.getForklifts()) {
-          for (TransportOrder transportOrder : forklift.getTransportOrders()) {
-            transportOrder.setForklift(forklift);
-            transportOrderRepository.save(transportOrder);
-          }
-          forkliftRepository.save(forklift);
-        }
-        log.debug("Database sync complete for all forklifts and transportOrders.");
-      } catch (Exception e) {
-        log.error("Failed to persist solution to database: ", e);
-      }
-    } else {
-      log.warn("Latest solution is infeasible (Score: {}). Skipping DB save.", solution.getScore());
-    }
-
-    this.bestSolution = solution;
-    MDC.remove("jobId");
-  }*/
+  }
 }
