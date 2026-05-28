@@ -8,17 +8,22 @@ public class WarehouseConstraintProvider implements ConstraintProvider {
 
   @Override
   public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
-      return new Constraint[] {
-            forkliftCapacity(constraintFactory),
-            travelDistance(constraintFactory),
-            equipmentType(constraintFactory)
-      };
+    return new Constraint[] {
+      forkliftCapacity(constraintFactory),
+      travelDistance(constraintFactory),
+      equipmentType(constraintFactory)
+    };
   }
 
-    public Constraint forkliftCapacity(ConstraintFactory factory) {return ForkliftCapacityConstraint.forkliftCapacity(factory);}
+  public Constraint forkliftCapacity(ConstraintFactory factory) {
+    return ForkliftCapacityConstraint.forkliftCapacity(factory);
+  }
 
-    public Constraint travelDistance(ConstraintFactory factory){return ForkliftTravelDistanceConstraint.forkliftTravelDistance(factory); }
+  public Constraint travelDistance(ConstraintFactory factory) {
+    return ForkliftTravelDistanceConstraint.forkliftTravelDistance(factory);
+  }
 
-    public Constraint equipmentType(ConstraintFactory factory){ return TransportOrderEquipmentRequirementConstraint.equipmentType(factory); }
-
+  public Constraint equipmentType(ConstraintFactory factory) {
+    return TransportOrderEquipmentRequirementConstraint.equipmentType(factory);
+  }
 }

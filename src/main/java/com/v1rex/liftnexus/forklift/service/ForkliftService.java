@@ -60,7 +60,7 @@ public class ForkliftService {
 
   @Transactional(readOnly = true)
   public Page<ForkliftResponse> findAll(Pageable pageable) {
-    return forkliftRepository.findAll(pageable).map(forkliftMapper::toResponse);
+    return findAllEntities(pageable).map(forkliftMapper::toResponse);
   }
 
   @Transactional(readOnly = true)
@@ -104,6 +104,7 @@ public class ForkliftService {
 
   @Transactional(readOnly = true)
   public Forklift findEntityById(Long id) {
+    log.info("Fetching Forklift entity with id: {}", id);
     return forkliftRepository
         .findById(id)
         .orElseThrow(
@@ -114,8 +115,14 @@ public class ForkliftService {
   }
 
   @Transactional(readOnly = true)
-  public List<Forklift> findAllEntitiesForPlanning() {
-    log.info("Fetching all managed forklift assets for Timefold optimization engine execution");
+  public Page<Forklift> findAllEntities(Pageable pageable) {
+    log.info("Fetching all managed forklift entities and returning a page");
+    return forkliftRepository.findAll(pageable);
+  }
+
+  @Transactional(readOnly = true)
+  public List<Forklift> findAllEntities() {
+    log.info("Fetching all managed forklift entities without pagination");
     return forkliftRepository.findAll();
   }
 }

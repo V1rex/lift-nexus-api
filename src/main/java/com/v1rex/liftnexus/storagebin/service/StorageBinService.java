@@ -6,6 +6,7 @@ import com.v1rex.liftnexus.storagebin.dto.StorageBinRequest;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
 import com.v1rex.liftnexus.storagebin.mapper.StorageBinMapper;
 import com.v1rex.liftnexus.storagebin.repository.StorageBinRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -61,7 +62,9 @@ public class StorageBinService {
   // =====================================================================
   // INTERNAL DOMAIN BOUNDARY (Returns Entities to other Services/Timefold)
   // =====================================================================
+  @Transactional(readOnly = true)
   public StorageBin findEntityById(Long id) {
+    log.info("Fetching storage bin entity with id: {}", id);
     return storageBinRepository
         .findById(id)
         .orElseThrow(
@@ -71,7 +74,15 @@ public class StorageBinService {
             });
   }
 
+  @Transactional(readOnly = true)
   public Page<StorageBin> findAllEntities(Pageable pageable) {
+    log.info("Fetching all managed storage bin entities with pagination");
     return storageBinRepository.findAll(pageable);
+  }
+
+  @Transactional(readOnly = true)
+  public List<StorageBin> findAllEntities() {
+    log.info("Fetching all managed storage bin entities without pagination");
+    return storageBinRepository.findAll();
   }
 }

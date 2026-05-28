@@ -284,7 +284,7 @@ public class ForkliftServiceTest {
 
       when(forkliftRepository.findAll()).thenReturn(mockList);
 
-      List<Forklift> result = forkliftService.findAllEntitiesForPlanning();
+      List<Forklift> result = forkliftService.findAllEntities();
 
       assertThat(result).hasSize(2);
       assertThat(result).containsExactly(forklift1, forklift2);
