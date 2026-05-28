@@ -70,14 +70,32 @@ public class WarehouseDispatcherService {
   }
 
   @Transactional
+  public void terminateOptimizationJob(UUID jobId) {
+    log.info("Request received to manually terminate optimization Job: {}", jobId);
+
+    DispatchJob job = findJobEntityById(jobId);
+
+    // Defensive Guard: Only active jobs can be aborted
+    if (job.getStatus() != JobStatus.QUEUED && job.getStatus() != JobStatus.SOLVING) {
+      throw new IllegalStateException(
+          "Cannot terminate job " + jobId + " because it is already in status: " + job.getStatus());
+    }
+
+    solverManager.terminateEarly(jobId);
+
+    job.setStatus(JobStatus.ABORTED);
+    job.setCompletedAt(Instant.now());
+    jobRepository.save(job);
+
+    log.info("Job {} has been successfully halted and marked as ABORTED.", jobId);
+  }
+
+  @Transactional
   public WarehouseSchedule buildCurrentProblemAndSetSolvingStatus(UUID jobId) {
     log.info("Worker thread starting optimization for Job: {}", jobId);
 
-    DispatchJob job =
-        jobRepository
-            .findById(jobId)
-            // TODO: implement proper Custom Exception in the API
-            .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
+    DispatchJob job = findJobEntityById(jobId);
+
     job.setStatus(JobStatus.SOLVING);
     jobRepository.save(job);
 
@@ -89,5 +107,12 @@ public class WarehouseDispatcherService {
     log.info("Optimization completed for Job: {}", jobId);
     // TODO: implement solution persistence logic here (e.g. save to DB, publish events, etc.)
 
+  }
+
+  public DispatchJob findJobEntityById(UUID jobId) {
+    return jobRepository
+        .findById(jobId)
+        // TODO: implement proper Custom Exception in the API
+        .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
   }
 }

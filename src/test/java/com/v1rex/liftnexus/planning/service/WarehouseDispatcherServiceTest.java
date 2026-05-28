@@ -64,6 +64,60 @@ public class WarehouseDispatcherServiceTest {
   }
 
   @Nested
+  @DisplayName("Feature: Terminate Optimization Job")
+  class TerminateOptimizationJob {
+
+    @Test
+    void shouldSuccessfullyTerminateRunningJob() {
+
+      UUID runningJobId = UUID.randomUUID();
+      DispatchJob activeJob =
+          DispatchJob.builder()
+              .id(runningJobId)
+              .status(JobStatus.SOLVING)
+              .createdAt(Instant.now())
+              .build();
+
+      when(jobRepository.findById(runningJobId)).thenReturn(Optional.of(activeJob));
+      when(jobRepository.save(any(DispatchJob.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      warehouseDispatcherService.terminateOptimizationJob(runningJobId);
+
+      verify(solverManager, times(1)).terminateEarly(runningJobId);
+
+      ArgumentCaptor<DispatchJob> finalJobCaptor = ArgumentCaptor.forClass(DispatchJob.class);
+      verify(jobRepository, times(1)).save(finalJobCaptor.capture());
+
+      assertThat(finalJobCaptor.getValue().getStatus()).isEqualTo(JobStatus.ABORTED);
+      assertThat(finalJobCaptor.getValue().getCompletedAt()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTryingToTerminateAnAlreadyCompletedJob() {
+
+      UUID completedJobId = UUID.randomUUID();
+      DispatchJob historicalJob =
+          DispatchJob.builder()
+              .id(completedJobId)
+              .status(JobStatus.COMPLETED)
+              .createdAt(Instant.now().minusSeconds(60))
+              .completedAt(Instant.now())
+              .build();
+
+      when(jobRepository.findById(completedJobId)).thenReturn(Optional.of(historicalJob));
+
+      assertThatThrownBy(() -> warehouseDispatcherService.terminateOptimizationJob(completedJobId))
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessageContaining("Cannot terminate job")
+          .hasMessageContaining("COMPLETED");
+
+      verify(solverManager, never()).terminateEarly(any());
+      verify(jobRepository, never()).save(any());
+    }
+  }
+
+  @Nested
   @DisplayName("Feature: Submit Optimization Job")
   class SubmitOptimizationJob {
 
