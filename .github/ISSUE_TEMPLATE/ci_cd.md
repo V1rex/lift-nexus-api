@@ -1,7 +1,7 @@
 ---
 name: "🚀 Infrastructure & CI/CD"
 about: Setup automation, Docker configurations, or deployment pipelines.
-title: "[DEVOPS]: "
+title: "[DEVOPS]:"
 labels: devops, automation
 ---
 
@@ -17,5 +17,4 @@ Describe why this infrastructure change is needed (e.g., "The build process is m
 - [ ] No secrets are exposed in the repository.
 - [ ] [Optional] Deployment to environment is successful.
 
-### 📚 Resources
-Link to documentation (e.g., GitHub Actions, Docker Hub).
+

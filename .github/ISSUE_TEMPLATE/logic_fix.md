@@ -1,7 +1,7 @@
 ---
-name: Logic or Optimization Refactor
+name: 🔨 Logic Fix
 about: Fix mathematical errors or improve solver efficiency
-title: "logic:"
+title: "[LOGIC]:"
 labels: solver, math
 assignees: ''
 ---

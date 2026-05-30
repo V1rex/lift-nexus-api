@@ -1,7 +1,7 @@
 ---
-name: Technical Debt
+name: 🧹 Technical Debt
 about: Clean up code, improve performance, or update dependencies
-title: "refactor: "
+title: "[REFACTOR]:"
 labels: tech-debt
 ---
 ### The Debt

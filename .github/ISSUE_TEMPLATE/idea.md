@@ -8,7 +8,7 @@ labels: spike, enhancement
 ### 🌟 The "Big Picture"
 What is the core idea? (e.g., "Implement a 'What-If' mode to simulate warehouse layout changes").
 
-### 🚀 Business / User Value
+### 🚀 Added Value
 Why is this worth building? How does it make the Warehouse Dispatcher better or more "Senior"?
 
 ### 🛠 Potential Implementation

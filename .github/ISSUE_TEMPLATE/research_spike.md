@@ -1,7 +1,7 @@
 ---
 name: "🔬 Research / Spike"
 about: Investigate a new technology or approach before implementation.
-title: "[SPIKE]: "
+title: "[SPIKE]:"
 labels: research, documentation
 ---
 

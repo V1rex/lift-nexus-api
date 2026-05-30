@@ -1,7 +1,7 @@
 ---
-name: Feature Request
+name: ✨ Feature
 about: Create a new feature or Epic for the warehouse engine
-title: "feat: "
+title: "[FEAT]:"
 labels: enhancement
 assignees: ''
 ---
