@@ -16,8 +16,8 @@
     <url>https://github.com/v1rex/lift-nexus-api</url>
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
