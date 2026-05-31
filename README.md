@@ -188,26 +188,40 @@ open target/site/jacoco/index.html  # Coverage report
 
 ## Roadmap
 
-## Roadmap
+| Phase | Status | Focus | Tech Stack |
+|-------|--------|-------|-----------|
+| **Milestone 1** | ✅ Current | **Static Dispatching MVP** | Spring Boot 4.0.5, Timefold 2.0, PostgreSQL 16, Flyway, REST API, DDD, JPA, OpenAPI/Swagger, Testcontainers, JUnit 5 (75%+ coverage), Docker Compose |
+| | | • VRP with capacity constraints solver | |
+| | | • Async job-based optimization engine | |
+| | | • Production-ready API structure | |
+| **Milestone 2** | 🚀 Planned | **Real-Time Reactive Optimization** | Event-driven architecture, real-time updates, microservices |
+| | | • Live order re-routing on demand | |
+| | | • Dynamic vehicle state tracking | |
+| | | • Advanced pathfinding optimization | |
+| **Milestone 3** | 📈 Next Phase | **Energy Market Integration for Fleet Optimization** | Multi-objective optimization, spot-market feeds, sustainability |
+| | | • Dynamic electricity tariff-aware forklift charging schedules | |
+| | | • Smart charging cycles integrated with dispatch optimization | |
+| | | • Grid-responsive fleet operations & cost-optimized logistics | |
 
-- **Milestone 1 (Core _MVP_ - Current Backend Architecture)**
-  * Core VRP solver implementation with Timefold constraint programming
-  * Domain-driven intralogistics dispatching engine across 5 bounded contexts
-  * Asynchronous REST API architecture with status tracking
-  * Production-ready database schema with automated Flyway migrations
+**Current Focus:** Milestone 1 – Building production-ready foundation. Strategic goal: Energy-aware intralogistics targeting companies optimizing warehouse operations and electric fleet charging with sustainability & cost efficiency.
 
-- **Milestone 2 (Real-Time Reactive Scheduling)**
-  * Migration to event-driven asset re-routing using messaging queues 
-  * Dynamic graph network updates for live warehouse pathing and deadheading reduction
-  * Real-time websocket notifications for fleet state and dispatch updates
-
--  **Milestone 3 (Sector Coupling & Energy Market Integration)**
-  * Design and integration of the **Electron Nexus API** module
-  * Direct ingestion of European electricity spot-market feeds
-  * Multi-objective optimization constraints matching vehicle routing with dynamic electricity tariffs
-  * Automated warehouse smart charging cycles to exploit negative pricing windows
-  
 See the [open issues](https://github.com/v1rex/lift-nexus-api/issues) for a full list of proposed features.
+
+<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
+
+---
+
+## Contributing
+
+Contributions are welcome! To contribute:
+
+1. Fork the project
+2. Create your feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit your changes: `git commit -m 'feat: add AmazingFeature'` (follow [Conventional Commits](https://www.conventionalcommits.org/))
+4. Push to the branch: `git push origin feature/AmazingFeature`
+5. Open a Pull Request
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed setup instructions, code standards, and testing requirements.
 
 <p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
 
