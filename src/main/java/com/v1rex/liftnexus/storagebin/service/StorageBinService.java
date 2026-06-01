@@ -1,6 +1,7 @@
 package com.v1rex.liftnexus.storagebin.service;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
+import com.v1rex.liftnexus.storagebin.exception.StorageBinCodeExistsException;
+import com.v1rex.liftnexus.storagebin.exception.StorageBinNotFoundException;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinRequest;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
@@ -35,8 +36,7 @@ public class StorageBinService {
         request.coordinate().z());
 
     if (storageBinRepository.existsByBinCode(request.binCode())) {
-      throw new IllegalArgumentException(
-          "Storage bin with code " + request.binCode() + " already exists.");
+      throw new StorageBinCodeExistsException(request.binCode());
     }
 
     StorageBin storageBin = storageBinMapper.toEntity(request);
@@ -70,7 +70,7 @@ public class StorageBinService {
         .orElseThrow(
             () -> {
               log.warn("Storage bin with id: {} not found.", id);
-              return new ResourceNotFoundException("Storage bin with " + id + " not found.");
+              return new StorageBinNotFoundException(id);
             });
   }
 

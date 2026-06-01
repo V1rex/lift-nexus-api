@@ -12,6 +12,7 @@ import com.v1rex.liftnexus.storagebin.domain.ZoneType;
 import com.v1rex.liftnexus.storagebin.dto.CoordinateDto;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinRequest;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinResponse;
+import com.v1rex.liftnexus.storagebin.exception.StorageBinNotFoundException;
 import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +32,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
 import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 
+import com.v1rex.liftnexus.storagebin.controller.StorageBinExceptionHandler;
+
 @WebMvcTest(controllers = StorageBinController.class)
-@Import({GlobalExceptionHandler.class, ProblemDetailFactory.class})
+@Import({GlobalExceptionHandler.class, StorageBinExceptionHandler.class, ProblemDetailFactory.class})
 @ActiveProfiles("test")
 @DisplayName("StorageBin REST API Gateway Endpoints Tests")
 public class StorageBinControllerTest {
@@ -95,7 +98,7 @@ public class StorageBinControllerTest {
       Long missingId = 999L;
       Mockito.when(storageBinService.findById(missingId))
           .thenThrow(
-              new ResourceNotFoundException("Storage bin with " + missingId + " not found."));
+              new StorageBinNotFoundException(missingId));
 
       // Act & Assert
       mockMvc
