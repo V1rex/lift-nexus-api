@@ -1,7 +1,6 @@
 package com.v1rex.liftnexus.planning.domain;
 
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
