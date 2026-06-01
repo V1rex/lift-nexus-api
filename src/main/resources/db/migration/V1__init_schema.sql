@@ -52,6 +52,14 @@ CREATE TABLE transport_orders (
     CONSTRAINT fk_transport_forklift FOREIGN KEY (forklift_id) REFERENCES forklifts (id)
 );
 
+CREATE TABLE dispatch_jobs (
+    id UUID PRIMARY KEY,
+    status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    completed_at TIMESTAMPTZ,
+    final_score VARCHAR(255)
+);
+
 CREATE INDEX idx_transport_forklift ON transport_orders(forklift_id);
 CREATE INDEX idx_forklift_current_bin ON forklifts(current_storage_bin_id);
 CREATE INDEX idx_transport_loadunit ON transport_orders(load_unit_id);

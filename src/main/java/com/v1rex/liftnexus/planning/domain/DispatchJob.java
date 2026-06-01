@@ -1,14 +1,13 @@
 package com.v1rex.liftnexus.planning.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
 
 @Entity
+@Table(name = "dispatch_jobs")
 @Getter
 @Setter
 @NoArgsConstructor
