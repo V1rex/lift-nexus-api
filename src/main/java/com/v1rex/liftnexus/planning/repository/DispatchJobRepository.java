@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.planning;
+package com.v1rex.liftnexus.planning.repository;
 
 import com.v1rex.liftnexus.planning.domain.DispatchJob;
 import java.util.UUID;

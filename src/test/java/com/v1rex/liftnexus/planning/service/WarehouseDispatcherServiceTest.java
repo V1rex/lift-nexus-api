@@ -8,7 +8,9 @@ import static org.mockito.Mockito.*;
 import ai.timefold.solver.core.api.score.HardSoftScore;
 import ai.timefold.solver.core.api.solver.SolverManager;
 import com.v1rex.liftnexus.forklift.service.ForkliftService;
-import com.v1rex.liftnexus.planning.DispatchJobRepository;
+import com.v1rex.liftnexus.planning.exception.DispatchJobInvalidStateException;
+import com.v1rex.liftnexus.planning.exception.DispatchJobNotFoundException;
+import com.v1rex.liftnexus.planning.repository.DispatchJobRepository;
 import com.v1rex.liftnexus.planning.domain.DispatchJob;
 import com.v1rex.liftnexus.planning.domain.JobStatus;
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
@@ -109,9 +111,7 @@ public class WarehouseDispatcherServiceTest {
       when(jobRepository.findById(completedJobId)).thenReturn(Optional.of(historicalJob));
 
       assertThatThrownBy(() -> warehouseDispatcherService.terminateOptimizationJob(completedJobId))
-          .isInstanceOf(IllegalStateException.class)
-          .hasMessageContaining("Cannot terminate job")
-          .hasMessageContaining("COMPLETED");
+          .isInstanceOf(DispatchJobInvalidStateException.class);
 
       verify(solverManager, never()).terminateEarly(any());
       verify(jobRepository, never()).save(any());
@@ -205,8 +205,7 @@ public class WarehouseDispatcherServiceTest {
               () ->
                   warehouseDispatcherService.buildCurrentProblemAndSetSolvingStatus(
                       nonExistentJobId))
-          .isInstanceOf(RuntimeException.class)
-          .hasMessageContaining("Job not found: " + nonExistentJobId);
+          .isInstanceOf(DispatchJobNotFoundException.class);
 
       verify(jobRepository, never()).save(any());
     }

@@ -24,8 +24,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
 import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
+import com.v1rex.liftnexus.planning.controller.DispatchJobExceptionHandler;
+
 @WebMvcTest(WarehouseDispatcherController.class)
-@Import({GlobalExceptionHandler.class, ProblemDetailFactory.class})
+@Import({GlobalExceptionHandler.class, DispatchJobExceptionHandler.class, ProblemDetailFactory.class})
 @DisplayName("WarehouseDispatcherController API Tests")
 class WarehouseDispatcherControllerTest {
 
