@@ -1,6 +1,7 @@
 package com.v1rex.liftnexus.transportorder.service;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
+import com.v1rex.liftnexus.transportorder.exception.TransportOrderInvalidStateException;
+import com.v1rex.liftnexus.transportorder.exception.TransportOrderNotFoundException;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnit;
 import com.v1rex.liftnexus.loadunit.service.LoadUnitService;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
@@ -45,10 +46,8 @@ public class TransportOrderService {
 
     if (loadUnit.getCurrentBin() == null
         || !loadUnit.getCurrentBin().getId().equals(sourceBin.getId())) {
-      throw new IllegalStateException(
-          "LoadUnit "
-              + loadUnit.getTrackingCode()
-              + " is not located in the requested source bin.");
+      throw new TransportOrderInvalidStateException(
+          "LoadUnit " + loadUnit.getTrackingCode() + " is not located in the requested source bin.");
     }
 
     TransportOrder order = transportOrderMapper.toEntity(request);
@@ -95,7 +94,7 @@ public class TransportOrderService {
     return transportOrderRepository
         .findById(id)
         .orElseThrow(
-            () -> new ResourceNotFoundException("TransportOrder with ID " + id + " not found."));
+            () -> new TransportOrderNotFoundException(id));
   }
 
   public List<TransportOrder> findAllEntities() {
@@ -119,16 +118,16 @@ public class TransportOrderService {
   private void checkStatusBeforeUpdate(
       Long id, TransportOrderStatus currentStatus, TransportOrderStatus newStatus) {
     if (currentStatus == TransportOrderStatus.COMPLETED) {
-      throw new IllegalStateException(
+      throw new TransportOrderInvalidStateException(
           "Cannot update TransportOrder " + id + " because it is already COMPLETED.");
     }
     if (currentStatus == TransportOrderStatus.IN_PROGRESS
         && newStatus == TransportOrderStatus.OPEN) {
-      throw new IllegalStateException(
+      throw new TransportOrderInvalidStateException(
           "Cannot roll back TransportOrder " + id + " from ACTIVE to OPEN.");
     }
     if (currentStatus == TransportOrderStatus.ASSIGNED && newStatus == TransportOrderStatus.OPEN) {
-      throw new IllegalStateException(
+      throw new TransportOrderInvalidStateException(
           "Cannot roll back TransportOrder " + id + " from ASSIGNED to OPEN.");
     }
   }

@@ -15,6 +15,7 @@ import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
 import com.v1rex.liftnexus.transportorder.dto.TransportOrderRequest;
 import com.v1rex.liftnexus.transportorder.dto.TransportOrderResponse;
 import com.v1rex.liftnexus.transportorder.dto.TransportOrderStatusUpdateRequest;
+import com.v1rex.liftnexus.transportorder.exception.TransportOrderNotFoundException;
 import com.v1rex.liftnexus.transportorder.service.TransportOrderService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -33,8 +34,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
 import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 
+import com.v1rex.liftnexus.transportorder.controller.TransportOrderExceptionHandler;
+
 @WebMvcTest(TransportOrderController.class)
-@Import({GlobalExceptionHandler.class, ProblemDetailFactory.class})
+@Import({GlobalExceptionHandler.class, TransportOrderExceptionHandler.class, ProblemDetailFactory.class})
 @DisplayName("TransportOrderController Gateway Tests")
 class TransportOrderControllerTest {
 
@@ -69,7 +72,7 @@ class TransportOrderControllerTest {
     @DisplayName("Should return 404 Not Found when ID does not exist in system")
     void shouldReturn404_WhenIdDoesNotExist() throws Exception {
       when(transportOrderService.findById(99L))
-          .thenThrow(new ResourceNotFoundException("TransportOrder with ID 99 not found."));
+          .thenThrow(new TransportOrderNotFoundException(99L));
 
       mockMvc
           .perform(get("/api/v1/transport-orders/{id}", 99L))
