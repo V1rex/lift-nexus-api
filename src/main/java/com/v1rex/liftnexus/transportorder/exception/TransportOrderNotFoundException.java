@@ -5,8 +5,6 @@ public final class TransportOrderNotFoundException extends TransportOrderDomainE
   public TransportOrderNotFoundException(Long id) {
     super(
         TransportOrderErrorCode.TRANSPORT_ORDER_NOT_FOUND,
-        "Transport order with ID " + id + " does not exist."
-    );
+        "Transport order with ID " + id + " does not exist.");
   }
 }
-

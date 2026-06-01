@@ -28,7 +28,8 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ProblemDetail> handleConstraintViolationException(
       ConstraintViolationException ex, HttpServletRequest request) {
 
-    List<String> errors = ex.getConstraintViolations().stream()
+    List<String> errors =
+        ex.getConstraintViolations().stream()
             .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
             .sorted()
             .toList();
@@ -46,13 +47,15 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ProblemDetail> handleValidationException(
       MethodArgumentNotValidException ex, HttpServletRequest request) {
 
-    String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+    String errorMessage =
+        ex.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .filter(message -> !message.isBlank())
             .sorted()
             .collect(Collectors.joining(", "));
 
-    List<String> errors = ex.getBindingResult().getFieldErrors().stream()
+    List<String> errors =
+        ex.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .filter(message -> !message.isBlank())
             .sorted()
@@ -71,16 +74,16 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ProblemDetail> handleTypeMismatch(
       MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
 
-    String message = "Parameter '" + ex.getName() + "' must be of type " +
-        (ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
+    String message =
+        "Parameter '"
+            + ex.getName()
+            + "' must be of type "
+            + (ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
 
     log.warn("Type mismatch at {}: {}", request.getRequestURI(), message);
 
     return errorFactory.createErrorResponse(
-        GlobalErrorCode.TYPE_MISMATCH,
-        message,
-        request,
-        List.of());
+        GlobalErrorCode.TYPE_MISMATCH, message, request, List.of());
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -103,9 +106,6 @@ public class GlobalExceptionHandler {
     log.error("Unhandled exception occurred at {} : ", request.getRequestURI(), ex);
 
     return errorFactory.createErrorResponse(
-        GlobalErrorCode.INTERNAL_SERVER_ERROR,
-        "An unexpected error occurred.",
-        request,
-        List.of());
+        GlobalErrorCode.INTERNAL_SERVER_ERROR, "An unexpected error occurred.", request, List.of());
   }
 }

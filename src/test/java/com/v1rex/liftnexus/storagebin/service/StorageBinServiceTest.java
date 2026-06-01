@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.domain.ZoneType;
 import com.v1rex.liftnexus.storagebin.dto.CoordinateDto;

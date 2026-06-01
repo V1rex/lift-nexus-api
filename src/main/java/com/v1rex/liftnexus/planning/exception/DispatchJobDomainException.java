@@ -10,4 +10,3 @@ public abstract sealed class DispatchJobDomainException extends DomainException
     super(errorCode, message);
   }
 }
-

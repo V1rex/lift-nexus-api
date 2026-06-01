@@ -7,7 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 import com.v1rex.liftnexus.storagebin.domain.ZoneType;
 import com.v1rex.liftnexus.storagebin.dto.CoordinateDto;
 import com.v1rex.liftnexus.storagebin.dto.StorageBinRequest;
@@ -29,13 +30,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
-import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
-
-import com.v1rex.liftnexus.storagebin.controller.StorageBinExceptionHandler;
-
 @WebMvcTest(controllers = StorageBinController.class)
-@Import({GlobalExceptionHandler.class, StorageBinExceptionHandler.class, ProblemDetailFactory.class})
+@Import({
+  GlobalExceptionHandler.class,
+  StorageBinExceptionHandler.class,
+  ProblemDetailFactory.class
+})
 @ActiveProfiles("test")
 @DisplayName("StorageBin REST API Gateway Endpoints Tests")
 public class StorageBinControllerTest {
@@ -97,8 +97,7 @@ public class StorageBinControllerTest {
       // Arrange
       Long missingId = 999L;
       Mockito.when(storageBinService.findById(missingId))
-          .thenThrow(
-              new StorageBinNotFoundException(missingId));
+          .thenThrow(new StorageBinNotFoundException(missingId));
 
       // Act & Assert
       mockMvc

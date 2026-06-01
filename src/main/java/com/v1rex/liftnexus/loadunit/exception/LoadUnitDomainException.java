@@ -10,4 +10,3 @@ public abstract sealed class LoadUnitDomainException extends DomainException
     super(errorCode, message);
   }
 }
-

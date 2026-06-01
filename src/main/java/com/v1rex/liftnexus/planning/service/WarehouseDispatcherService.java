@@ -3,20 +3,20 @@ package com.v1rex.liftnexus.planning.service;
 import ai.timefold.solver.core.api.solver.SolverManager;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.service.ForkliftService;
-import com.v1rex.liftnexus.planning.repository.DispatchJobRepository;
 import com.v1rex.liftnexus.planning.domain.DispatchJob;
 import com.v1rex.liftnexus.planning.domain.JobStatus;
 import com.v1rex.liftnexus.planning.domain.WarehouseSchedule;
 import com.v1rex.liftnexus.planning.dto.DispatchJobResponse;
+import com.v1rex.liftnexus.planning.exception.DispatchJobInvalidStateException;
+import com.v1rex.liftnexus.planning.exception.DispatchJobNotFoundException;
 import com.v1rex.liftnexus.planning.mapper.DispatchJobMapper;
+import com.v1rex.liftnexus.planning.repository.DispatchJobRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.service.StorageBinService;
 import com.v1rex.liftnexus.transportorder.domain.TransportOrder;
 import com.v1rex.liftnexus.transportorder.service.TransportOrderService;
 import java.time.Instant;
 import java.util.List;
-import com.v1rex.liftnexus.planning.exception.DispatchJobInvalidStateException;
-import com.v1rex.liftnexus.planning.exception.DispatchJobNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -172,8 +172,6 @@ public class WarehouseDispatcherService {
   }
 
   public DispatchJob findJobEntityById(UUID jobId) {
-    return jobRepository
-        .findById(jobId)
-        .orElseThrow(() -> new DispatchJobNotFoundException(jobId));
+    return jobRepository.findById(jobId).orElseThrow(() -> new DispatchJobNotFoundException(jobId));
   }
 }

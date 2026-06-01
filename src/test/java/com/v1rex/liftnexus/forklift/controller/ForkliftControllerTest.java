@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
 import com.v1rex.liftnexus.forklift.dto.ForkliftLocationUpdateRequest;
@@ -26,10 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
-import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
-import com.v1rex.liftnexus.forklift.controller.ForkliftExceptionHandler;
 
 @WebMvcTest(ForkliftController.class)
 @Import({GlobalExceptionHandler.class, ForkliftExceptionHandler.class, ProblemDetailFactory.class})

@@ -5,8 +5,6 @@ public final class StorageBinCodeExistsException extends StorageBinDomainExcepti
   public StorageBinCodeExistsException(String binCode) {
     super(
         StorageBinErrorCode.STORAGE_BIN_CODE_EXISTS,
-        "Storage bin with code '" + binCode + "' already exists."
-    );
+        "Storage bin with code '" + binCode + "' already exists.");
   }
 }
-

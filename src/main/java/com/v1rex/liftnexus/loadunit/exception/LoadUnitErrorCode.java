@@ -8,12 +8,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum LoadUnitErrorCode implements ErrorCode {
+  LOAD_UNIT_NOT_FOUND("load_unit_not_found", "Load Unit Not Found", HttpStatus.NOT_FOUND),
 
-  LOAD_UNIT_NOT_FOUND("load_unit_not_found",
-      "Load Unit Not Found",
-      HttpStatus.NOT_FOUND),
-
-  LOAD_UNIT_TRACKING_CODE_EXISTS("load_unit_tracking_code_already_exists",
+  LOAD_UNIT_TRACKING_CODE_EXISTS(
+      "load_unit_tracking_code_already_exists",
       "Load Unit Tracking Code Already Exists",
       HttpStatus.CONFLICT);
 
@@ -21,4 +19,3 @@ public enum LoadUnitErrorCode implements ErrorCode {
   private final String defaultTitle;
   private final HttpStatus status;
 }
-

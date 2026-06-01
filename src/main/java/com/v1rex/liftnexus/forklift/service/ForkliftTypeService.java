@@ -50,7 +50,6 @@ public class ForkliftTypeService {
   public ForkliftType findEntityById(Long id) {
     return forkliftTypeRepository
         .findById(id)
-        .orElseThrow(
-            () -> new ForkliftTypeNotFoundException(id));
+        .orElseThrow(() -> new ForkliftTypeNotFoundException(id));
   }
 }

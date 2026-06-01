@@ -5,8 +5,6 @@ public final class LoadUnitTrackingCodeExistsException extends LoadUnitDomainExc
   public LoadUnitTrackingCodeExistsException(String trackingCode) {
     super(
         LoadUnitErrorCode.LOAD_UNIT_TRACKING_CODE_EXISTS,
-        "Load unit with tracking code '" + trackingCode + "' already exists."
-    );
+        "Load unit with tracking code '" + trackingCode + "' already exists.");
   }
 }
-

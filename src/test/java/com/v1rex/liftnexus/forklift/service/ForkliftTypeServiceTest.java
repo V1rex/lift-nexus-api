@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-import com.v1rex.liftnexus.forklift.exception.ForkliftTypeNameExistsException;
-import com.v1rex.liftnexus.forklift.exception.ForkliftTypeNotFoundException;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.forklift.domain.ForkliftType;
 import com.v1rex.liftnexus.forklift.dto.ForkliftTypeRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftTypeResponse;
+import com.v1rex.liftnexus.forklift.exception.ForkliftTypeNameExistsException;
+import com.v1rex.liftnexus.forklift.exception.ForkliftTypeNotFoundException;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftTypeMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftTypeRepository;
 import java.util.List;
@@ -136,8 +136,8 @@ public class ForkliftTypeServiceTest {
 
       Page<ForkliftTypeResponse> result = forkliftTypeService.findAll(pageRequest);
 
-       assertThat(result.getContent()).hasSize(1);
-       assertThat(result.getContent().getFirst()).isEqualTo(responseDto);
-     }
-   }
+      assertThat(result.getContent()).hasSize(1);
+      assertThat(result.getContent().getFirst()).isEqualTo(responseDto);
+    }
+  }
 }

@@ -25,15 +25,9 @@ public class DispatchJobExceptionHandler {
   public ResponseEntity<ProblemDetail> handleDispatchJobDomainException(
       DispatchJobDomainException ex, HttpServletRequest request) {
 
-    log.warn("Domain anomaly tracked [{}] | Context: {}",
-        ex.getErrorCode().getCode(), ex.getMessage());
+    log.warn(
+        "Domain anomaly tracked [{}] | Context: {}", ex.getErrorCode().getCode(), ex.getMessage());
 
-    return errorFactory.createErrorResponse(
-        ex.getErrorCode(),
-        ex.getMessage(),
-        request,
-        List.of()
-    );
+    return errorFactory.createErrorResponse(ex.getErrorCode(), ex.getMessage(), request, List.of());
   }
 }
-

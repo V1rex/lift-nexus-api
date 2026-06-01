@@ -12,10 +12,7 @@ import org.springframework.stereotype.Component;
 public class ProblemDetailFactory {
 
   public ResponseEntity<ProblemDetail> createErrorResponse(
-      ErrorCode errorCode,
-      String detail,
-      HttpServletRequest request,
-      List<String> errors) {
+      ErrorCode errorCode, String detail, HttpServletRequest request, List<String> errors) {
 
     ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(errorCode.getStatus(), detail);
     problemDetail.setTitle(errorCode.getDefaultTitle());

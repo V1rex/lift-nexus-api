@@ -10,4 +10,3 @@ public abstract sealed class TransportOrderDomainException extends DomainExcepti
     super(errorCode, message);
   }
 }
-

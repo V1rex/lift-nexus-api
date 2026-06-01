@@ -9,7 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 import com.v1rex.liftnexus.forklift.domain.EquipmentType;
 import com.v1rex.liftnexus.transportorder.domain.TransportOrderStatus;
 import com.v1rex.liftnexus.transportorder.dto.TransportOrderRequest;
@@ -31,13 +32,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
-import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
-
-import com.v1rex.liftnexus.transportorder.controller.TransportOrderExceptionHandler;
-
 @WebMvcTest(TransportOrderController.class)
-@Import({GlobalExceptionHandler.class, TransportOrderExceptionHandler.class, ProblemDetailFactory.class})
+@Import({
+  GlobalExceptionHandler.class,
+  TransportOrderExceptionHandler.class,
+  ProblemDetailFactory.class
+})
 @DisplayName("TransportOrderController Gateway Tests")
 class TransportOrderControllerTest {
 
@@ -71,8 +71,7 @@ class TransportOrderControllerTest {
     @Test
     @DisplayName("Should return 404 Not Found when ID does not exist in system")
     void shouldReturn404_WhenIdDoesNotExist() throws Exception {
-      when(transportOrderService.findById(99L))
-          .thenThrow(new TransportOrderNotFoundException(99L));
+      when(transportOrderService.findById(99L)).thenThrow(new TransportOrderNotFoundException(99L));
 
       mockMvc
           .perform(get("/api/v1/transport-orders/{id}", 99L))

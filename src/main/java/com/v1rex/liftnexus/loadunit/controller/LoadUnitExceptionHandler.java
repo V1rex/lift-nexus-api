@@ -25,15 +25,9 @@ public class LoadUnitExceptionHandler {
   public ResponseEntity<ProblemDetail> handleLoadUnitDomainException(
       LoadUnitDomainException ex, HttpServletRequest request) {
 
-    log.warn("Domain anomaly tracked [{}] | Context: {}",
-        ex.getErrorCode().getCode(), ex.getMessage());
+    log.warn(
+        "Domain anomaly tracked [{}] | Context: {}", ex.getErrorCode().getCode(), ex.getMessage());
 
-    return errorFactory.createErrorResponse(
-        ex.getErrorCode(),
-        ex.getMessage(),
-        request,
-        List.of()
-    );
+    return errorFactory.createErrorResponse(ex.getErrorCode(), ex.getMessage(), request, List.of());
   }
 }
-

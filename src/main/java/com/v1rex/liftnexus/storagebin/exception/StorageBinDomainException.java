@@ -10,4 +10,3 @@ public abstract sealed class StorageBinDomainException extends DomainException
     super(errorCode, message);
   }
 }
-

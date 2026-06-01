@@ -7,8 +7,6 @@ public final class DispatchJobNotFoundException extends DispatchJobDomainExcepti
   public DispatchJobNotFoundException(UUID jobId) {
     super(
         DispatchJobErrorCode.DISPATCH_JOB_NOT_FOUND,
-        "Dispatch job with ID " + jobId + " does not exist."
-    );
+        "Dispatch job with ID " + jobId + " does not exist.");
   }
 }
-
