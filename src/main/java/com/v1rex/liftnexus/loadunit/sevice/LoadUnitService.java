@@ -1,6 +1,7 @@
 package com.v1rex.liftnexus.loadunit.service;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
+import com.v1rex.liftnexus.loadunit.exception.LoadUnitNotFoundException;
+import com.v1rex.liftnexus.loadunit.exception.LoadUnitTrackingCodeExistsException;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnit;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnitStatus;
 import com.v1rex.liftnexus.loadunit.dto.LoadUnitRequest;
@@ -40,8 +41,7 @@ public class LoadUnitService {
       log.warn(
           "Creation failed: Load unit with tracking code {} already exists",
           request.trackingCode());
-      throw new IllegalArgumentException(
-          "Load Unit with tracking code '" + request.trackingCode() + "' already exists.");
+      throw new LoadUnitTrackingCodeExistsException(request.trackingCode());
     }
 
     StorageBin assignedBin = null;
@@ -88,7 +88,7 @@ public class LoadUnitService {
         .orElseThrow(
             () -> {
               log.warn("Load unit with id: {} not found.", id);
-              return new ResourceNotFoundException("Load Unit with ID " + id + " not found.");
+              return new LoadUnitNotFoundException(id);
             });
   }
 
@@ -98,8 +98,7 @@ public class LoadUnitService {
         .orElseThrow(
             () -> {
               log.warn("Load unit with tracking code: {} not found.", trackingCode);
-              return new ResourceNotFoundException(
-                  "Load Unit with tracking code '" + trackingCode + "' not found.");
+              return new LoadUnitNotFoundException(trackingCode);
             });
   }
 

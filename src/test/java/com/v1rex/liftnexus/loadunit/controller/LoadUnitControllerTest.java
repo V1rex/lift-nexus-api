@@ -30,8 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
 import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 
+import com.v1rex.liftnexus.loadunit.controller.LoadUnitExceptionHandler;
+
 @WebMvcTest(LoadUnitController.class)
-@Import({GlobalExceptionHandler.class, ProblemDetailFactory.class})
+@Import({GlobalExceptionHandler.class, LoadUnitExceptionHandler.class, ProblemDetailFactory.class})
 @DisplayName("LoadUnitController Gateway Endpoint Tests")
 class LoadUnitControllerTest {
 
