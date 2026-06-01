@@ -238,7 +238,7 @@ class TransportOrderServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when ID does not exist in DB")
+    @DisplayName("Should throw TransportOrderNotFoundException when ID does not exist in DB")
     void shouldThrowResourceNotFound_WhenMissing() {
       when(transportOrderRepository.findById(99L)).thenReturn(Optional.empty());
 

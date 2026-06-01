@@ -94,7 +94,7 @@ public class ForkliftTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw ResourceNotFoundException when ID does not exist")
+    @DisplayName("Should throw ForkliftTypeNotFoundException when ID does not exist")
     void shouldThrowWhenNotFound() {
       when(forkliftTypeRepository.findById(99L)).thenReturn(Optional.empty());
 
