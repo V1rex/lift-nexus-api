@@ -5,7 +5,7 @@ public final class ForkliftNotFoundException extends ForkliftDomainException {
   public ForkliftNotFoundException(Long id) {
     super(
         ForkliftErrorCode.FORKLIFT_NOT_FOUND,
-        "Forklift with ID " + id + " does not exist in the active planning timeline."
+        "Forklift with ID " + id + " does not exist."
     );
   }
 }

@@ -1,9 +1,10 @@
 package com.v1rex.liftnexus.forklift.service;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.forklift.domain.ForkliftType;
 import com.v1rex.liftnexus.forklift.dto.ForkliftTypeRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftTypeResponse;
+import com.v1rex.liftnexus.forklift.exception.ForkliftTypeNameExistsException;
+import com.v1rex.liftnexus.forklift.exception.ForkliftTypeNotFoundException;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftTypeMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,7 @@ public class ForkliftTypeService {
     log.info("Registering new forklift archetype blueprint: {}", request.modelName());
 
     if (forkliftTypeRepository.existsByModelName(request.modelName())) {
-      throw new IllegalStateException(
-          "A forklift type model named '" + request.modelName() + "' already exists.");
+      throw new ForkliftTypeNameExistsException(request.modelName());
     }
 
     ForkliftType forkliftType = forkliftTypeMapper.toEntity(request);
@@ -51,6 +51,6 @@ public class ForkliftTypeService {
     return forkliftTypeRepository
         .findById(id)
         .orElseThrow(
-            () -> new ResourceNotFoundException("ForkliftType with ID " + id + " not found."));
+            () -> new ForkliftTypeNotFoundException(id));
   }
 }

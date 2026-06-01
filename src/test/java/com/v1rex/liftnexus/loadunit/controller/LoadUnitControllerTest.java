@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
+
 @WebMvcTest(LoadUnitController.class)
+@Import({GlobalExceptionHandler.class, ProblemDetailFactory.class})
 @DisplayName("LoadUnitController Gateway Endpoint Tests")
 class LoadUnitControllerTest {
 

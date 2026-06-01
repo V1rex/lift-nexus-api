@@ -1,12 +1,12 @@
 package com.v1rex.liftnexus.forklift.service;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.domain.ForkliftType;
 import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
 import com.v1rex.liftnexus.forklift.exception.ForkliftNotFoundException;
+import com.v1rex.liftnexus.forklift.exception.ForkliftFleetNumberExistsException;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
@@ -34,8 +34,7 @@ public class ForkliftService {
     log.info("Provisioning new warehouse asset with fleet number: {}", request.fleetNumber());
 
     if (forkliftRepository.existsByFleetNumber(request.fleetNumber())) {
-      throw new IllegalStateException(
-          "A forklift with fleet number '" + request.fleetNumber() + "' already exists.");
+      throw new ForkliftFleetNumberExistsException(request.fleetNumber());
     }
 
     ForkliftType forkliftType = forkliftTypeService.findEntityById(request.forkliftTypeId());

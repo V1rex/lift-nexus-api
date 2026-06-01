@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
+import com.v1rex.liftnexus.forklift.exception.ForkliftFleetNumberExistsException;
+import com.v1rex.liftnexus.forklift.exception.ForkliftNotFoundException;
 import com.v1rex.liftnexus.forklift.domain.Forklift;
 import com.v1rex.liftnexus.forklift.domain.ForkliftType;
 import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
@@ -109,14 +110,13 @@ public class ForkliftServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalStateException if fleet number exists")
+    @DisplayName("Should throw ForkliftFleetNumberExistsException if fleet number exists")
     void shouldThrowIfFleetNumberExists() {
       ForkliftRequest request = new ForkliftRequest("FL-DUP", 1L, null, null, null);
       when(forkliftRepository.existsByFleetNumber("FL-DUP")).thenReturn(true);
 
       assertThatThrownBy(() -> forkliftService.createForklift(request))
-          .isInstanceOf(IllegalStateException.class)
-          .hasMessageContaining("already exists");
+          .isInstanceOf(ForkliftFleetNumberExistsException.class);
 
       verifyNoInteractions(forkliftTypeService, storageBinService, forkliftMapper);
     }
@@ -126,21 +126,20 @@ public class ForkliftServiceTest {
   @DisplayName("Tests - findById()")
   class FindByIdTests {
 
-    @Test
-    @DisplayName("Should find response by ID")
-    void shouldFindById() {
-      Forklift entity = new Forklift();
-      entity.setId(1L);
-      ForkliftResponse expectedResponse =
-          new ForkliftResponse(1L, "FL-01", null, null, null, null, null, null, null, null);
+     @Test
+     @DisplayName("Should find response by ID")
+     void shouldFindById() {
+       Forklift entity = new Forklift();
+       ForkliftResponse expectedResponse =
+           new ForkliftResponse(1L, "FL-01", null, null, null, null, null, null, null, null);
 
-      when(forkliftRepository.findById(1L)).thenReturn(Optional.of(entity));
-      when(forkliftMapper.toResponse(entity)).thenReturn(expectedResponse);
+       when(forkliftRepository.findById(1L)).thenReturn(Optional.of(entity));
+       when(forkliftMapper.toResponse(entity)).thenReturn(expectedResponse);
 
-      ForkliftResponse response = forkliftService.findById(1L);
+       ForkliftResponse response = forkliftService.findById(1L);
 
-      assertThat(response).isEqualTo(expectedResponse);
-    }
+       assertThat(response).isEqualTo(expectedResponse);
+     }
   }
 
   @Nested
@@ -162,40 +161,40 @@ public class ForkliftServiceTest {
 
       Page<ForkliftResponse> result = forkliftService.findAll(pageable);
 
-      assertThat(result.getContent()).hasSize(1);
-      assertThat(result.getContent().get(0)).isEqualTo(responseDto);
-    }
+       assertThat(result.getContent()).hasSize(1);
+       assertThat(result.getContent().getFirst()).isEqualTo(responseDto);
+     }
 
-    @Test
-    @DisplayName("Should return forklifts filtered by capacity")
-    void shouldFindWithCapacityGreaterThan() {
-      Page<Forklift> page = new PageImpl<>(List.of(entity));
+     @Test
+     @DisplayName("Should return forklifts filtered by capacity")
+     void shouldFindWithCapacityGreaterThan() {
+       Page<Forklift> page = new PageImpl<>(List.of(entity));
 
-      when(forkliftRepository.findByForkliftType_MaxCapacityKgGreaterThanEqual(2000, pageable))
-          .thenReturn(page);
-      when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
+       when(forkliftRepository.findByForkliftType_MaxCapacityKgGreaterThanEqual(2000, pageable))
+           .thenReturn(page);
+       when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
 
-      Page<ForkliftResponse> result = forkliftService.findWithCapacityGreaterThan(2000, pageable);
+       Page<ForkliftResponse> result = forkliftService.findWithCapacityGreaterThan(2000, pageable);
 
-      assertThat(result.getContent()).hasSize(1);
-      assertThat(result.getContent().get(0)).isEqualTo(responseDto);
-    }
+       assertThat(result.getContent()).hasSize(1);
+       assertThat(result.getContent().getFirst()).isEqualTo(responseDto);
+     }
 
-    @Test
-    @DisplayName("Should return forklifts filtered by status")
-    void shouldFindByStatus() {
-      Page<Forklift> page = new PageImpl<>(List.of(entity));
+     @Test
+     @DisplayName("Should return forklifts filtered by status")
+     void shouldFindByStatus() {
+       Page<Forklift> page = new PageImpl<>(List.of(entity));
 
-      when(forkliftRepository.findByStatus(OperationalStatus.ACTIVE, pageable)).thenReturn(page);
-      when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
+       when(forkliftRepository.findByStatus(OperationalStatus.ACTIVE, pageable)).thenReturn(page);
+       when(forkliftMapper.toResponse(entity)).thenReturn(responseDto);
 
-      Page<ForkliftResponse> result =
-          forkliftService.findByStatus(OperationalStatus.ACTIVE, pageable);
+       Page<ForkliftResponse> result =
+           forkliftService.findByStatus(OperationalStatus.ACTIVE, pageable);
 
-      assertThat(result.getContent()).hasSize(1);
+       assertThat(result.getContent()).hasSize(1);
 
-      assertThat(result.getContent().get(0)).isEqualTo(responseDto);
-    }
+       assertThat(result.getContent().getFirst()).isEqualTo(responseDto);
+     }
   }
 
   @Nested
@@ -260,15 +259,15 @@ public class ForkliftServiceTest {
       assertThat(result).isEqualTo(forklift);
     }
 
-    @Test
-    @DisplayName("Should throw ResourceNotFoundException if forklift not found")
-    void shouldThrowIfForkliftNotFound() {
-      when(forkliftRepository.findById(99L)).thenReturn(Optional.empty());
+     @Test
+     @DisplayName("Should throw ForkliftNotFoundException if forklift not found")
+     void shouldThrowIfForkliftNotFound() {
+       when(forkliftRepository.findById(99L)).thenReturn(Optional.empty());
 
-      assertThatThrownBy(() -> forkliftService.findEntityById(99L))
-          .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("Forklift with 99 not found.");
-    }
+       assertThatThrownBy(() -> forkliftService.findEntityById(99L))
+           .isInstanceOf(ForkliftNotFoundException.class)
+           .hasMessageContaining("Forklift with ID 99 does not exist.");
+     }
   }
 
   @Nested

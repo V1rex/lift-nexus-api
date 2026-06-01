@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -27,7 +28,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
+
 @WebMvcTest(controllers = StorageBinController.class)
+@Import({GlobalExceptionHandler.class, ProblemDetailFactory.class})
 @ActiveProfiles("test")
 @DisplayName("StorageBin REST API Gateway Endpoints Tests")
 public class StorageBinControllerTest {

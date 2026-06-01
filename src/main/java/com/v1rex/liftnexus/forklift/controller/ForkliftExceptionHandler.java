@@ -1,4 +1,4 @@
-package com.v1rex.liftnexus.forklift.api;
+package com.v1rex.liftnexus.forklift.controller;
 
 import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
 import com.v1rex.liftnexus.forklift.exception.ForkliftDomainException;
@@ -25,7 +25,7 @@ public class ForkliftExceptionHandler {
   public ResponseEntity<ProblemDetail> handleForkliftDomainException(
       ForkliftDomainException ex, HttpServletRequest request) {
 
-    log.warn("Forklift module domain exception [{}]: {}",
+    log.warn("Domain anomaly tracked [{}] | Context: {}",
         ex.getErrorCode().getCode(), ex.getMessage());
 
     return errorFactory.createErrorResponse(

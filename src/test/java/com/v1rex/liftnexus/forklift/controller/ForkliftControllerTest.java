@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.v1rex.liftnexus.common.exception.GlobalExceptionHandler;
+import com.v1rex.liftnexus.common.exception.ProblemDetailFactory;
+import com.v1rex.liftnexus.forklift.controller.ForkliftExceptionHandler;
+
 @WebMvcTest(ForkliftController.class)
+@Import({GlobalExceptionHandler.class, ForkliftExceptionHandler.class, ProblemDetailFactory.class})
 public class ForkliftControllerTest {
 
   @Autowired private MockMvc mockMvc;
