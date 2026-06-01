@@ -132,7 +132,15 @@ public class WarehouseDispatcherService {
     job.setStatus(JobStatus.SOLVING);
     jobRepository.save(job);
 
-    return buildCurrentState();
+    try {
+      return buildCurrentState();
+    } catch (Exception e) {
+      log.error("Failed to build current state for job {}: {}", jobId, e.getMessage(), e);
+      job.setStatus(JobStatus.FAILED);
+      job.setCompletedAt(Instant.now());
+      jobRepository.save(job);
+      throw e;
+    }
   }
 
   @Transactional
@@ -158,16 +166,22 @@ public class WarehouseDispatcherService {
     //       throws an exception here, the job status will remain stuck in 'SOLVING'.
     //       Catch exceptions and mark the job status as JobStatus.FAILED.
 
-    transportOrderService.updateForkliftAssignments(solution.getTransportOrderPool());
-    forkliftService.updateAssignedOrders(solution.getForklifts());
+    try {
+      transportOrderService.updateForkliftAssignments(solution.getTransportOrderPool());
+      forkliftService.updateAssignedOrders(solution.getForklifts());
 
-    job.setStatus(JobStatus.COMPLETED);
-    job.setCompletedAt(Instant.now());
-
-    if (solution.getScore() != null) {
-      job.setFinalScore(solution.getScore().toString());
+      job.setStatus(JobStatus.COMPLETED);
+      if (solution.getScore() != null) {
+        job.setFinalScore(solution.getScore().toString());
+      }
+    } catch (Exception e) {
+      log.error("Failed to persist solution for job {}: {}", jobId, e.getMessage(), e);
+      job.setStatus(JobStatus.FAILED);
+    } finally {
+      job.setCompletedAt(Instant.now());
+      jobRepository.save(job);
     }
-    jobRepository.save(job);
+
     log.info("Job {} successfully wrapped and saved.", jobId);
   }
 

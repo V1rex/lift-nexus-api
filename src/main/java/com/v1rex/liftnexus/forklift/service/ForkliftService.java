@@ -129,7 +129,11 @@ public class ForkliftService {
   @Transactional
   public void updateAssignedOrders(List<Forklift> forklifts) {
     log.info("Updating assigned transport orders for Forklifts");
-    // TODO: write here a better log
+    List<Long> ids = forklifts.stream().map(Forklift::getId).toList();
+    List<Forklift> databaseForklifts = forkliftRepository.findAllById(ids);
+    if (databaseForklifts.size() != ids.size()) {
+      throw new IllegalStateException("One or more forklifts not found during assignment update");
+    }
 
     for (Forklift newForklift : forklifts) {
       Forklift databaseForklift = findEntityById(newForklift.getId());

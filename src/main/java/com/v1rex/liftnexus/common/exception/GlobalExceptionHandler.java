@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -182,17 +183,31 @@ public class GlobalExceptionHandler {
         List.of());
   }
 
-  @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+  @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(
-      org.springframework.dao.DataIntegrityViolationException ex, HttpServletRequest request) {
-
-    log.error("Database constraint triggered at {}: {}", request.getRequestURI(), ex.getMessage());
-
+      DataIntegrityViolationException ex, HttpServletRequest request) {
+    String detail = "Database constraint violation.";
+    // Try to extract constraint name
+    String message = ex.getMessage();
+    if (message != null && message.contains("Detail:")) {
+      detail = message.substring(message.indexOf("Detail:"));
+    }
+    log.warn("Database constraint triggered at {}: {}", request.getRequestURI(), message);
     return errorFactory.createErrorResponse(
-        GlobalErrorCode.DATABASE_CONFLICT,
-        "Operation rejected due to data integrity validation failure (e.g., duplicate index collision or missing foreign reference key).",
-        request,
-        List.of());
+        GlobalErrorCode.DATABASE_CONFLICT, detail, request, List.of());
+  }
+
+  @ExceptionHandler(DomainException.class)
+  public ResponseEntity<ProblemDetail> handleDomainException(
+      DomainException ex, HttpServletRequest request) {
+
+    log.warn(
+        "Unhandled domain exception [{}] at {}: {}",
+        ex.getErrorCode().getCode(),
+        request.getRequestURI(),
+        ex.getMessage());
+
+    return errorFactory.createErrorResponse(ex.getErrorCode(), ex.getMessage(), request, List.of());
   }
 
   @ExceptionHandler(Exception.class)
