@@ -5,11 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnit;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnitStatus;
 import com.v1rex.liftnexus.loadunit.dto.LoadUnitRequest;
 import com.v1rex.liftnexus.loadunit.dto.LoadUnitResponse;
+import com.v1rex.liftnexus.loadunit.exception.LoadUnitNotFoundException;
+import com.v1rex.liftnexus.loadunit.exception.LoadUnitTrackingCodeExistsException;
 import com.v1rex.liftnexus.loadunit.mapper.LoadUnitMapper;
 import com.v1rex.liftnexus.loadunit.repository.LoadUnitRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
@@ -73,7 +74,7 @@ class LoadUnitServiceTest {
 
     @Test
     @DisplayName(
-        "Should abort creation and throw IllegalArgumentException on business-key code duplication")
+        "Should abort creation and throw LoadUnitTrackingCodeExistsException on business-key code duplication")
     void shouldThrowExceptionOnDuplicateTrackingCode() {
       // Arrange
       LoadUnitRequest request =
@@ -83,8 +84,7 @@ class LoadUnitServiceTest {
 
       // Act and Assert
       assertThatThrownBy(() -> loadUnitService.createLoadUnit(request))
-          .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("already exists");
+          .isInstanceOf(LoadUnitTrackingCodeExistsException.class);
 
       verify(loadUnitRepository, never()).save(any());
     }
@@ -115,15 +115,14 @@ class LoadUnitServiceTest {
 
     @Test
     @DisplayName(
-        "Should capture failure and throw ResourceNotFoundException if technical ID does not match any entry")
+        "Should capture failure and throw LoadUnitNotFoundException if technical ID does not match any entry")
     void shouldThrowNotFoundOnMissingId() {
       // Arrange
       when(loadUnitRepository.findById(99L)).thenReturn(Optional.empty());
 
       // Act and Assert
       assertThatThrownBy(() -> loadUnitService.findById(99L))
-          .isInstanceOf(ResourceNotFoundException.class)
-          .hasMessageContaining("Load Unit with ID 99 not found");
+          .isInstanceOf(LoadUnitNotFoundException.class);
     }
   }
 

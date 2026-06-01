@@ -7,10 +7,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.v1rex.liftnexus.common.exception.ResourceNotFoundException;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnitStatus;
 import com.v1rex.liftnexus.loadunit.dto.LoadUnitRequest;
 import com.v1rex.liftnexus.loadunit.dto.LoadUnitResponse;
+import com.v1rex.liftnexus.loadunit.exception.LoadUnitNotFoundException;
 import com.v1rex.liftnexus.loadunit.service.LoadUnitService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -112,7 +112,7 @@ class LoadUnitControllerTest {
         "Should transform infrastructure exception maps to standard 404 Not Found returns securely")
     void shouldReturnNotFoundOnMissingElement() throws Exception {
       when(loadUnitService.findById(404L))
-          .thenThrow(new ResourceNotFoundException("Load Unit with ID 404 not found."));
+          .thenThrow(new LoadUnitNotFoundException(404L));
 
       mockMvc.perform(get("/api/v1/load-units/404")).andExpect(status().isNotFound());
     }
