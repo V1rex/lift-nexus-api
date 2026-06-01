@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Service layer for {@link StorageBin} domain operations.
  *
- * <p>This class provides a clear separation between <b>external API</b> methods (returning DTOs
- * to controllers) and <b>internal domain</b> methods (returning entities to other services or
- * the Timefold solver). This dual-boundary pattern ensures that external clients receive
- * decoupled response objects, while internal consumers have full access to the domain model
- * for complex operations like constraint-based optimisation.
+ * <p>This class provides a clear separation between <b>external API</b> methods (returning DTOs to
+ * controllers) and <b>internal domain</b> methods (returning entities to other services or the
+ * Timefold solver). This dual-boundary pattern ensures that external clients receive decoupled
+ * response objects, while internal consumers have full access to the domain model for complex
+ * operations like constraint-based optimisation.
  *
  * <p>All public methods are {@link Transactional @Transactional} to guarantee data consistency.
  *
@@ -44,14 +44,14 @@ public class StorageBinService {
   /**
    * Creates a new storage bin and returns its DTO representation.
    *
-   * <p>Before persisting, this method validates that the supplied {@code binCode} is unique.
-   * If a storage bin with the same code already exists, a {@link StorageBinCodeExistsException}
-   * is thrown.
+   * <p>Before persisting, this method validates that the supplied {@code binCode} is unique. If a
+   * storage bin with the same code already exists, a {@link StorageBinCodeExistsException} is
+   * thrown.
    *
    * @param request the input data containing the bin code and its spatial coordinates
    * @return a {@link StorageBinResponse} representing the newly persisted storage bin
-   * @throws StorageBinCodeExistsException if a storage bin with the given {@code binCode}
-   *                                       already exists in the database
+   * @throws StorageBinCodeExistsException if a storage bin with the given {@code binCode} already
+   *     exists in the database
    */
   @Transactional
   public StorageBinResponse createStorageBin(StorageBinRequest request) {
@@ -79,8 +79,8 @@ public class StorageBinService {
   /**
    * Retrieves a storage bin by its unique identifier and returns its DTO representation.
    *
-   * <p>If no storage bin exists with the given {@code id}, a
-   * {@link StorageBinNotFoundException} is thrown.
+   * <p>If no storage bin exists with the given {@code id}, a {@link StorageBinNotFoundException} is
+   * thrown.
    *
    * @param id the storage bin's primary key
    * @return a {@link StorageBinResponse} for the matching storage bin
@@ -111,9 +111,9 @@ public class StorageBinService {
   /**
    * Finds a {@link StorageBin} entity by its identifier.
    *
-   * <p>This is an <b>internal</b> method intended for use by other services or the Timefold
-   * solver that require access to the full domain model. It throws a
-   * {@link StorageBinNotFoundException} when the entity is not found.
+   * <p>This is an <b>internal</b> method intended for use by other services or the Timefold solver
+   * that require access to the full domain model. It throws a {@link StorageBinNotFoundException}
+   * when the entity is not found.
    *
    * @param id the storage bin's primary key
    * @return the {@link StorageBin} entity
@@ -134,8 +134,8 @@ public class StorageBinService {
   /**
    * Retrieves a paginated list of all {@link StorageBin} entities.
    *
-   * <p>This is an <b>internal</b> method that returns full domain objects, suitable for
-   * batch processing or solver input.
+   * <p>This is an <b>internal</b> method that returns full domain objects, suitable for batch
+   * processing or solver input.
    *
    * @param pageable pagination and sorting parameters
    * @return a {@link Page} of {@link StorageBin} entities
@@ -149,9 +149,9 @@ public class StorageBinService {
   /**
    * Retrieves all {@link StorageBin} entities without pagination.
    *
-   * <p>This is an <b>internal</b> method that should be used with care when the total number
-   * of bins is expected to be small, or when the caller intentionally loads the full collection
-   * (e.g., seeding the Timefold solver).
+   * <p>This is an <b>internal</b> method that should be used with care when the total number of
+   * bins is expected to be small, or when the caller intentionally loads the full collection (e.g.,
+   * seeding the Timefold solver).
    *
    * @return an unmodifiable-style {@link List} of all {@link StorageBin} entities
    */

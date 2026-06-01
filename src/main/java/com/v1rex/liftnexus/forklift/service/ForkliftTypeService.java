@@ -1,4 +1,5 @@
 package com.v1rex.liftnexus.forklift.service;
+
 import com.v1rex.liftnexus.forklift.domain.ForkliftType;
 import com.v1rex.liftnexus.forklift.dto.ForkliftTypeRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftTypeResponse;
@@ -15,10 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service layer for managing {@link ForkliftType} entities.
- * <p>
- * Provides transactional operations for creating, retrieving, and querying forklift types.
+ *
+ * <p>Provides transactional operations for creating, retrieving, and querying forklift types.
  * Enforces uniqueness constraints on model names and uses a mapper for entity-to-DTO conversion.
- * </p>
  */
 @Service
 @Slf4j
@@ -74,10 +74,9 @@ public class ForkliftTypeService {
 
   /**
    * Finds the underlying {@link ForkliftType} entity by its id, throwing if not found.
-   * <p>
-   * This is an internal helper used by other service methods that need access to the
-   * entity object rather than its DTO representation.
-   * </p>
+   *
+   * <p>This is an internal helper used by other service methods that need access to the entity
+   * object rather than its DTO representation.
    *
    * @param id the primary key of the forklift type
    * @return the {@link ForkliftType} entity

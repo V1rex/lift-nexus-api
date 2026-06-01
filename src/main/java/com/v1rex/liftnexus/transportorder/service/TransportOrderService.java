@@ -23,18 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service layer responsible for managing transport orders within the warehouse system.
- * <p>
- * Handles the full lifecycle of a transport order: creation, status transitions,
- * assignment to forklifts, and retrieval. All public methods enforce business rules
- * such as ensuring the load unit is physically present at the source bin before
- * a transport order can be created.
+ *
+ * <p>Handles the full lifecycle of a transport order: creation, status transitions, assignment to
+ * forklifts, and retrieval. All public methods enforce business rules such as ensuring the load
+ * unit is physically present at the source bin before a transport order can be created.
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class TransportOrderService {
-
-
 
   private final TransportOrderRepository transportOrderRepository;
   private final TransportOrderMapper transportOrderMapper;
@@ -42,20 +39,17 @@ public class TransportOrderService {
   private final StorageBinService storageBinService;
   private final LoadUnitService loadUnitService;
 
-
   /**
-   * Creates a new transport order that moves a load unit from a source storage
-   * bin to a destination storage bin.
-   * <p>
-   * Validates that the specified load unit is currently located in the requested
-   * source bin before proceeding. Throws an exception if the load unit is not
-   * present at the source location.
+   * Creates a new transport order that moves a load unit from a source storage bin to a destination
+   * storage bin.
    *
-   * @param request DTO containing the target load unit ID, source bin ID, and
-   *                destination bin ID.
+   * <p>Validates that the specified load unit is currently located in the requested source bin
+   * before proceeding. Throws an exception if the load unit is not present at the source location.
+   *
+   * @param request DTO containing the target load unit ID, source bin ID, and destination bin ID.
    * @return The persisted transport order wrapped in a response DTO.
-   * @throws TransportOrderInvalidStateException if the load unit is not in the
-   *                                             specified source bin.
+   * @throws TransportOrderInvalidStateException if the load unit is not in the specified source
+   *     bin.
    */
   @Transactional
   public TransportOrderResponse createTransportOrder(TransportOrderRequest request) {
@@ -93,16 +87,16 @@ public class TransportOrderService {
 
   /**
    * Advances (or changes) the status of an existing transport order.
-   * <p>
-   * Applies state-machine rules defined in {@link #checkStatusBeforeUpdate} to
-   * prevent invalid transitions such as rolling back from {@code IN_PROGRESS}
-   * to {@code OPEN} or mutating a completed order.
    *
-   * @param id      The unique identifier of the transport order to update.
+   * <p>Applies state-machine rules defined in {@link #checkStatusBeforeUpdate} to prevent invalid
+   * transitions such as rolling back from {@code IN_PROGRESS} to {@code OPEN} or mutating a
+   * completed order.
+   *
+   * @param id The unique identifier of the transport order to update.
    * @param request DTO carrying the desired new status.
    * @return The updated transport order wrapped in a response DTO.
-   * @throws TransportOrderNotFoundException      if no order exists for the given ID.
-   * @throws TransportOrderInvalidStateException  if the requested transition is not allowed.
+   * @throws TransportOrderNotFoundException if no order exists for the given ID.
+   * @throws TransportOrderInvalidStateException if the requested transition is not allowed.
    */
   @Transactional
   public TransportOrderResponse updateOrderStatus(
@@ -134,9 +128,9 @@ public class TransportOrderService {
   /**
    * Searches for transport orders with optional filters and pagination.
    *
-   * @param status    Optional status filter (may be null).
+   * @param status Optional status filter (may be null).
    * @param minWeight Optional minimum weight filter (may be null).
-   * @param pageable  Pagination and sorting information.
+   * @param pageable Pagination and sorting information.
    * @return A page of matching transport order response DTOs.
    */
   @Transactional(readOnly = true)
@@ -147,13 +141,11 @@ public class TransportOrderService {
         .map(transportOrderMapper::toResponse);
   }
 
-
-
   /**
    * Retrieves the raw {@link TransportOrder} entity by its ID.
-   * <p>
-   * This is used internally by other service methods that need to work with the
-   * managed JPA entity rather than the response DTO.
+   *
+   * <p>This is used internally by other service methods that need to work with the managed JPA
+   * entity rather than the response DTO.
    *
    * @param id The unique identifier of the transport order.
    * @return The managed {@link TransportOrder} entity.
@@ -168,11 +160,10 @@ public class TransportOrderService {
 
   /**
    * Returns <strong>all</strong> transport order entities without pagination.
-   * <p>
-   * <b>Caution:</b> This method should only be used in batch/background
-   * operations where fetching the full dataset is acceptable (e.g., scheduled
-   * forklift-assignment jobs). Prefer the paginated {@link #searchOrders}
-   * method for user-facing features.
+   *
+   * <p><b>Caution:</b> This method should only be used in batch/background operations where
+   * fetching the full dataset is acceptable (e.g., scheduled forklift-assignment jobs). Prefer the
+   * paginated {@link #searchOrders} method for user-facing features.
    *
    * @return A list of every {@link TransportOrder} in the database.
    */
@@ -182,15 +173,15 @@ public class TransportOrderService {
   }
 
   /**
-   * Assigns forklifts to a list of transport orders and transitions them
-   * to the {@link TransportOrderStatus#ASSIGNED} state.
-   * <p>
-   * Each order in the provided list is fetched from the database to obtain
-   * the managed entity, then updated with the assigned forklift reference.
-   * The status is automatically advanced to {@code ASSIGNED}.
+   * Assigns forklifts to a list of transport orders and transitions them to the {@link
+   * TransportOrderStatus#ASSIGNED} state.
    *
-   * @param orders List of transport order entities carrying at least the ID
-   *               and the desired forklift assignment.
+   * <p>Each order in the provided list is fetched from the database to obtain the managed entity,
+   * then updated with the assigned forklift reference. The status is automatically advanced to
+   * {@code ASSIGNED}.
+   *
+   * @param orders List of transport order entities carrying at least the ID and the desired
+   *     forklift assignment.
    */
   @Transactional
   public void updateForkliftAssignments(List<TransportOrder> orders) {
@@ -209,19 +200,19 @@ public class TransportOrderService {
   }
 
   /**
-   * Enforces the transport-order state machine rules to prevent invalid status
-   * transitions.
-   * <p>
-   * Currently enforced rules:
+   * Enforces the transport-order state machine rules to prevent invalid status transitions.
+   *
+   * <p>Currently enforced rules:
+   *
    * <ul>
-   *   <li>A {@code COMPLETED} order can never be changed.</li>
-   *   <li>An {@code IN_PROGRESS} order cannot be rolled back to {@code OPEN}.</li>
-   *   <li>An {@code ASSIGNED} order cannot be rolled back to {@code OPEN}.</li>
+   *   <li>A {@code COMPLETED} order can never be changed.
+   *   <li>An {@code IN_PROGRESS} order cannot be rolled back to {@code OPEN}.
+   *   <li>An {@code ASSIGNED} order cannot be rolled back to {@code OPEN}.
    * </ul>
    *
-   * @param id            The transport order ID (used only in error messages).
+   * @param id The transport order ID (used only in error messages).
    * @param currentStatus The current status of the order.
-   * @param newStatus     The desired new status.
+   * @param newStatus The desired new status.
    * @throws TransportOrderInvalidStateException if the transition is forbidden.
    */
   private void checkStatusBeforeUpdate(

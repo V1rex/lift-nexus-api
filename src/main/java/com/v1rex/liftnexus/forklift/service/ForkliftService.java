@@ -19,16 +19,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
 /**
  * Service layer for the Forklift bounded context.
  *
  * <p>Manages the full lifecycle of warehouse forklifts: registration, location tracking,
  * operational status updates, and assignment of transport orders during solver solution
- * persistence. Cross-domain communication follows the anti-corruption rule — all external
- * entity lookups go through the respective service interfaces, never directly through
- * repositories.</p>
+ * persistence. Cross-domain communication follows the anti-corruption rule — all external entity
+ * lookups go through the respective service interfaces, never directly through repositories.
  */
 @Service
 @Slf4j
@@ -40,18 +37,18 @@ public class ForkliftService {
   private final ForkliftTypeService forkliftTypeService;
   private final StorageBinService storageBinService;
 
-    /**
+  /**
    * Registers a new forklift in the warehouse fleet.
    *
-   * <p>Validates that the fleet number is unique, resolves the forklift type (archetype)
-   * and optional initial storage bin from their respective domains, persists the aggregate,
-   * and returns a {@link ForkliftResponse} DTO.</p>
+   * <p>Validates that the fleet number is unique, resolves the forklift type (archetype) and
+   * optional initial storage bin from their respective domains, persists the aggregate, and returns
+   * a {@link ForkliftResponse} DTO.
    *
-   * @param request the inbound payload containing fleet number, type ID, and optional
-   *                initial storage bin ID (must not be {@code null}, must pass validation)
+   * @param request the inbound payload containing fleet number, type ID, and optional initial
+   *     storage bin ID (must not be {@code null}, must pass validation)
    * @return a DTO representing the newly created forklift
-   * @throws ForkliftFleetNumberExistsException if a forklift with the given fleet number
-   *                                            already exists in the system
+   * @throws ForkliftFleetNumberExistsException if a forklift with the given fleet number already
+   *     exists in the system
    */
   @Transactional
   public ForkliftResponse createForklift(ForkliftRequest request) {
@@ -77,7 +74,7 @@ public class ForkliftService {
     return forkliftMapper.toResponse(savedForklift);
   }
 
-    /**
+  /**
    * Retrieves a single forklift by its unique identifier.
    *
    * @param id the forklift's database identifier (must be positive and exist)
@@ -89,7 +86,7 @@ public class ForkliftService {
     return forkliftMapper.toResponse(findEntityById(id));
   }
 
-    /**
+  /**
    * Returns a paginated list of all forklifts in the system.
    *
    * @param pageable pagination and sorting parameters (default sort: {@code id} ascending)
@@ -100,14 +97,14 @@ public class ForkliftService {
     return findAllEntities(pageable).map(forkliftMapper::toResponse);
   }
 
-    /**
+  /**
    * Searches for forklifts by minimum lifting capacity or operational status.
    *
-   * <p> If {@code minCapacity} is provided, results are filtered
-   * by the forklift type's max capacity.</p>
+   * <p>If {@code minCapacity} is provided, results are filtered by the forklift type's max
+   * capacity.
    *
    * @param minCapacity the minimum weight capacity in kilograms (optional, {@code >= 1})
-   * @param pageable    pagination parameters (default size: 10, sort: fleetNumber)
+   * @param pageable pagination parameters (default size: 10, sort: fleetNumber)
    * @return a page of matching forklift DTOs
    */
   @Transactional(readOnly = true)
@@ -119,10 +116,10 @@ public class ForkliftService {
         .map(forkliftMapper::toResponse);
   }
 
-    /**
+  /**
    * Searches for forklifts by operational status.
    *
-   * @param status   the operational status to filter by (e.g. {@code ACTIVE}, {@code OFFLINE})
+   * @param status the operational status to filter by (e.g. {@code ACTIVE}, {@code OFFLINE})
    * @param pageable pagination parameters
    * @return a page of forklift DTOs matching the given status
    */
@@ -132,16 +129,16 @@ public class ForkliftService {
     return forkliftRepository.findByStatus(status, pageable).map(forkliftMapper::toResponse);
   }
 
-    /**
+  /**
    * Moves a forklift to a new storage bin location.
    *
-   * <p>This operation updates the physical location of the forklift within the warehouse.
-   * Both the forklift and the target bin must exist.</p>
+   * <p>This operation updates the physical location of the forklift within the warehouse. Both the
+   * forklift and the target bin must exist.
    *
    * @param forkliftId the identifier of the forklift to relocate
    * @param locationId the identifier of the destination storage bin
    * @return a DTO representing the updated forklift
-   * @throws ForkliftNotFoundException   if no forklift with the given ID exists
+   * @throws ForkliftNotFoundException if no forklift with the given ID exists
    */
   @Transactional
   public ForkliftResponse updateForkliftLocation(Long forkliftId, Long locationId) {
@@ -160,7 +157,7 @@ public class ForkliftService {
    * Transitions a forklift's operational status (e.g. from {@code OFFLINE} to {@code ACTIVE}).
    *
    * @param forkliftId the identifier of the target forklift
-   * @param status     the new operational status
+   * @param status the new operational status
    * @return a DTO representing the updated forklift
    * @throws ForkliftNotFoundException if no forklift with the given ID exists
    */
@@ -175,13 +172,12 @@ public class ForkliftService {
     return forkliftMapper.toResponse(updatedForklift);
   }
 
-
   /**
    * Internal domain-level lookup: retrieves the managed {@link Forklift} entity by its ID.
    *
-   * <p>This method is exposed to other services within the same domain and to the
-   * planning service for solution persistence. External consumers receive a DTO; only
-   * domain-internal callers should use the entity directly.</p>
+   * <p>This method is exposed to other services within the same domain and to the planning service
+   * for solution persistence. External consumers receive a DTO; only domain-internal callers should
+   * use the entity directly.
    *
    * @param id the forklift's database identifier
    * @return the persistent Forklift entity
@@ -199,7 +195,7 @@ public class ForkliftService {
             });
   }
 
-    /**
+  /**
    * Returns a paginated list of raw {@link Forklift} entities for internal domain usage.
    *
    * @param pageable pagination and sorting parameters
@@ -211,12 +207,12 @@ public class ForkliftService {
     return forkliftRepository.findAll(pageable);
   }
 
-    /**
+  /**
    * Returns all {@link Forklift} entities without pagination for solver consumption.
    *
-   * <p><b>Performance note:</b> This method loads the entire fleet into memory and is
-   * called during {@code WarehouseDispatcherService.buildCurrentState()}. For large
-   * warehouses, consider paginated or selective fetching (addressed in Milestone 2).</p>
+   * <p><b>Performance note:</b> This method loads the entire fleet into memory and is called during
+   * {@code WarehouseDispatcherService.buildCurrentState()}. For large warehouses, consider
+   * paginated or selective fetching (addressed in Milestone 2).
    *
    * @return a list of all Forklift entities in the database
    */
@@ -226,22 +222,21 @@ public class ForkliftService {
     return forkliftRepository.findAll();
   }
 
-    /**
+  /**
    * Persists the solver's assignment results back to the database.
    *
-   * <p>Called by {@code WarehouseDispatcherService.saveFinalSolution()} after the
-   * Timefold solver produces a solution. This method performs a bulk ID lookup to
-   * ensure all referenced forklifts exist <em>before</em> applying any assignment
-   * changes. If a forklift was deleted between solver completion and persistence,
-   * the operation fails with an {@link IllegalStateException} to prevent partial
-   * updates.</p>
+   * <p>Called by {@code WarehouseDispatcherService.saveFinalSolution()} after the Timefold solver
+   * produces a solution. This method performs a bulk ID lookup to ensure all referenced forklifts
+   * exist <em>before</em> applying any assignment changes. If a forklift was deleted between solver
+   * completion and persistence, the operation fails with an {@link IllegalStateException} to
+   * prevent partial updates.
    *
-   * <p>Each database forklift's transport order list is cleared and repopulated with
-   * the solver-determined assignments.</p>
+   * <p>Each database forklift's transport order list is cleared and repopulated with the
+   * solver-determined assignments.
    *
    * @param forklifts the list of solver-state forklifts containing updated order assignments
-   * @throws IllegalStateException if one or more forklift IDs from the solver solution
-   *                                no longer exist in the database (stale data)
+   * @throws IllegalStateException if one or more forklift IDs from the solver solution no longer
+   *     exist in the database (stale data)
    */
   @Transactional
   public void updateAssignedOrders(List<Forklift> forklifts) {

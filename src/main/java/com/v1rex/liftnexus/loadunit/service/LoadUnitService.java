@@ -21,13 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
  * Service layer for managing {@link LoadUnit} entities.
  *
  * <p>This class provides two tiers of access:
+ *
  * <ul>
  *   <li><b>External API Boundary</b> – Methods that return DTOs ({@link LoadUnitResponse}) to
  *       controllers and external callers. These methods handle validation, business logic, and
- *       mapping.</li>
+ *       mapping.
  *   <li><b>Internal Domain Boundary</b> – Methods that return domain entities ({@link LoadUnit})
  *       for use by other services, internal components, or the Timefold solver, bypassing DTO
- *       conversion.</li>
+ *       conversion.
  * </ul>
  */
 @Service
@@ -124,7 +125,7 @@ public class LoadUnitService {
   /**
    * Returns a paginated list of load units filtered by the given {@link LoadUnitStatus} as DTOs.
    *
-   * @param status  the status to filter by (e.g. {@code AVAILABLE}, {@code RESERVED}, etc.)
+   * @param status the status to filter by (e.g. {@code AVAILABLE}, {@code RESERVED}, etc.)
    * @param pageable pagination and sorting configuration
    * @return a {@link Page} of {@link LoadUnitResponse} matching the specified status
    */
@@ -196,7 +197,7 @@ public class LoadUnitService {
    * <p>This method is intended for internal use by other services, domain components, or the
    * Timefold solver that require direct access to the domain entity rather than a DTO.
    *
-   * @param status   the status to filter by
+   * @param status the status to filter by
    * @param pageable pagination and sorting configuration
    * @return a {@link Page} of {@link LoadUnit} entities matching the specified status
    */
