@@ -6,6 +6,7 @@ import com.v1rex.liftnexus.forklift.domain.ForkliftType;
 import com.v1rex.liftnexus.forklift.domain.OperationalStatus;
 import com.v1rex.liftnexus.forklift.dto.ForkliftRequest;
 import com.v1rex.liftnexus.forklift.dto.ForkliftResponse;
+import com.v1rex.liftnexus.forklift.exception.ForkliftNotFoundException;
 import com.v1rex.liftnexus.forklift.mapper.ForkliftMapper;
 import com.v1rex.liftnexus.forklift.repository.ForkliftRepository;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
@@ -79,7 +80,8 @@ public class ForkliftService {
   }
 
   @Transactional
-  public ForkliftResponse updateForkliftLocation(Long forkliftId, Long locationId) {
+  public ForkliftResponse updateForkliftLocation(Long forkliftId,
+                                                 Long locationId) {
     log.info("Moving Forklift ID {} to StorageBin ID {}", forkliftId, locationId);
     Forklift forklift = findEntityById(forkliftId);
     StorageBin newStorageBin = storageBinService.findEntityById(locationId);
@@ -110,7 +112,7 @@ public class ForkliftService {
         .orElseThrow(
             () -> {
               log.warn("Lookup failed: Forklift ID {} not found", id);
-              return new ResourceNotFoundException("Forklift with " + id + " not found.");
+              return new ForkliftNotFoundException(id);
             });
   }
 
