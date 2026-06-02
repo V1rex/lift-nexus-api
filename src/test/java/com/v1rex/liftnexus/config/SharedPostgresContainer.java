@@ -1,10 +1,10 @@
 package com.v1rex.liftnexus.config;
+
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public final class SharedPostgresContainer {
 
-  private static final boolean IS_CI =
-      "true".equalsIgnoreCase(System.getenv("CI"));
+  private static final boolean IS_CI = "true".equalsIgnoreCase(System.getenv("CI"));
 
   private static final PostgreSQLContainer<?> INSTANCE;
 
