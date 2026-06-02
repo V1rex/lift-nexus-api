@@ -5,6 +5,37 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: warehouse_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: ${POSTGRES_DB:-warehouse_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_password}
+    # Healthcheck: tells Docker (and dependent services) when
+    # PostgreSQL is actually ready to accept connections, not just
+    # when the process started.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-warehouse_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lift-nexus-api
+    ports:
+      - "8080:8080"
+    environment:
+      # Override the datasource URL to use Docker network hostname.
+      # Inside the Docker network, 'db' resolves to the PostgreSQL
+      # container. This replaces 'localhost' from application-dev.properties.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-warehouse_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-your_password}
+      # Activate the 'dev' profile for Flyway + data seeder
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      db:
+        # Wait for the healthcheck to pass, not just for the
+        # container to start. Without this, the app might try to
+        # connect before PostgreSQL is accepting connections.
+        condition: service_healthy
