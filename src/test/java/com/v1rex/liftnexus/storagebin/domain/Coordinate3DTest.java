@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.within;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Profile;
 
 @DisplayName("Coordinate3D Domain Unit Tests")
 class Coordinate3DTest {
