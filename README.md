@@ -1,4 +1,4 @@
-![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/v1rex/27dc15f2c2aeef4b021fdff63d7ba722/raw/lift-nexus-metrics.json&style=for-the-badge&logo=github&logoColor=white)
+![Build](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/v1rex/27dc15f2c2aeef4b021fdff63d7ba722/raw/lift-nexus-metrics.json&style=for-the-badge&logo=github&logoColor=white)
 ![Doc Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/v1rex/27dc15f2c2aeef4b021fdff63d7ba722/raw/lift-nexus-docs.json&style=for-the-badge&logo=openjdk&logoColor=white)
 ![Test Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/v1rex/27dc15f2c2aeef4b021fdff63d7ba722/raw/lift-nexus-coverage.json?v=1&style=for-the-badge&logo=github-actions&logoColor=white)
 ![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)
@@ -17,14 +17,14 @@
     Asynchronous constraint-based optimization engine for warehouse dispatching.
     Intelligently assign transport orders to forklifts using Timefold constraint programming.
     <br />
-    <a href="https://github.com/v1rex/lift-nexus-api"><strong>Explore the docs »</strong></a>
+    <a href="./ARCHITECTURE.md"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/v1rex/lift-nexus-api">View Demo</a>
+    <a href="#-getting-started">View Demo</a>
     &middot;
-    <a href="https://github.com/v1rex/lift-nexus-api">Report Bug</a>
+    <a href="https://github.com/v1rex/lift-nexus-api/issues/new?labels=bug">Report Bug</a>
     &middot;
-    <a href="https://github.com/v1rex/lift-nexus-api">Request Feature</a>
+    <a href="https://github.com/v1rex/lift-nexus-api/issues/new?labels=enhancement">Request Feature</a>
   </p>
 </div>
 
@@ -179,7 +179,7 @@ open target/site/jacoco/index.html  # Coverage report
 
 ### Full Documentation
 
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** – System design, DDD, technology choices, scalability
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** – System design, DDD, exception architecture, testing strategy, database schema, roadmap evolution
 - **[CHANGELOG.md](./CHANGELOG.md)** – Features, limitations, roadmap
 
 <p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>

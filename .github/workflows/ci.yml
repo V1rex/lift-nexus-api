@@ -34,16 +34,16 @@ jobs:
         run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
         timeout-minutes: 15
 
-      - name: Evaluate Code Style Compliance
-        id: spotless-status
+      - name: Evaluate Build Status
+        id: build-status
         if: always()
         run: |
           if [ "${{ job.status }}" = "success" ]; then
-            echo "style_status=passing" >> $GITHUB_OUTPUT
-            echo "style_color=brightgreen" >> $GITHUB_OUTPUT
+            echo "build_status=passing" >> $GITHUB_OUTPUT
+            echo "build_color=brightgreen" >> $GITHUB_OUTPUT
           else
-            echo "style_status=failing" >> $GITHUB_OUTPUT
-            echo "style_color=red" >> $GITHUB_OUTPUT
+            echo "build_status=failing" >> $GITHUB_OUTPUT
+            echo "build_color=red" >> $GITHUB_OUTPUT
           fi
 
       - name: Calculate Service Doc Coverage Percentage
@@ -114,16 +114,16 @@ jobs:
           elif [ "$PERCENT" -ge 50 ]; then echo "test_color=yellow" >> $GITHUB_OUTPUT;
           else echo "test_color=red" >> $GITHUB_OUTPUT; fi
 
-      - name: Generate Dynamic Style Badges
+      - name: Generate Dynamic Build Badge
         uses: schneegans/dynamic-badges-action@v1.7.0
         if: always()
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 27dc15f2c2aeef4b021fdff63d7ba722
           filename: lift-nexus-metrics.json
-          label: code style
-          message: ${{ steps.spotless-status.outputs.style_status || 'failing' }}
-          color: ${{ steps.spotless-status.outputs.style_color || 'red' }}
+          label: build
+          message: ${{ steps.build-status.outputs.build_status || 'failing' }}
+          color: ${{ steps.build-status.outputs.build_color || 'red' }}
 
       - name: Generate Dynamic Doc Badges
         uses: schneegans/dynamic-badges-action@v1.7.0
