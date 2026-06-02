@@ -2,9 +2,9 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ develop, main, 'devops/**' ]
+    branches: [develop, main, 'devops/**']
   pull_request:
-    branches: [ develop, main ]
+    branches: [develop, main]
 
 jobs:
   build-and-test:
@@ -57,9 +57,9 @@ jobs:
               TOTAL_ELEMENTS=$((TOTAL_ELEMENTS + COUNT))
             fi
           done < <(find src/main/java -type f \( -path "*/service/*" -o -name "*Service.java" \))
-          
+
           echo "Total Service Elements: $TOTAL_ELEMENTS"
-          
+
           MISSING_DOCS=0
           if [ -f target/checkstyle-result.xml ]; then
             MISSING_METHODS=$(grep -c "MissingJavadocMethod" target/checkstyle-result.xml || echo 0)
@@ -67,7 +67,7 @@ jobs:
             MISSING_DOCS=$((MISSING_METHODS + MISSING_VARS))
           fi
           echo "Missing Service Javadocs: $MISSING_DOCS"
-          
+
           if [ "$TOTAL_ELEMENTS" -gt 0 ]; then
             if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then
               COVERAGE=0
@@ -77,10 +77,10 @@ jobs:
           else
             COVERAGE=100
           fi
-          
+
           echo "doc_percentage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Final Computed Coverage: ${COVERAGE}%"
-          
+
           if [ "$COVERAGE" -ge 80 ]; then echo "doc_color=brightgreen" >> $GITHUB_OUTPUT;
           elif [ "$COVERAGE" -ge 50 ]; then echo "doc_color=yellow" >> $GITHUB_OUTPUT;
           else echo "doc_color=red" >> $GITHUB_OUTPUT; fi
@@ -91,11 +91,10 @@ jobs:
         run: |
           JACOCO_XML="target/site/jacoco/jacoco.xml"
           if [ -f "$JACOCO_XML" ]; then
-            # Extract total line execution counts from the global counter footer tag
             LINE_INFO=$(tail -n 15 "$JACOCO_XML" | grep 'type="LINE"' || true)
             MISSED=$(echo "$LINE_INFO" | sed -n 's/.*missed="\([0-9]*\)".*/\1/p' || echo 0)
             COVERED=$(echo "$LINE_INFO" | sed -n 's/.*covered="\([0-9]*\)".*/\1/p' || echo 0)
-            
+
             TOTAL=$((MISSED + COVERED))
             if [ "$TOTAL" -gt 0 ]; then
               PERCENT=$((COVERED * 100 / TOTAL))
@@ -106,11 +105,10 @@ jobs:
             echo "JaCoCo report missing, fallback to 0%"
             PERCENT=0
           fi
-          
+
           echo "test_percentage=$PERCENT" >> $GITHUB_OUTPUT
           echo "Total Verified Test Coverage: ${PERCENT}%"
-          
-          # Match industry standard code coverage color steps
+
           if [ "$PERCENT" -ge 85 ]; then echo "test_color=brightgreen" >> $GITHUB_OUTPUT;
           elif [ "$PERCENT" -ge 70 ]; then echo "test_color=green" >> $GITHUB_OUTPUT;
           elif [ "$PERCENT" -ge 50 ]; then echo "test_color=yellow" >> $GITHUB_OUTPUT;

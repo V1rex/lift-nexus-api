@@ -1,21 +1,26 @@
 package com.v1rex.liftnexus.config;
-
 import org.testcontainers.containers.PostgreSQLContainer;
 
 public final class SharedPostgresContainer {
 
+  private static final boolean IS_CI =
+      "true".equalsIgnoreCase(System.getenv("CI"));
+
   private static final PostgreSQLContainer<?> INSTANCE;
 
   static {
-    INSTANCE =
+    PostgreSQLContainer<?> container =
         new PostgreSQLContainer<>("postgres:16")
             .withDatabaseName("warehouse_testdb")
             .withUsername("test_user")
-            .withPassword("test_pass")
-            .withReuse(true);
+            .withPassword("test_pass");
 
+    if (!IS_CI) {
+      container.withReuse(true);
+    }
+
+    INSTANCE = container;
     INSTANCE.start();
-    Runtime.getRuntime().addShutdownHook(new Thread(INSTANCE::stop));
   }
 
   public static PostgreSQLContainer<?> getInstance() {
