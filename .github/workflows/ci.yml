@@ -32,6 +32,7 @@ jobs:
 
       - name: Execute Test Suite with Maven
         run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
+        timeout-minutes: 15
 
       - name: Evaluate Code Style Compliance
         id: spotless-status
