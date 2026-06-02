@@ -32,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("WarehouseDispatcherService Logic Tests")
-@ActiveProfiles("test")
 public class WarehouseDispatcherServiceTest {
 
   @Mock private StorageBinService storageBinService;

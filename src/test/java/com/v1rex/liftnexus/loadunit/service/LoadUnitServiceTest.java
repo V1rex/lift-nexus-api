@@ -32,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoadUnitService Business Logic Tests")
-@ActiveProfiles("test")
 class LoadUnitServiceTest {
 
   @Mock private LoadUnitRepository loadUnitRepository;

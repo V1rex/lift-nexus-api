@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Profile;
 
 @DisplayName("Coordinate3D Domain Unit Tests")
-@Profile("test")
 class Coordinate3DTest {
 
   @Test

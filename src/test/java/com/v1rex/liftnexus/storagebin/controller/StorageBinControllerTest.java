@@ -36,7 +36,6 @@ import org.springframework.test.web.servlet.MockMvc;
   StorageBinExceptionHandler.class,
   ProblemDetailFactory.class
 })
-@ActiveProfiles("test")
 @DisplayName("StorageBin REST API Gateway Endpoints Tests")
 public class StorageBinControllerTest {
 
