@@ -113,18 +113,15 @@ This section explains how to get a local copy running.
 
 ### Prerequisites
 
-- **Java 21+**
-  ```bash
-  java -version
-  ```
-- **Maven 3.8+**
-  ```bash
-  mvn -version
-  ```
-- **Docker & Docker Compose**
+- **Docker & Docker Compose** (all you need for Option 1)
   ```bash
   docker --version
   docker-compose --version
+  ```
+- **Java 21+ & Maven 3.8+** (only needed for Option 2 — development)
+  ```bash
+  java -version
+  mvn -version
   ```
 
 ### Installation
@@ -135,21 +132,26 @@ This section explains how to get a local copy running.
    cd lift-nexus-api
    ```
 
-2. Start PostgreSQL (Docker)
+2. Choose your setup:
+
+   **Option 1: Docker only (recommended — no Java/Maven needed)**
    ```bash
    docker-compose up -d
    ```
+   Starts both PostgreSQL and the app. App available at `http://localhost:8080`.
 
-3. Build & run the application
+   **Option 2: Development mode (hot reload, debugger support)**
    ```bash
-   ./mvnw clean spring-boot:run
+   docker-compose up -d db         # Start only PostgreSQL
+   ./mvnw clean spring-boot:run    # Run app from your IDE or terminal
    ```
 
-4. Access the application
+3. Access the application
    - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+   - **API Docs (hosted):** [https://v1rex.github.io/lift-nexus-api/](https://v1rex.github.io/lift-nexus-api/)
    - **Health Check:** `curl http://localhost:8080/actuator/health`
 
-5. Stop the environment
+4. Stop the environment
    ```bash
    docker-compose down
    ```
@@ -167,7 +169,7 @@ This section explains how to get a local copy running.
 ```bash
 ./mvnw clean test           # Unit tests
 ./mvnw clean verify         # Full suite (includes integration)
-open target/site/jacoco/index.html  # Coverage report
+open target/site/jacoco/api.html  # Coverage report
 ```
 
 ### Code Style

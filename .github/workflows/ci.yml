@@ -155,3 +155,36 @@ jobs:
             target/*.jar
             target/openapi.json
           retention-days: 7
+
+      - name: Prepare GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        run: |
+          mkdir -p gh-pages/coverage gh-pages/javadoc gh-pages/tests
+
+          # Landing page + API docs
+          cp docs/index.html gh-pages/
+          cp docs/api.html gh-pages/
+          cp target/openapi.json gh-pages/
+
+          # JaCoCo coverage report
+          if [ -d target/site/jacoco ]; then
+            cp -r target/site/jacoco/* gh-pages/coverage/
+          fi
+
+          # Javadoc
+          mvn javadoc:javadoc -Dquiet=true -Ddoclint=none
+          if [ -d target/site/apidocs ]; then
+            cp -r target/site/apidocs/* gh-pages/javadoc/
+          fi
+
+          # Surefire test reports
+          if [ -d target/surefire-reports ]; then
+            cp -r target/surefire-reports/* gh-pages/tests/
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages

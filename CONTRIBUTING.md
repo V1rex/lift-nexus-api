@@ -159,7 +159,7 @@ This includes:
 
 ```bash
 ./mvnw clean verify
-open target/site/jacoco/index.html
+open target/site/jacoco/api.html
 ```
 
 ### Writing Tests
