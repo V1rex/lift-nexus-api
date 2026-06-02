@@ -3,6 +3,7 @@ package com.v1rex.liftnexus.loadunit.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.v1rex.liftnexus.config.TestContainersConfiguration;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnit;
 import com.v1rex.liftnexus.loadunit.domain.LoadUnitStatus;
 import jakarta.persistence.PersistenceException;
@@ -14,12 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @DisplayName("LoadUnitRepository Integration Tests")
+@Import(TestContainersConfiguration.class)
 @ActiveProfiles("test")
 class LoadUnitRepositoryTest {
 

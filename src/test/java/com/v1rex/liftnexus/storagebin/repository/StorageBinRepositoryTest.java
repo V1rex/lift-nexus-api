@@ -2,6 +2,7 @@ package com.v1rex.liftnexus.storagebin.repository;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.v1rex.liftnexus.config.TestContainersConfiguration;
 import com.v1rex.liftnexus.storagebin.domain.Coordinate3D;
 import com.v1rex.liftnexus.storagebin.domain.StorageBin;
 import com.v1rex.liftnexus.storagebin.domain.ZoneType;
@@ -11,10 +12,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
+@Import(TestContainersConfiguration.class)
 @ActiveProfiles("test")
 @DisplayName("StorageBin Repository Constraints & Integrity Tests")
 public class StorageBinRepositoryTest {
