@@ -3,90 +3,48 @@
 ![Test Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/v1rex/27dc15f2c2aeef4b021fdff63d7ba722/raw/lift-nexus-coverage.json?v=1&style=for-the-badge&logo=github-actions&logoColor=white)
 ![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)
 
-
-
 <br />
 <div align="center">
   <a href="https://github.com/v1rex/lift-nexus-api">
-    <img src="assets/logo_horizental_with_gradient.png" alt="Logo">
+    <img src="assets/logo_horizental_without_gradient_slim.png" alt="Lift Nexus API Logo">
   </a>
 
   <h3 align="center">Lift Nexus API</h3>
 
   <p align="center">
-    Asynchronous constraint-based optimization engine for warehouse dispatching.
-    Intelligently assign transport orders to forklifts using Timefold constraint programming.
+    Spring Boot backend MVP for warehouse dispatch optimization.<br />
+    Built to explore domain modeling, async job handling, PostgreSQL/Flyway persistence,
+    integration testing, and Timefold-based constraint solving.
     <br />
-    <a href="./ARCHITECTURE.md"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="#-getting-started">View Demo</a>
+    <a href="https://v1rex.github.io/lift-nexus-api/"><strong>Read the docs »</strong></a>
     &middot;
-    <a href="https://github.com/v1rex/lift-nexus-api/issues/new?labels=bug">Report Bug</a>
+    <a href="#getting-started">Getting started</a>
     &middot;
-    <a href="https://github.com/v1rex/lift-nexus-api/issues/new?labels=enhancement">Request Feature</a>
+    <a href="https://github.com/v1rex/lift-nexus-api/issues">Roadmap</a>
   </p>
 </div>
 
-
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
-
 ---
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About The Project</a></li>
-    <li><a href="#built-with">Built With</a></li>
-    <li><a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+> **Status:** Portfolio / learning project. The current focus is a static dispatching MVP, not a production warehouse management system.
 
----
+## About
 
-## About The Project
+**Lift Nexus API** models a simplified warehouse dispatching scenario where transport orders need to be assigned to forklifts.
 
-**Lift Nexus** solves the **Vehicle Routing Problem (VRP) with Capacity Constraints** – a classic Operations Research challenge applied to warehouse dispatching.
+The project goes beyond a basic CRUD API by combining:
 
-Intelligently assigns transport orders to forklifts inside a warehouse while respecting:
-- **Capacity constraints** (weight limits per forklift)
-- **Equipment requirements** (specialized lifting)
-- **Travel distance optimization** (minimize deadheading)
-- **Async, non-blocking dispatch** (job-based processing)
+- a warehouse domain model for forklifts, load units, storage bins, and transport orders
+- asynchronous optimization jobs with status tracking
+- Timefold Solver for constraint-based assignment planning
+- PostgreSQL persistence with Flyway migrations
+- OpenAPI documentation and Docker-based local setup
+- unit and integration tests with JUnit 5 and Testcontainers
 
-Uses **constraint-programming optimization** (Timefold solver) to find near-optimal solutions in seconds.
+The goal is to experiment with backend architecture and optimization in a realistic intralogistics domain.
 
-Perfect for warehouse optimization and intralogistics.
-
-**Key Features:**
-- 🚀 **REST API** – Manage forklifts, load units, storage bins, transport orders
-- ⚙️ **Constraint Solver** – Timefold-powered optimization engine
-- 🔄 **Async Dispatching** – Job-based processing with status tracking
-- 📊 **Domain-Driven Architecture** – Clean DDD structure across 5 bounded contexts
-- 🗄️ **PostgreSQL + Flyway** – Production-ready database with migrations
-- 📖 **OpenAPI/Swagger** – Full API docs at `/swagger-ui.html`
-- 🐳 **Docker Compose** – One-command local setup
-- 🧪 **75%+ Test Coverage** – Unit + integration tests
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
-
----
-
-## Built With
-
+## Tech Stack
 ![Java 21+](https://img.shields.io/badge/Java-21+-ED8936?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
 ![Timefold](https://img.shields.io/badge/Timefold-2.0.0--beta-blue?style=for-the-badge&logoColor=white)
@@ -103,162 +61,170 @@ Perfect for warehouse optimization and intralogistics.
 ![Checkstyle](https://img.shields.io/badge/Checkstyle-333333?style=for-the-badge&logoColor=white)
 ![JaCoCo](https://img.shields.io/badge/JaCoCo-4285F4?style=for-the-badge&logoColor=white)
 
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
+## Features
 
----
+- Manage forklifts, load units, storage bins, and transport orders through REST endpoints
+- Start dispatch optimization as an asynchronous job
+- Poll job status and retrieve optimization results
+- Apply initial hard and soft constraints for forklift-to-order assignment planning
+- Run locally with Docker Compose
+- Validate database changes through Flyway migrations
+- Generate and inspect API documentation through Swagger UI
 
 ## Getting Started
 
-This section explains how to get a local copy running.
-
 ### Prerequisites
 
-- **Docker & Docker Compose** (all you need for Option 1)
-  ```bash
-  docker --version
-  docker-compose --version
-  ```
-- **Java 21+ & Maven 3.8+** (only needed for Option 2 — development)
-  ```bash
-  java -version
-  mvn -version
-  ```
-
-### Installation
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/v1rex/lift-nexus-api.git
-   cd lift-nexus-api
-   ```
-
-2. Choose your setup:
-
-   **Option 1: Docker only (recommended — no Java/Maven needed)**
-   ```bash
-   docker-compose up -d
-   ```
-   Starts both PostgreSQL and the app. App available at `http://localhost:8080`.
-
-   **Option 2: Development mode (hot reload, debugger support)**
-   ```bash
-   docker-compose up -d db         # Start only PostgreSQL
-   ./mvnw clean spring-boot:run    # Run app from your IDE or terminal
-   ```
-
-3. Access the application
-   - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-   - **API Docs (hosted):** [https://v1rex.github.io/lift-nexus-api/](https://v1rex.github.io/lift-nexus-api/)
-   - **Health Check:** `curl http://localhost:8080/actuator/health`
-
-4. Stop the environment
-   ```bash
-   docker-compose down
-   ```
-
-**Expected:** App starts in ~10 seconds, Swagger UI accessible at localhost:8080
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
-
----
-
-## Usage
-
-### Run Tests
+For the recommended setup:
 
 ```bash
-./mvnw clean test           # Unit tests
-./mvnw clean verify         # Full suite (includes integration)
-open target/site/jacoco/api.html  # Coverage report
+docker --version
+docker compose version
 ```
 
-### Code Style
+For local development without running the app container:
 
 ```bash
-./mvnw spotless:apply       # Auto-format code
-./mvnw spotless:check       # Check formatting
+java -version
+./mvnw -version
 ```
 
-### Full Documentation
+### Run with Docker Compose
 
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** – System design, DDD, exception architecture, testing strategy, database schema, roadmap evolution
-- **[CHANGELOG.md](./CHANGELOG.md)** – Features, limitations, roadmap
+```bash
+git clone https://github.com/v1rex/lift-nexus-api.git
+cd lift-nexus-api
+docker compose up -d
+```
 
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
+The API should be available at:
 
----
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- Health check: `http://localhost:8080/actuator/health`
+- Hosted docs: `https://v1rex.github.io/lift-nexus-api/`
+
+Stop the environment:
+
+```bash
+docker compose down
+```
+
+### Development Mode
+
+Run PostgreSQL in Docker and start the application from your IDE or terminal:
+
+```bash
+docker compose up -d db
+./mvnw clean spring-boot:run
+```
+
+## Testing and Code Quality
+
+```bash
+./mvnw clean test            # Unit tests
+./mvnw clean verify          # Full verification, including integration tests
+./mvnw spotless:check        # Formatting check
+./mvnw spotless:apply        # Apply formatting
+```
+
+Coverage report:
+
+```bash
+open target/site/jacoco/api.html
+```
+
+## Documentation
+
+Detailed documentation is available on GitHub Pages:
+
+- Project overview
+- Architecture and module boundaries
+- Domain model
+- Optimization approach
+- API usage
+- Testing strategy
+- Known limitations
+- Roadmap
+
+Docs: **https://v1rex.github.io/lift-nexus-api/**
+
+For repository-level notes, see:
+
+- [CHANGELOG.md](./CHANGELOG.md)
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Current Scope and Limitations
+
+Lift Nexus API is an MVP / portfolio project, not a production warehouse management system yet.
+
+Main limitations:
+- No authentication or authorization yet
+- Simplified warehouse topology and pathfinding
+- Limited solver constraints
+- Basic observability only
+- Not tested in a production-like deployment environment yet
+
+See the full documentation for detailed limitations and planned improvements.
 
 ## Roadmap
 
-| Phase | Status | Focus | Tech Stack |
-|-------|--------|-------|-----------|
-| **Milestone 1** | ✅ Current | **Static Dispatching MVP** | Spring Boot 4.0.5, Timefold 2.0, PostgreSQL 16, Flyway, REST API, DDD, JPA, OpenAPI/Swagger, Testcontainers, JUnit 5 (75%+ coverage), Docker Compose |
-| | | • VRP with capacity constraints solver | |
-| | | • Async job-based optimization engine | |
-| | | • Production-ready API structure | |
-| **Milestone 2** | 🚀 Planned | **Real-Time Reactive Optimization** | Event-driven architecture, real-time updates, microservices |
-| | | • Live order re-routing on demand | |
-| | | • Dynamic vehicle state tracking | |
-| | | • Advanced pathfinding optimization | |
-| **Milestone 3** | 📈 Next Phase | **Energy Market Integration for Fleet Optimization** | Multi-objective optimization, spot-market feeds, sustainability |
-| | | • Dynamic electricity tariff-aware forklift charging schedules | |
-| | | • Smart charging cycles integrated with dispatch optimization | |
-| | | • Grid-responsive fleet operations & cost-optimized logistics | |
+| Milestone | Status       | Focus |
+|----------|--------------|-------|
+| Core MVP - Static Dispatching | 90% complete | Physical warehouse model and one-shot optimization |
+| Dynamic Dispatching | Planned      | React to warehouse changes instead of running only one-shot dispatching |
+| Production Constraints | Planned      | Add more realistic planning constraints such as deadlines, priorities, equipment compatibility, and energy-aware dispatching |
+| Auth, Monitoring, Deployment | Planned      | Improve security, observability, and deployment readiness |
+| Performance/Benchmarking | Planned      | Measure behavior under larger scenarios |
 
-**Current Focus:** Milestone 1 – Building production-ready foundation. Strategic goal: Energy-aware intralogistics targeting companies optimizing warehouse operations and electric fleet charging with sustainability & cost efficiency.
+See the [open issues](https://github.com/v1rex/lift-nexus-api/issues) for the detailed task list.
 
-See the [open issues](https://github.com/v1rex/lift-nexus-api/issues) for a full list of proposed features.
+## What I Learned
 
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
+This is my first larger Spring Boot project. I built it to go beyond simple CRUD applications and practice backend architecture in a more realistic domain.
 
----
+Coming from an academic optimization background, where I previously worked with mathematical modeling in GurobiPy, this project helped me understand how optimization can be integrated into a real backend application using Timefold.
+
+Through this project, I learned and applied:
+- domain modeling for warehouse dispatching
+- asynchronous job handling
+- database migrations with Flyway
+- integration testing with PostgreSQL and Testcontainers
+- separating API, service, persistence, and planning concerns
+- constraint solving with Timefold
+- documenting architectural trade-offs and limitations
 
 ## Contributing
 
-Contributions are welcome! To contribute:
+This is mainly a personal learning and portfolio project, but feedback and suggestions are welcome.
 
 1. Fork the project
-2. Create your feature branch: `git checkout -b feature/AmazingFeature`
-3. Commit your changes: `git commit -m 'feat: add AmazingFeature'` (follow [Conventional Commits](https://www.conventionalcommits.org/))
-4. Push to the branch: `git push origin feature/AmazingFeature`
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/my-change`
+3. Commit your changes using Conventional Commits
+4. Push your branch
+5. Open a pull request
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed setup instructions, code standards, and testing requirements.
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
-
----
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ## License
 
 Distributed under the Apache License 2.0. See [LICENSE](./LICENSE) for more information.
 
-```
+```text
 Copyright 2026 Mohamed Amine Bahij
 ```
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
-
----
 
 ## Contact
 
 **Amine Bahij**
+
 - GitHub: [@v1rex](https://github.com/v1rex)
 - Email: medaminebahij02@gmail.com
-
-Project Repository: [https://github.com/v1rex/lift-nexus-api](https://github.com/v1rex/lift-nexus-api)
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
-
----
+- Project: [https://github.com/v1rex/lift-nexus-api](https://github.com/v1rex/lift-nexus-api)
 
 ## Acknowledgments
 
-- [Timefold](https://timefold.ai/) – Open-source constraint-programming solver
-- [Spring Boot](https://spring.io/projects/spring-boot) – Enterprise Java framework
-- [PostgreSQL](https://www.postgresql.org/) – Reliable RDBMS
+- [Timefold](https://timefold.ai/) – Constraint solver
+- [Spring Boot](https://spring.io/projects/spring-boot) – Java application framework
+- [PostgreSQL](https://www.postgresql.org/) – Relational database
 - [Flyway](https://flywaydb.org/) – Database migrations
-- [Best-README-Template](https://github.com/othneildrew/Best-README-Template) – README structure inspiration
-
-<p align="right">(<a href="#-lift-nexus-api">back to top</a>)</p>
+- [Best-README-Template](https://github.com/othneildrew/Best-README-Template) – Original README structure inspiration
