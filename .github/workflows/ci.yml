@@ -30,9 +30,10 @@ jobs:
         with:
           python-version: '3.12'
           cache: "pip"
+          cache-dependency-path: docs/requirements-docs.txt
 
       - name: Install MkDocs Material
-        run: pip install mkdocs-material
+        run: pip install -r docs/requirements-docs.txt
 
       - name: Cache Maven Dependencies
         uses: actions/cache@v4
