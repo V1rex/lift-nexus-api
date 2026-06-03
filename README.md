@@ -43,6 +43,8 @@ The project goes beyond a basic CRUD API by combining:
 
 The goal is to experiment with backend architecture and optimization in a realistic intralogistics domain.
 
+[For more infos](https://v1rex.github.io/lift-nexus-api/)
+
 ## Tech Stack
 ![Java 21+](https://img.shields.io/badge/Java-21+-ED8936?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.5-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
@@ -99,7 +101,6 @@ docker compose up -d
 The API should be available at:
 
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
-- Health check: `http://localhost:8080/actuator/health`
 - Hosted docs: `https://v1rex.github.io/lift-nexus-api/`
 
 Stop the environment:
@@ -145,7 +146,7 @@ Detailed documentation is available on GitHub Pages:
 - Known limitations
 - Roadmap
 
-Docs: **https://v1rex.github.io/lift-nexus-api/**
+Docs: **https://v1rex.github.io/lift-nexus-api/site**
 
 For repository-level notes, see:
 
@@ -163,7 +164,7 @@ Main limitations:
 - Basic observability only
 - Not tested in a production-like deployment environment yet
 
-See the full documentation for detailed limitations and planned improvements.
+See the full [documentation](https://v1rex.github.io/lift-nexus-api/site/limitations/) for detailed limitations and planned improvements.
 
 ## Roadmap
 
@@ -175,7 +176,7 @@ See the full documentation for detailed limitations and planned improvements.
 | Auth, Monitoring, Deployment | Planned      | Improve security, observability, and deployment readiness |
 | Performance/Benchmarking | Planned      | Measure behavior under larger scenarios |
 
-See the [open issues](https://github.com/v1rex/lift-nexus-api/issues) for the detailed task list.
+See the [open issues](https://github.com/v1rex/lift-nexus-api/issues) for the detailed task list and read [roadmap](https://v1rex.github.io/lift-nexus-api/site/roadmap/) for more infos. 
 
 ## What I Learned
 
