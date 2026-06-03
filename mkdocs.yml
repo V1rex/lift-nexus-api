@@ -1,0 +1,32 @@
+site_name: Lift Nexus API
+site_description: Spring Boot backend MVP for warehouse dispatch optimization
+site_url: https://v1rex.github.io/lift-nexus-api/
+repo_url: https://github.com/v1rex/lift-nexus-api
+repo_name: v1rex/lift-nexus-api
+
+docs_dir: docs/mkdocs
+site_dir: build/site
+
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: blue
+    accent: blue
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+nav:
+  - Overview: index.md
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences

@@ -24,6 +24,15 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+
+      - name: Set up Python for MkDocs
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install MkDocs Material
+        run: pip install mkdocs-material
+
       - name: Cache Maven Dependencies
         uses: actions/cache@v4
         with:
@@ -47,7 +56,8 @@ jobs:
             echo "build_status=failing" >> $GITHUB_OUTPUT
             echo "build_color=red" >> $GITHUB_OUTPUT
           fi
-
+      - name: Build MkDocs documentation
+        run: mkdocs build
       - name: Calculate Service Doc Coverage Percentage
         id: calc-doc-coverage
         if: always()
@@ -163,7 +173,7 @@ jobs:
           github.ref == 'refs/heads/develop' ||
           startsWith(github.ref, 'refs/heads/devops/')
         run: |
-          mkdir -p gh-pages/coverage gh-pages/javadoc gh-pages/tests
+          mkdir -p gh-pages/coverage gh-pages/javadoc gh-pages/tests gh-pages/site
 
           # Landing page + API docs
           cp docs/index.html gh-pages/
@@ -173,6 +183,10 @@ jobs:
           # Static assets for landing page
           if [ -d docs/assets ]; then
             cp -r docs/assets gh-pages/assets
+          fi
+          
+          if [ -d build/site ]; then
+            cp -r build/site/* gh-pages/site/
           fi
 
           # JaCoCo coverage report
