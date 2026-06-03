@@ -34,7 +34,6 @@
 **Lift Nexus API** models a simplified warehouse dispatching scenario where transport orders need to be assigned to forklifts.
 
 The project goes beyond a basic CRUD API by combining:
-
 - a warehouse domain model for forklifts, load units, storage bins, and transport orders
 - asynchronous optimization jobs with status tracking
 - Timefold Solver for constraint-based assignment planning
