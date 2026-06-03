@@ -6,7 +6,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/v1rex/lift-nexus-api">
-    <img src="assets/logo_horizental_without_gradient_slim.png" alt="Lift Nexus API Logo">
+    <img src="docs/assets/logo_horizental_without_gradient_slim.png" alt="Lift Nexus API Logo">
   </a>
 
   <h3 align="center">Lift Nexus API</h3>

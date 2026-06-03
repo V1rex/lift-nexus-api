@@ -167,6 +167,11 @@ jobs:
           cp docs/index.html gh-pages/
           cp docs/api.html gh-pages/
           cp target/openapi.json gh-pages/
+          
+          # Static assets for landing page
+          if [ -d docs/assets ]; then
+            cp -r docs/assets gh-pages/assets
+          fi
 
           # JaCoCo coverage report
           if [ -d target/site/jacoco ]; then
