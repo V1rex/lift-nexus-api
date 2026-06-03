@@ -182,6 +182,9 @@ jobs:
           cp docs/api.html gh-pages/
           cp target/openapi.json gh-pages/
           
+          # custom domain 
+          echo "lift-nexus.amine-bahij.dev" > gh-pages/CNAME
+          
           # Static assets for landing page
           if [ -d docs/assets ]; then
             cp -r docs/assets gh-pages/assets
