@@ -60,44 +60,13 @@ jobs:
           fi
       - name: Build MkDocs documentation
         run: mkdocs build
+
+
       - name: Calculate Service Doc Coverage Percentage
         id: calc-doc-coverage
         if: always()
-        run: |
-          TOTAL_ELEMENTS=0
-          while read -r file; do
-            if [ -f "$file" ]; then
-              COUNT=$(grep -E -c "public (class|interface|void|[A-Z][a-zA-Z0-9_<>]*)" "$file" || echo 0)
-              TOTAL_ELEMENTS=$((TOTAL_ELEMENTS + COUNT))
-            fi
-          done < <(find src/main/java -type f \( -path "*/service/*" -o -name "*Service.java" \))
+        run: python scripts/ci/javadoc_coverage.py
 
-          echo "Total Service Elements: $TOTAL_ELEMENTS"
-
-          MISSING_DOCS=0
-          if [ -f target/checkstyle-result.xml ]; then
-            MISSING_METHODS=$(grep -c "MissingJavadocMethod" target/checkstyle-result.xml || echo 0)
-            MISSING_VARS=$(grep -c "JavadocVariable" target/checkstyle-result.xml || echo 0)
-            MISSING_DOCS=$((MISSING_METHODS + MISSING_VARS))
-          fi
-          echo "Missing Service Javadocs: $MISSING_DOCS"
-
-          if [ "$TOTAL_ELEMENTS" -gt 0 ]; then
-            if [ "$MISSING_DOCS" -gt "$TOTAL_ELEMENTS" ]; then
-              COVERAGE=0
-            else
-              COVERAGE=$(( (TOTAL_ELEMENTS - MISSING_DOCS) * 100 / TOTAL_ELEMENTS ))
-            fi
-          else
-            COVERAGE=100
-          fi
-
-          echo "doc_percentage=$COVERAGE" >> $GITHUB_OUTPUT
-          echo "Final Computed Coverage: ${COVERAGE}%"
-
-          if [ "$COVERAGE" -ge 80 ]; then echo "doc_color=brightgreen" >> $GITHUB_OUTPUT;
-          elif [ "$COVERAGE" -ge 50 ]; then echo "doc_color=yellow" >> $GITHUB_OUTPUT;
-          else echo "doc_color=red" >> $GITHUB_OUTPUT; fi
 
       - name: Calculate JaCoCo Test Coverage
         id: jacoco-coverage
