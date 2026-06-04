@@ -52,3 +52,10 @@ postgres_data/
 .DS_Store
 Thumbs.db
 
+
+# python virtual environment
+.venv/
+venv/
+scripts/ci/venv/
+scripts/ci/.venv/
+

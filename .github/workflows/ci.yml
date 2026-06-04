@@ -99,34 +99,11 @@ jobs:
           elif [ "$COVERAGE" -ge 50 ]; then echo "doc_color=yellow" >> $GITHUB_OUTPUT;
           else echo "doc_color=red" >> $GITHUB_OUTPUT; fi
 
-      - name: Parse JaCoCo Test Coverage
+      - name: Calculate JaCoCo Test Coverage
         id: jacoco-coverage
         if: always()
-        run: |
-          JACOCO_XML="target/site/jacoco/jacoco.xml"
-          if [ -f "$JACOCO_XML" ]; then
-            LINE_INFO=$(tail -n 15 "$JACOCO_XML" | grep 'type="LINE"' || true)
-            MISSED=$(echo "$LINE_INFO" | sed -n 's/.*missed="\([0-9]*\)".*/\1/p' || echo 0)
-            COVERED=$(echo "$LINE_INFO" | sed -n 's/.*covered="\([0-9]*\)".*/\1/p' || echo 0)
+        run: python scripts/ci/jacoco_coverage.py
 
-            TOTAL=$((MISSED + COVERED))
-            if [ "$TOTAL" -gt 0 ]; then
-              PERCENT=$((COVERED * 100 / TOTAL))
-            else
-              PERCENT=0
-            fi
-          else
-            echo "JaCoCo report missing, fallback to 0%"
-            PERCENT=0
-          fi
-
-          echo "test_percentage=$PERCENT" >> $GITHUB_OUTPUT
-          echo "Total Verified Test Coverage: ${PERCENT}%"
-
-          if [ "$PERCENT" -ge 85 ]; then echo "test_color=brightgreen" >> $GITHUB_OUTPUT;
-          elif [ "$PERCENT" -ge 70 ]; then echo "test_color=green" >> $GITHUB_OUTPUT;
-          elif [ "$PERCENT" -ge 50 ]; then echo "test_color=yellow" >> $GITHUB_OUTPUT;
-          else echo "test_color=red" >> $GITHUB_OUTPUT; fi
 
       - name: Generate Dynamic Build Badge
         uses: schneegans/dynamic-badges-action@v1.7.0
