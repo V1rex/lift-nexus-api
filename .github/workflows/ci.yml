@@ -24,7 +24,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-
       - name: Set up Python for MkDocs
         uses: actions/setup-python@v5
         with:
@@ -43,6 +42,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+
+
       - name: Execute Test Suite with Maven
         run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
         timeout-minutes: 15
@@ -58,21 +59,25 @@ jobs:
             echo "build_status=failing" >> $GITHUB_OUTPUT
             echo "build_color=red" >> $GITHUB_OUTPUT
           fi
+
+
+
+
       - name: Build MkDocs documentation
         run: mkdocs build
-
 
       - name: Calculate Service Doc Coverage Percentage
         id: calc-doc-coverage
         if: always()
         run: python scripts/ci/javadoc_coverage.py
 
-
       - name: Calculate JaCoCo Test Coverage
         id: jacoco-coverage
         if: always()
         run: python scripts/ci/jacoco_coverage.py
 
+      - name: Generate Javadoc
+        run: mvn javadoc:javadoc -Dquiet=true -Ddoclint=none -Dcheckstyle.skip=true -Dspotless.check.skip=true
 
       - name: Generate Dynamic Build Badge
         uses: schneegans/dynamic-badges-action@v1.7.0
@@ -120,41 +125,8 @@ jobs:
         if: github.ref == 'refs/heads/main' ||
           github.ref == 'refs/heads/develop' ||
           startsWith(github.ref, 'refs/heads/devops/')
-        run: |
-          mkdir -p gh-pages/coverage gh-pages/javadoc gh-pages/tests gh-pages/site
+        run: bash scripts/ci/prepare_pages.sh
 
-          # Landing page + API docs
-          cp docs/index.html gh-pages/
-          cp docs/api.html gh-pages/
-          cp target/openapi.json gh-pages/
-          
-          # custom domain 
-          echo "lift-nexus.amine-bahij.dev" > gh-pages/CNAME
-          
-          # Static assets for landing page
-          if [ -d docs/assets ]; then
-            cp -r docs/assets gh-pages/assets
-          fi
-          
-          if [ -d build/site ]; then
-            cp -r build/site/* gh-pages/site/
-          fi
-
-          # JaCoCo coverage report
-          if [ -d target/site/jacoco ]; then
-            cp -r target/site/jacoco/* gh-pages/coverage/
-          fi
-
-          # Javadoc (with doclint disabled for CI resilience)
-          mvn javadoc:javadoc -Dquiet=true -Ddoclint=none -Dcheckstyle.skip=true -Dspotless.check.skip=true
-          if [ -d target/site/apidocs ]; then
-            cp -r target/site/apidocs/* gh-pages/javadoc/
-          fi
-
-          # Surefire test reports
-          if [ -d target/surefire-reports ]; then
-            cp -r target/surefire-reports/* gh-pages/tests/
-          fi
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main' ||
