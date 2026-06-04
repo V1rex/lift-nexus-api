@@ -34,15 +34,6 @@ jobs:
       - name: Install MkDocs Material
         run: pip install -r docs/requirements-docs.txt
 
-      - name: Cache Maven Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-
 
       - name: Execute Test Suite with Maven
         run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
@@ -83,12 +74,11 @@ jobs:
             -Ddoclint=none \
             -Dcheckstyle.skip=true \
             -Dmaven.checkstyle.skip=true \
-            -Dspotless.check.skip=true \
-            -DreportOutputDirectory=target/site
-
+            -Dspotless.check.skip=true
+      
           echo "Checking generated Javadoc folders..."
           find target -maxdepth 4 -type d | sort | grep -E "apidocs|javadoc|site" || true
-          test -f target/site/apidocs/index.html
+          test -f target/reports/apidocs/index.html
 
       - name: Generate Dynamic Build Badge
         uses: schneegans/dynamic-badges-action@v1.7.0

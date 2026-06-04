@@ -39,9 +39,9 @@ fi
 
 # Javadoc
 if [ -d target/site/apidocs ]; then
-  cp -r target/site/apidocs/* "$PAGES_DIR/javadoc/"
+  cp -r target/reports/apidocs/* "$PAGES_DIR/javadoc/"
 else
-  echo "Javadoc directory missing: target/site/apidocs"
+  echo "Javadoc directory missing: target/reports/apidocs"
 fi
 
 # Surefire test reports
