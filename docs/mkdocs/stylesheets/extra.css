@@ -1,0 +1,14 @@
+.md-typeset .admonition.dev-note,
+.md-typeset details.dev-note {
+  border-color: #f97316;
+}
+
+.md-typeset .dev-note > .admonition-title,
+.md-typeset .dev-note > summary {
+  background-color: rgba(249, 115, 22, 0.12);
+}
+
+.md-typeset .dev-note > .admonition-title::before,
+.md-typeset .dev-note > summary::before {
+  background-color: #f97316;
+}

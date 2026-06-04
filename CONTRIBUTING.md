@@ -301,7 +301,6 @@ Returns 500 Internal Server Error
 
 ## Questions?
 
-- 📚 See [ARCHITECTURE.md](./ARCHITECTURE.md) for design questions
 - 🚀 See [README.md](./README.md) for project overview
 - 🔗 Check existing [GitHub Issues](https://github.com/v1rex/lift-nexus-api/issues)
 
