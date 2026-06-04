@@ -19,26 +19,36 @@ echo "lift-nexus.amine-bahij.dev" > "$PAGES_DIR/CNAME"
 # Static assets for landing page
 if [ -d docs/assets ]; then
   cp -r docs/assets "$PAGES_DIR/assets"
+else
+  echo "Assets directory missing"
 fi
 
 # MkDocs generated documentation
 if [ -d build/site ]; then
   cp -r build/site/* "$PAGES_DIR/site/"
+else
+  echo "MkDocs directory missing: target/site/*"
 fi
 
 # JaCoCo coverage report
 if [ -d target/site/jacoco ]; then
   cp -r target/site/jacoco/* "$PAGES_DIR/coverage/"
+else
+  echo "JaCoCo directory missing: target/site/jacoco"
 fi
 
 # Javadoc
 if [ -d target/site/apidocs ]; then
   cp -r target/site/apidocs/* "$PAGES_DIR/javadoc/"
+else
+  echo "Javadoc directory missing: target/site/apidocs"
 fi
 
 # Surefire test reports
 if [ -d target/surefire-reports ]; then
   cp -r target/surefire-reports/* "$PAGES_DIR/tests/"
+else
+  echo "Surefire directory missing: target/surefire-reports"
 fi
 
 echo "GitHub Pages output prepared in $PAGES_DIR/"

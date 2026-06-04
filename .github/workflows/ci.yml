@@ -77,7 +77,18 @@ jobs:
         run: python scripts/ci/jacoco_coverage.py
 
       - name: Generate Javadoc
-        run: mvn javadoc:javadoc -Dquiet=true -Ddoclint=none -Dcheckstyle.skip=true -Dspotless.check.skip=true
+        run: |
+          mvn javadoc:javadoc \
+            -Dquiet=true \
+            -Ddoclint=none \
+            -Dcheckstyle.skip=true \
+            -Dmaven.checkstyle.skip=true \
+            -Dspotless.check.skip=true \
+            -DreportOutputDirectory=target/site
+
+          echo "Checking generated Javadoc folders..."
+          find target -maxdepth 4 -type d | sort | grep -E "apidocs|javadoc|site" || true
+          test -f target/site/apidocs/index.html
 
       - name: Generate Dynamic Build Badge
         uses: schneegans/dynamic-badges-action@v1.7.0
