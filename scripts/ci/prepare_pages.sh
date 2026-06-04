@@ -27,7 +27,7 @@ fi
 if [ -d build/site ]; then
   cp -r build/site/* "$PAGES_DIR/site/"
 else
-  echo "MkDocs directory missing: target/site/*"
+  echo "MkDocs directory missing: build-site"
 fi
 
 # JaCoCo coverage report
@@ -38,7 +38,7 @@ else
 fi
 
 # Javadoc
-if [ -d target/site/apidocs ]; then
+if [ -d target/reports/apidocs ]; then
   cp -r target/reports/apidocs/* "$PAGES_DIR/javadoc/"
 else
   echo "Javadoc directory missing: target/reports/apidocs"
