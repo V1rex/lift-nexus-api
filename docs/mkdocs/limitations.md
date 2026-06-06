@@ -78,7 +78,7 @@ The MVP already considers important dispatching aspects such as forklift capacit
 - forklift battery level
 - charging requirements
 - driver or shift availability
-- equipment compatibility
+- richer equipment compatibility rules
 - blocked or unavailable storage bins
 - congestion and traffic inside the warehouse
 - service times for pickup and drop-off
