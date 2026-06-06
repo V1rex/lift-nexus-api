@@ -1,11 +1,12 @@
 # Lift Nexus API Documentation
 
-Lift Nexus API is a Spring Boot backend MVP for warehouse dispatch optimization.
+[Lift Nexus API](../) is a Spring Boot backend MVP for warehouse dispatch optimization.
 
-It models a simplified warehouse scenario with forklifts, load units, storage bins, and transport orders. The current MVP focuses on static dispatching: creating a warehouse state, starting a one-shot optimization job, and assigning transport orders to forklifts using Timefold Solver.
+It models a simplified warehouse scenario with [Forklifts](domain-model.md#forklifts-), [Load Units](domain-model.md#load-units-), [Storage Bins](domain-model.md#storage-bins-), and [Transport Orders](domain-model.md#transport-orders). The current MVP focuses on [static dispatching](roadmap.md): creating a warehouse state, starting a one-shot optimization job, and assigning transport orders to forklifts using [Timefold](https://docs.timefold.ai/) Solver.
 
 !!! info "Project status"
     This is a portfolio / learning project, not a production warehouse management system yet.
+
 
 ## What this documentation covers
 
@@ -31,7 +32,7 @@ It models a simplified warehouse scenario with forklifts, load units, storage bi
 
     ---
 
-    Explanation of forklifts, load units, storage bins, transport orders, and dispatch jobs.
+    Explanation of Forklifts, Load Units, Storage Bins, Transport Orders, and Dispatch Jobs.
 
     [:octicons-arrow-right-24: Read domain model](domain-model.md)
 
@@ -77,15 +78,15 @@ It models a simplified warehouse scenario with forklifts, load units, storage bi
 
 </div>
 
-## Generated reports
+### Generated reports
 
 These reports are generated from the build pipeline:
 
 - [Interactive API Reference](../api.html)
-- [Test Coverage](../coverage/)
-- [Javadoc](../javadoc/)
-- [Test Results](../tests/)
+- [Jacoco Test Coverage](../coverage/)
+- [Generated Javadoc](../javadoc/)
+- [Surefire Test Results](../tests/)
 
-## Repository
+### Repository
 
 [View the project on GitHub](https://github.com/v1rex/lift-nexus-api)
