@@ -59,7 +59,7 @@ The goal is to experiment with backend architecture and optimization in a realis
 ![JUnit5](https://img.shields.io/badge/JUnit%205-25A162?style=for-the-badge&logoColor=white)
 ![Testcontainers](https://img.shields.io/badge/Testcontainers-092E20?style=for-the-badge&logoColor=white)
 ![Spotless](https://img.shields.io/badge/Spotless-333333?style=for-the-badge&logoColor=white)
-![Checkstyle](https://img.shields.io/badge/Checkstyle-333333?style=for-the-badge&logoColor=white)
+<!--- ![Checkstyle](https://img.shields.io/badge/Checkstyle-333333?style=for-the-badge&logoColor=white) -->
 ![JaCoCo](https://img.shields.io/badge/JaCoCo-4285F4?style=for-the-badge&logoColor=white)
 
 ## Features
