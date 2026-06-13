@@ -31,7 +31,15 @@ jobs:
           python-version: '3.12'
 
       - name: Execute Test Suite with Maven
-        run: mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
+        run: |
+          # Checkstyle is intentionally disabled for the v0.1.0 release.
+          # It will be reintroduced as a proper quality gate in Milestone 2.
+          #
+          # Previous temporary setup:
+          # mvn clean package -Dspotless.check.skip=false -Dcheckstyle.failOnViolation=false
+      
+          mvn clean package \
+            -Dspotless.check.skip=false
         timeout-minutes: 15
 
       - name: Evaluate Build Status
@@ -46,37 +54,27 @@ jobs:
             echo "build_color=red" >> $GITHUB_OUTPUT
           fi
 
-      - name: Calculate Service Javadoc Coverage
-        id: calc-doc-coverage
-        if: always()
-        run: python scripts/ci/javadoc_coverage.py
+      # deactivation the javadoc badge for v0.1.0
+      #- name: Calculate Service Javadoc Coverage
+       # id: calc-doc-coverage
+        #if: always()
+        #run: python scripts/ci/javadoc_coverage.py
 
       - name: Calculate JaCoCo Test Coverage
         id: jacoco-coverage
         if: always()
         run: python scripts/ci/jacoco_coverage.py
 
-      - name: Generate Dynamic Build Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        if: always()
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: 27dc15f2c2aeef4b021fdff63d7ba722
-          filename: lift-nexus-metrics.json
-          label: build
-          message: ${{ steps.build-status.outputs.build_status || 'failing' }}
-          color: ${{ steps.build-status.outputs.build_color || 'red' }}
-
-      - name: Generate Dynamic Doc Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        if: always()
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: 27dc15f2c2aeef4b021fdff63d7ba722
-          filename: lift-nexus-docs.json
-          label: doc coverage
-          message: "${{ steps.calc-doc-coverage.outputs.doc_percentage || '0' }}%"
-          color: ${{ steps.calc-doc-coverage.outputs.doc_color || 'red' }}
+      # - name: Generate Dynamic Doc Badge
+      #   uses: schneegans/dynamic-badges-action@v1.7.0
+      #   if: always()
+      #   with:
+      #     auth: ${{ secrets.GIST_SECRET }}
+      #     gistID: 27dc15f2c2aeef4b021fdff63d7ba722
+      #     filename: lift-nexus-docs.json
+      #     label: doc coverage
+      #     message: "${{ steps.calc-doc-coverage.outputs.doc_percentage || '0' }}%"
+      #     color: ${{ steps.calc-doc-coverage.outputs.doc_color || 'red' }}
 
       - name: Generate Dynamic Test Coverage Badge
         uses: schneegans/dynamic-badges-action@v1.7.0
